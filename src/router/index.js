@@ -1,3 +1,7 @@
+import Admin from "@/views/Admin/admin.vue";
+import CreateUser from "@/views/Admin/manage-user/create-user.vue";
+import EditUser from "@/views/Admin/manage-user/edit-user.vue";
+import ManageUser from "@/views/Admin/manage-user/manage-user.vue";
 import Login from "@/views/Auth/login.vue";
 import Register from "@/views/Auth/register.vue";
 import Dashboard from "@/views/dashboard.vue";
@@ -34,6 +38,32 @@ const routes = [
         name: 'Register',
         component: Register
     },
+
+    // Admin
+    {
+        path: '/admin',
+        name: 'Admin',
+        component: Admin
+    },
+
+     //Manage User
+     {
+        path: '/manage-user',
+        name: 'ManageUser',
+        component: ManageUser
+     },
+
+     {
+        path: '/create-user',
+        name: 'CreateUser',
+        component: CreateUser
+     },
+
+     {
+        path: '/edit-user/:id',
+        name: 'EditUser',
+        component: EditUser
+     },
 ]
 
 const router = createRouter({

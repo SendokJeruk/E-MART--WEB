@@ -89,7 +89,7 @@ export default {
       try {
         const response = await api.post("/auth/register", this.form);
         alert("Registrasi Berhasil! Silakan Login.");
-        this.$router.push("/auth/login");
+        this.$router.push("/login");
       } catch (error) {
         console.error(error);
         alert(error.response?.data?.message || "Registrasi Gagal!");
