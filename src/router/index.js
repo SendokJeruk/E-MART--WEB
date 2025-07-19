@@ -11,6 +11,7 @@ import EditKategori from "@/views/admin/kategori/edit-kategori.vue";
 import Kategori from "@/views/Admin/kategori/kategori.vue";
 import path from "node:path";
 import { createRouter, createWebHistory } from "vue-router";
+import Produk from "@/views/produk/produk.vue";
 
 
 const routes = [
@@ -84,6 +85,13 @@ const routes = [
         name: 'editKategori',
         component: EditKategori
     },
+
+    // Detail Produk
+    {
+        path: '/produk/:id',
+        name: 'Produk',
+        component: Produk
+    }
 ]
 
 const router = createRouter({

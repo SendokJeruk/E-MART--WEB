@@ -126,7 +126,7 @@ const logout = async () => {
   try {
     await api.post('/auth/logout')
     localStorage.removeItem("token")
-    router.push('/auth/login')
+    router.push('/login')
     alert('Logged out successfully!')
   } catch (error) {
     console.error('Logout failed:', error)
