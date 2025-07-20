@@ -11,7 +11,7 @@
 
         <div class="md:flex md:items-center md:gap-12">
           <nav aria-label="Global" class="hidden md:block">
-            <ul class="flex items-center gap-6 text-sm">
+            <ul class="flex items-center gap-6 text-sm inter-font">
               <li><a class="text-gray-500 transition hover:text-gray-500/75" href="#"> About </a></li>
               <li><a class="text-gray-500 transition hover:text-gray-500/75" href="#"> Careers </a></li>
               <li><a class="text-gray-500 transition hover:text-gray-500/75" href="#"> History </a></li>
@@ -54,45 +54,45 @@
   </div>
 
   <div class="relative h-20">
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-    <buttonred class="h-13 w-full flex items-center justify-center navbar-font" label="Go To Storage Page" to="/dashboard" />
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <buttonred class="h-13 w-full flex items-center justify-center navbar-font" label="Go To Storage Page" to="/dashboard" />
+    </div>
   </div>
-</div>
 
-<section id="tentang" class="px-4 py-12">
-      <h2 class="text-3xl font-bold text-center text-[#7D0A0A] mb-8 navbar-font">Kenapa Harus E-Mart?</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-xl shadow-md p-6 text-center navbar-font" data-aos="fade-up" data-aos-delay="200">
-          <h3 class="text-xl font-semibold mb-2 ">🚀 Pengiriman Cepat</h3>
-          <p>Kami memastikan barang sampai dengan aman dan cepat.</p>
+  <section id="tentang" class="px-4 py-12">
+    <h2 class="text-3xl font-bold text-center text-[#7D0A0A] mb-8 navbar-font">Kenapa Harus E-Mart?</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl shadow-md p-6 text-center inter-font" data-aos="fade-up" data-aos-delay="200">
+        <h3 class="text-xl font-semibold mb-2 oswald-font">🚀 Pengiriman Cepat</h3>
+        <p>Kami memastikan barang sampai dengan aman dan cepat.</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6 text-center inter-font" data-aos="fade-up" data-aos-delay="400">
+        <h3 class="text-xl font-semibold mb-2 oswald-font">🔒 Transaksi Aman</h3>
+        <p>Keamanan data dan transaksi Anda adalah prioritas kami.</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6 text-center inter-font" data-aos="fade-up" data-aos-delay="600">
+        <h3 class="text-xl font-semibold mb-2 oswald-font">🎉 Promo Menarik</h3>
+        <p>Dapatkan penawaran spesial setiap hari.</p>
+      </div>
+    </div>
+
+    <div class="mt-12" data-aos="fade-up" data-aos-delay="400">
+      <h3 class="text-2xl font-semibold text-center navbar-font">Apa Kata Pelanggan?</h3>
+      <div class="mt-6 flex flex-col gap-6 max-w-3xl mx-auto">
+        <div class="bg-white rounded-lg shadow-2xl p-4 text-center inter-font">
+          <p class="text-gray-700">"E-Mart adalah toko terbaik! Produk berkualitas, pengiriman cepat!"</p>
+          <p class="font-bold mt-2">- Rizky, Jakarta</p>
         </div>
-        <div class="bg-white rounded-xl shadow-md p-6 text-center navbar-font" data-aos="fade-up" data-aos-delay="400">
-          <h3 class="text-xl font-semibold mb-2">🔒 Transaksi Aman</h3>
-          <p>Keamanan data dan transaksi Anda adalah prioritas kami.</p>
-        </div>
-        <div class="bg-white rounded-xl shadow-md p-6 text-center navbar-font" data-aos="fade-up" data-aos-delay="600">
-          <h3 class="text-xl font-semibold mb-2">🎉 Promo Menarik</h3>
-          <p>Dapatkan penawaran spesial setiap hari.</p>
+        <div class="bg-white rounded-lg shadow-2xl p-4 text-center inter-font">
+          <p class="text-gray-700">"Sangat puas dengan pelayanan E-Mart! 100% recommended!"</p>
+          <p class="font-bold mt-2">- Siti, Bandung</p>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="mt-12" data-aos="fade-up" data-aos-delay="400">
-        <h3 class="text-2xl font-semibold text-center navbar-font">Apa Kata Pelanggan?</h3>
-        <div class="mt-6 flex flex-col gap-6 max-w-3xl mx-auto">
-          <div class="bg-white rounded-lg shadow-2xl p-4 text-center navbar-font">
-            <p class="text-gray-700">"E-Mart adalah toko terbaik! Produk berkualitas, pengiriman cepat!"</p>
-            <p class="font-bold mt-2">- Rizky, Jakarta</p>
-          </div>
-          <div class="bg-white rounded-lg shadow-2xl p-4 text-center navbar-font">
-            <p class="text-gray-700">"Sangat puas dengan pelayanan E-Mart! 100% recommended!"</p>
-            <p class="font-bold mt-2">- Siti, Bandung</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  <footer class="bg-[#7D0A0A] text-white py-6 mt-12 text-center ">
-    <p>&copy; 2025 E-Mart. Semua Hak Dilindungi.</p>
+  <footer class="bg-[#7D0A0A] text-white py-6 mt-12 text-center">
+    <p class="inter-font">&copy; 2025 E-Mart. Semua Hak Dilindungi.</p>
     <div class="mt-2 flex justify-center gap-4 text-sm">
       <a href="#" class="hover:underline navbar-font">Kontak</a>
       <a href="#" class="hover:underline navbar-font">Tentang Kami</a>
@@ -106,16 +106,8 @@ import buttonred from '@/components/button/buttonred.vue';
 import carousel from '@/components/card/carousel.vue';
 
 const imagesA = [
-    '/src/assets/img/carousel/wallpaperflare.com_wallpaper (1).jpg',
-    '/src/assets/img/carousel/wallpaperflare.com_wallpaper (2).jpg',
-    '/src/assets/img/carousel/wallpaperflare.com_wallpaper.jpg'
+  '/src/assets/img/carousel/wallpaperflare.com_wallpaper (1).jpg',
+  '/src/assets/img/carousel/wallpaperflare.com_wallpaper (2).jpg',
+  '/src/assets/img/carousel/wallpaperflare.com_wallpaper.jpg'
 ]
 </script>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
-
-.navbar-font {
-    font-family: 'Righteous', cursive;
-}
-</style>

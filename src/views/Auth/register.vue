@@ -1,16 +1,17 @@
 <template>
   <div class="flex justify-center items-center min-h-screen bg-[#eeeeee]">
     <div class="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-4xl">
+      <!-- Carousel Section -->
       <div v-if="isDesktop" class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4">
         <div class="w-11/12">
           <img :src="images[currentImage]" class="w-full rounded-lg" alt="Carousel Image" />
         </div>
       </div>
 
-
+      <!-- Form Section -->
       <div class="w-full md:w-1/2 bg-[#7d0a0a] p-10 text-white text-center">
-        <h2 class="font-[Righteous] text-2xl mb-6">Register</h2>
-        <form @submit.prevent="registerUser" class="space-y-4">
+        <h2 class="navbar-font text-2xl mb-6">Register</h2>
+        <form @submit.prevent="registerUser" class="space-y-4 inter-font">
           <input
             v-model="form.name"
             type="text"
@@ -42,7 +43,7 @@
 
           <button
             type="submit"
-            class="w-full p-3 bg-white text-[#7d0a0a] border-2 border-[#bf3131] rounded font-bold hover:bg-[#bf3131] hover:text-white hover:border-[#7d0a0a] transition"
+            class="w-full p-3 bg-white text-[#7d0a0a] border-2 border-[#bf3131] rounded font-bold hover:bg-[#bf3131] hover:text-white hover:border-[#7d0a0a] transition oswald-font"
           >
             Register
           </button>
@@ -110,7 +111,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Righteous&display=swap");
-</style>
