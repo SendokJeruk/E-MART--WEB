@@ -6,7 +6,7 @@
       :key="product.id"
       :product="product"
     />
-    <div v-if="filteredProducts.length === 0" class="col-span-full text-center text-gray-500 py-10">
+    <div v-if="filteredProducts.length === 0" class="col-span-full text-center text-gray-500 py-10 oswald-font">
       Tidak ada produk ditemukan.
     </div>
   </div>
