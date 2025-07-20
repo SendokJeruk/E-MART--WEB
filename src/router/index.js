@@ -12,11 +12,12 @@ import Kategori from "@/views/Admin/kategori/kategori.vue";
 import Profile from "@/views/Settings/profil.vue";
 import EditProfil from "@/views/Settings/editprofil.vue";
 import CreateAlamat from "@/views/Alamat/create-alamat.vue";
-import path from "node:path";
-import { createRouter, createWebHistory } from "vue-router";
 import Produk from "@/views/produk/produk.vue";
 import Alamat from "@/views/Alamat/alamat.vue";
-
+import Checkout from "@/views/checkout/checkout.vue";
+import Cart from "@/views/cart/cart.vue";
+import path from "node:path";
+import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
     {
@@ -117,6 +118,18 @@ const routes = [
         path: '/create-alamat',
         name: 'CreateAlamat',
         component: CreateAlamat
+    },
+
+    //Checkout + Cart
+     {
+        path: '/checkout',
+        name: 'checkout',
+        component: Checkout
+    },
+    {
+        path: '/cart',
+        name: 'cart',
+        component: Cart
     },
 ]
 
