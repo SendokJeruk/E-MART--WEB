@@ -9,9 +9,13 @@ import Index from "@/views/index.vue";
 import CreateKategori from "@/views/admin/kategori/create-kategori.vue";
 import EditKategori from "@/views/admin/kategori/edit-kategori.vue";
 import Kategori from "@/views/Admin/kategori/kategori.vue";
+import Profile from "@/views/Settings/profil.vue";
+import EditProfil from "@/views/Settings/editprofil.vue";
+import CreateAlamat from "@/views/Alamat/create-alamat.vue";
 import path from "node:path";
 import { createRouter, createWebHistory } from "vue-router";
 import Produk from "@/views/produk/produk.vue";
+import Alamat from "@/views/Alamat/alamat.vue";
 
 
 const routes = [
@@ -91,7 +95,29 @@ const routes = [
         path: '/produk/:id',
         name: 'Produk',
         component: Produk
-    }
+    },
+
+    // Settings
+    {
+        path: '/profile',
+        name: 'profile',
+        component: Profile
+    },
+    {
+        path: '/edit-profil/:id',
+        name: 'editProfil',
+        component: EditProfil
+    },
+    {
+        path: '/alamat',
+        name: 'alamat',
+        component: Alamat
+    },
+    {
+        path: '/create-alamat',
+        name: 'CreateAlamat',
+        component: CreateAlamat
+    },
 ]
 
 const router = createRouter({

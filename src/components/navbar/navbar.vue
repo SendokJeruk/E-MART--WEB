@@ -52,7 +52,7 @@
               class="absolute end-0 top-12 z-50 w-56 overflow-hidden rounded border border-gray-300 bg-white shadow-sm"
             >
               <router-link
-                to="/profil"
+                to="/profile"
                 class="block px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900"
                 role="menuitem"
               >
