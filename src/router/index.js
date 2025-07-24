@@ -22,6 +22,12 @@ import ManageKategoriProduk from "@/views/seller/managekategori/manage-kategori-
 import CreateKategoriProduk from "@/views/seller/managekategori/create-kategori-produk.vue";
 import EditKategoriProduk from "@/views/seller/managekategori/edit-kategori-produk.vue";
 import Seller from "@/views/seller/seller.vue";
+import ManageProduk from "@/views/seller/manageproduct/manage-produk.vue";
+import CreateProduk from "@/views/seller/manageproduct/create-produk.vue";
+import EditProduk from "@/views/seller/manageproduct/edit-produk.vue";
+import ManageFotoProduk from "@/views/seller/manageproduct/manage-foto-produk.vue";
+import EditFotoProduct from "@/views/seller/manageproduct/edit-foto-product.vue";
+import CreateFotoProduct from "@/views/seller/manageproduct/create-foto-product.vue";
 
 const routes = [
     {
@@ -155,6 +161,38 @@ const routes = [
         path: '/seller',
         name: 'seller',
         component: Seller
+    },
+    //Manage Produk
+    {
+        path: '/manage-produk',
+        name: 'product',
+        component: ManageProduk
+    },
+    {
+        path: '/create-produk',
+        name: 'createproduk',
+        component: CreateProduk
+    },
+    {
+        path: '/edit-produk/:id',
+        name: 'editproduk',
+        component: EditProduk
+    },
+    //Manage Foto Produk
+    {
+        path: '/manage-foto-product',
+        name: 'manageFotoproduct',
+        component: ManageFotoProduk
+    },
+    {
+        path: '/edit-foto-product/:id',
+        name: 'editfotoproduct',
+        component: EditFotoProduct
+    },
+    {
+        path: '/create-foto-product',
+        name: 'createfotoproduct',
+        component: CreateFotoProduct
     },
 ]
 

@@ -31,10 +31,10 @@
 
           <li>
             <router-link
-              to="/manageproduk"
+              to="/manage-produk"
               :class="{
-                'bg-[#7D0A0A]': $route.path !== '/manageproduk',
-                'bg-[#5E0A0A]': $route.path === '/manageproduk'
+                'bg-[#7D0A0A]': $route.path !== '/manage-produk',
+                'bg-[#5E0A0A]': $route.path === '/manage-produk'
               }"
               class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A] oswald-font"
             >
