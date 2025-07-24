@@ -18,6 +18,10 @@ import Checkout from "@/views/checkout/checkout.vue";
 import Cart from "@/views/cart/cart.vue";
 import path from "node:path";
 import { createRouter, createWebHistory } from "vue-router";
+import ManageKategoriProduk from "@/views/seller/managekategori/manage-kategori-produk.vue";
+import CreateKategoriProduk from "@/views/seller/managekategori/create-kategori-produk.vue";
+import EditKategoriProduk from "@/views/seller/managekategori/edit-kategori-produk.vue";
+import Seller from "@/views/seller/seller.vue";
 
 const routes = [
     {
@@ -130,6 +134,27 @@ const routes = [
         path: '/cart',
         name: 'cart',
         component: Cart
+    },
+    //Kategori Produk
+    {
+        path: '/manage-kategori-produk',
+        name: 'managekategoriproduct',
+        component: ManageKategoriProduk
+    },
+    {
+        path: '/create-kategori-produk',
+        name: 'createkategoriproduk',
+        component: CreateKategoriProduk
+    },
+    {
+        path: '/edit-kategori-produk/:id',
+        name: 'editkategoriproduk',
+        component: EditKategoriProduk
+    },
+    {
+        path: '/seller',
+        name: 'seller',
+        component: Seller
     },
 ]
 

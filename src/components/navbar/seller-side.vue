@@ -44,10 +44,10 @@
 
           <li>
             <router-link
-              to="/managekategori"
+              to="/manage-kategori-produk"
               :class="{
-                'bg-[#7D0A0A]': $route.path !== '/managekategori',
-                'bg-[#5E0A0A]': $route.path === '/managekategori'
+                'bg-[#7D0A0A]': $route.path !== '/manage-kategori-produk',
+                'bg-[#5E0A0A]': $route.path === '/manage-kategori-produk'
               }"
               class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A] oswald-font"
             >
