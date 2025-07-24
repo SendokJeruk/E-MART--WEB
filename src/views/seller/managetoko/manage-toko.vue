@@ -38,7 +38,7 @@
                       Hapus
                     </button>
                     <router-link
-                      :to="`/edi-toko/${item.id}`"
+                      :to="`/edit-toko/${item.id}`"
                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded mb-2 ml-3"
                     >
                       Edit
