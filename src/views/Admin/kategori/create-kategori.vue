@@ -28,7 +28,7 @@
   <script setup>
   import { ref, onMounted } from 'vue'
   import api from '@/plugins/axios'
-  import adminside from '@/components/navbar/adminside.vue'
+  import adminside from '@/components/navbar/admin-side.vue'
   
   const form = ref({
     nama_category: '',

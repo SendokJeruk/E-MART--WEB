@@ -123,7 +123,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
-import adminside from '@/components/navbar/adminside.vue'
+import adminside from '@/components/navbar/admin-side.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

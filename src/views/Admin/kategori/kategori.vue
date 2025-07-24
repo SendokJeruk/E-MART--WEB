@@ -83,7 +83,7 @@
   </template>
   
   <script setup>
-  import adminside from '@/components/navbar/adminside.vue';
+  import adminside from '@/components/navbar/admin-side.vue';
   import { ref, onMounted } from 'vue';
   import api from "@/plugins/axios";
   
