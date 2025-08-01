@@ -31,7 +31,6 @@ import CreateFotoProduct from "@/views/seller/manageproduct/create-foto-product.
 import ManageToko from "@/views/seller/managetoko/manage-toko.vue";
 import CreateToko from "@/views/seller/managetoko/create-toko.vue";
 import EditToko from "@/views/seller/managetoko/edit-toko.vue";
-import EditAlamatToko from "@/views/Alamat/edit-alamat-toko.vue";
 
 const routes = [
     {
@@ -213,11 +212,6 @@ const routes = [
         path: '/edit-toko/:id',
         name: 'editToko',
         component: EditToko
-    },
-    {
-        path: '/edit/alamat-toko/:id',
-        name: 'editAlamatToko',
-        component: EditAlamatToko
     },
 ]
 

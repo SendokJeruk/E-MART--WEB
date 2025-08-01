@@ -107,18 +107,6 @@
           </select>
         </div>
 
-        <!-- Alamat: Kode Pos -->
-        <div class="mb-4">
-          <label for="zip_code" class="block mb-1">Kode Pos</label>
-          <input
-            type="text"
-            id="zip_code"
-            v-model="form.zip_code"
-            class="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
-
         <!-- Alamat: Detail -->
         <div class="mb-4">
           <label for="detail_alamat" class="block mb-1">Detail Alamat (Jalan, RT/RW, dsb)</label>
@@ -213,8 +201,8 @@ watch(
     form.value.zip_code
   ],
   () => {
-    const { subdistrict_name, district_name, city_name, province_name, zip_code } = form.value;
-    const parts = [subdistrict_name, district_name, city_name, province_name, zip_code].filter(Boolean);
+    const { subdistrict_name, district_name, city_name, province_name } = form.value;
+    const parts = [subdistrict_name, district_name, city_name, province_name].filter(Boolean);
     form.value.label = parts.join(', ');
     form.value.kode_domestik = '';
     searchResults.value = [];
@@ -308,7 +296,6 @@ const getKelurahan = async () => {
   }
 };
 
-// Cari Kode Domestik
 const cariKodeDomestik = async () => {
   if (!form.value.label) {
     errorMessages.value = { general: 'Lengkapi alamat sebelum mencari kode domestik.' };
@@ -342,8 +329,9 @@ const cariKodeDomestik = async () => {
 
 const pilihAlamatDariDropdown = (event) => {
   const selectedItem = JSON.parse(event.target.value);
-  form.value.kode_domestik = selectedItem.id;
+  form.value.kode_domestik = selectedItem.kode_domestik || selectedItem.id;
   form.value.label = selectedItem.label;
+  form.value.zip_code = selectedItem.zip_code || '';
   searchResults.value = [];
 };
 

@@ -99,17 +99,6 @@
                 </div>
 
                 <div class="mb-4">
-                <label for="zip_code" class="block mb-1">Kode Pos</label>
-                <input
-                    type="text"
-                    id="zip_code"
-                    v-model="form.zip_code"
-                    class="w-full border px-3 py-2 rounded"
-                    required
-                />
-                </div>
-
-                <div class="mb-4">
                 <label for="detail_alamat" class="block mb-1">Detail Alamat (Jalan, RT/RW, dsb)</label>
                 <textarea
                     id="detail_alamat"
@@ -186,8 +175,8 @@ const form = ref({
   no_telp: '',
   kode_domestik: '',
   label: '',
-  province_id: '',             // ⬅️ DIUBAH
-  province_name: '',           // ⬅️ DIUBAH
+  province_id: '',            
+  province_name: '',           
   city_name: '',
   district_name: '',
   subdistrict_name: '',
@@ -204,8 +193,8 @@ watch(
     form.value.zip_code
   ],
   () => {
-    const { subdistrict_name, district_name, city_name, province_name, zip_code } = form.value
-    const parts = [subdistrict_name, district_name, city_name, province_name, zip_code].filter(Boolean)
+    const { subdistrict_name, district_name, city_name, province_name } = form.value
+    const parts = [subdistrict_name, district_name, city_name, province_name].filter(Boolean)
     form.value.label = parts.join(', ')
     form.value.kode_domestik = ''
     searchResults.value = []
@@ -249,7 +238,6 @@ const fetchToko = async () => {
       form.value.district_name = toko.alamat_toko.district_name
       await getKelurahan()
       form.value.subdistrict_name = toko.alamat_toko.subdistrict_name
-      form.value.zip_code = toko.alamat_toko.zip_code
       form.value.detail_alamat = toko.alamat_toko.detail_alamat
     }
   } catch (error) {
@@ -270,14 +258,18 @@ const submitForm = async () => {
     await api.post(`/toko/${route.params.id}`, tokoForm)
 
     const alamatForm = new FormData()
-    alamatForm.append('province_name', form.value.province_name) // ⬅️ DIUBAH
+    alamatForm.append('province_name', form.value.province_name)
     alamatForm.append('city_name', form.value.city_name)
     alamatForm.append('district_name', form.value.district_name)
     alamatForm.append('subdistrict_name', form.value.subdistrict_name)
-    alamatForm.append('zip_code', form.value.zip_code)
     alamatForm.append('detail_alamat', form.value.detail_alamat)
     alamatForm.append('label', form.value.label)
     alamatForm.append('kode_domestik', form.value.kode_domestik)
+
+    if (form.value.zip_code) {
+      alamatForm.append('zip_code', form.value.zip_code)
+    }
+
     alamatForm.append('_method', 'PUT')
 
     await api.post(`/toko/alamat/${route.params.id}`, alamatForm)
@@ -301,11 +293,11 @@ const dapat_Alamat = async () => {
 }
 
 const getKota = async () => {
-  if (form.value.province_id) { // ⬅️ DIUBAH
+  if (form.value.province_id) { 
     try {
       const response = await fetch(
         `https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/regencies/${form.value.province_id}.json`
-      ) // ⬅️ DIUBAH
+      ) 
       if (!response.ok) throw new Error('Gagal load kota')
       cities.value = await response.json()
       districts.value = []
@@ -380,9 +372,10 @@ const cariKodeDomestik = async () => {
 
 const pilihAlamatDariDropdown = (event) => {
   const selectedItem = JSON.parse(event.target.value)
-  form.value.kode_domestik = selectedItem.id
-  form.value.label = selectedItem.label
-  searchResults.value = []
+  form.value.kode_domestik = selectedItem.kode_domestik || selectedItem.id;
+    form.value.label = selectedItem.label;
+    form.value.zip_code = selectedItem.zip_code || '';
+    searchResults.value = [];
 }
 
 onMounted(() => {
