@@ -42,11 +42,6 @@
         </select>
       </div>
 
-      <div>
-        <label class="block mb-1 font-semibold text-gray-700">Kode Pos</label>
-        <input type="text" v-model="form.zip_code" placeholder="Contoh: 40291" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none" />
-      </div>
-
       <div class="flex justify-between items-center">
         <button type="button" @click="cariKodeDomestik" class="bg-blue-600 hover:bg-blue-700 transition text-white font-semibold px-4 py-2 rounded-lg shadow">
           Cari Kode Domestik
@@ -208,7 +203,6 @@ const getKelurahan = async () => {
   }
 };
 
-// Pencarian kode_domestik ke API RajaOngkir dengan label gabungan alamat
 const cariKodeDomestik = async () => {
   if (!form.value.label) {
     errorMessages.value = { general: 'Lengkapi alamat sebelum mencari kode domestik.' };
@@ -229,7 +223,6 @@ const cariKodeDomestik = async () => {
       form.value.kode_domestik = results[0].id;
       searchResults.value = [];
     } else {
-      // Banyak hasil, tampilkan pilihan ke user
       searchResults.value = results;
       form.value.kode_domestik = '';
     }
@@ -243,10 +236,12 @@ const cariKodeDomestik = async () => {
 
 // User pilih alamat dari hasil pencarian
 const pilihAlamat = (item) => {
-  form.value.kode_domestik = item.id;
+  form.value.kode_domestik = item.kode_domestik || item.id;
   form.value.label = item.label;
+  form.value.zip_code = item.zip_code || ''; 
   searchResults.value = [];
 };
+
 
 
 onMounted(() => {

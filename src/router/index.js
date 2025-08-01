@@ -28,6 +28,10 @@ import EditProduk from "@/views/seller/manageproduct/edit-produk.vue";
 import ManageFotoProduk from "@/views/seller/manageproduct/manage-foto-produk.vue";
 import EditFotoProduct from "@/views/seller/manageproduct/edit-foto-product.vue";
 import CreateFotoProduct from "@/views/seller/manageproduct/create-foto-product.vue";
+import ManageToko from "@/views/seller/managetoko/manage-toko.vue";
+import CreateToko from "@/views/seller/managetoko/create-toko.vue";
+import EditToko from "@/views/seller/managetoko/edit-toko.vue";
+import EditAlamatToko from "@/views/Alamat/edit-alamat-toko.vue";
 
 const routes = [
     {
@@ -193,6 +197,27 @@ const routes = [
         path: '/create-foto-product',
         name: 'createfotoproduct',
         component: CreateFotoProduct
+    },
+    //Toko
+    {
+        path: '/manage-toko',
+        name: 'managetoko',
+        component: ManageToko
+    },
+    {
+        path: '/create-toko',
+        name: 'createtoko',
+        component: CreateToko
+    },
+    {
+        path: '/edit-toko/:id',
+        name: 'editToko',
+        component: EditToko
+    },
+    {
+        path: '/edit/alamat-toko/:id',
+        name: 'editAlamatToko',
+        component: EditAlamatToko
     },
 ]
 
