@@ -5,7 +5,6 @@ import ManageUser from "@/views/Admin/manage-user/manage-user.vue";
 import Login from "@/views/Auth/login.vue";
 import Register from "@/views/Auth/register.vue";
 import Dashboard from "@/views/dashboard.vue";
-import Index from "@/views/index.vue";
 import CreateKategori from "@/views/admin/kategori/create-kategori.vue";
 import EditKategori from "@/views/admin/kategori/edit-kategori.vue";
 import Kategori from "@/views/Admin/kategori/kategori.vue";
@@ -31,15 +30,11 @@ import CreateFotoProduct from "@/views/seller/manageproduct/create-foto-product.
 import ManageToko from "@/views/seller/managetoko/manage-toko.vue";
 import CreateToko from "@/views/seller/managetoko/create-toko.vue";
 import EditToko from "@/views/seller/managetoko/edit-toko.vue";
-import EditAlamatToko from "@/views/Alamat/edit-alamat-toko.vue";
+import Settings from "@/views/Settings/settings.vue";
+import ListTransaksi from "@/views/checkout/list-transaksi.vue";
+import TransaksiSelesai from "@/views/checkout/transaksi-selesai.vue";
 
 const routes = [
-    {
-        path: '/',
-        name: 'Home',
-        component: Index
-    },
-
     // Dashboard
 
     {
@@ -114,6 +109,11 @@ const routes = [
 
     // Settings
     {
+        path: '/settings',
+        name: 'Settings',
+        component: Settings
+    },
+    {
         path: '/profile',
         name: 'profile',
         component: Profile
@@ -136,7 +136,7 @@ const routes = [
 
     //Checkout + Cart
      {
-        path: '/checkout',
+        path: '/checkout/:kode',
         name: 'checkout',
         component: Checkout
     },
@@ -215,10 +215,15 @@ const routes = [
         component: EditToko
     },
     {
-        path: '/edit/alamat-toko/:id',
-        name: 'editAlamatToko',
-        component: EditAlamatToko
+        path: '/list-transaksi',
+        name: 'listTransaksi',
+        component: ListTransaksi
     },
+    {
+        path: '/transaksi-selesai',
+        name: 'transaksiSelesai',
+        component: TransaksiSelesai
+    }
 ]
 
 const router = createRouter({

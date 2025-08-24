@@ -1,17 +1,30 @@
 <template>
   <div class="flex justify-center items-center min-h-screen bg-[#eeeeee]">
-    <div class="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-4xl">
+    <div
+      class="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-4xl"
+    >
       <!-- Carousel Section -->
-      <div v-if="isDesktop" class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4">
+      <div
+        v-if="isDesktop"
+        class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4"
+      >
         <div class="w-11/12">
-          <img :src="images[currentImage]" class="w-full rounded-lg" alt="Carousel Image" />
+          <img
+            :src="images[currentImage]"
+            class="w-full rounded-lg"
+            alt="Carousel Image"
+          />
         </div>
       </div>
 
       <!-- Form Section -->
-      <div class="w-full md:w-1/2 bg-[#7d0a0a] p-10 text-white text-center">
+      <div
+        class="w-full md:w-1/2 bg-[#7d0a0a] p-10 text-white text-center flex flex-col justify-center"
+      >
         <h2 class="navbar-font text-2xl mb-6">Register</h2>
+
         <form @submit.prevent="registerUser" class="space-y-4 inter-font">
+          <!-- Input Name -->
           <input
             v-model="form.name"
             type="text"
@@ -19,6 +32,8 @@
             required
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black"
           />
+
+          <!-- Input Email -->
           <input
             v-model="form.email"
             type="email"
@@ -26,6 +41,8 @@
             required
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black"
           />
+
+          <!-- Input Phone -->
           <input
             v-model="form.no_telp"
             type="tel"
@@ -33,6 +50,8 @@
             required
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black"
           />
+
+          <!-- Input Password -->
           <input
             v-model="form.password"
             type="password"
@@ -41,12 +60,22 @@
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black"
           />
 
+          <!-- Password Checklist -->
+          <div v-if="unmetRequirements.length" class="text-xs text-left mt-2 space-y-1">
+            <p v-for="(req, i) in unmetRequirements" :key="i" class="text-white">
+              • {{ req }}
+            </p>
+          </div>
+
+          <!-- Submit Button -->
           <button
             type="submit"
             class="w-full p-3 bg-white text-[#7d0a0a] border-2 border-[#bf3131] rounded font-bold hover:bg-[#bf3131] hover:text-white hover:border-[#7d0a0a] transition oswald-font"
           >
             Register
           </button>
+
+          <!-- Link to Login -->
           <router-link
             to="/login"
             class="block mt-4 text-sm text-[#ead196] hover:underline"
@@ -61,6 +90,7 @@
 
 <script>
 import api from "@/plugins/axios";
+import { showError, showSuccess } from "@/utils/alert";
 
 export default {
   data() {
@@ -79,34 +109,55 @@ export default {
       ],
       currentImage: 0,
       isDesktop: window.innerWidth >= 768,
+      intervalId: null,
+      requirements: [
+        { label: "Minimal 8 karakter", test: (pw) => pw.length >= 8 },
+        { label: "Huruf besar", test: (pw) => /[A-Z]/.test(pw) },
+        { label: "Huruf kecil", test: (pw) => /[a-z]/.test(pw) },
+        { label: "Angka", test: (pw) => /\d/.test(pw) },
+        { label: "Simbol (@, #, $, dll)", test: (pw) => /[!@#$%^&*(),.?\":{}|<>]/.test(pw) },
+      ],
     };
   },
+  computed: {
+    unmetRequirements() {
+      return this.requirements
+        .filter((rule) => !rule.test(this.form.password))
+        .map((rule) => rule.label);
+    },
+  },
   mounted() {
-    setInterval(this.nextImage, 3000);
+    this.intervalId = setInterval(this.nextImage, 3000);
     window.addEventListener("resize", this.checkScreen);
   },
   methods: {
     async registerUser() {
       try {
-        const response = await api.post("/auth/register", this.form);
-        alert("Registrasi Berhasil! Silakan Login.");
+        await api.post("/auth/register", this.form);
+        showSuccess("Registrasi Berhasil! Silakan Login.");
         this.$router.push("/login");
       } catch (error) {
-        console.error(error);
-        alert(error.response?.data?.message || "Registrasi Gagal!");
+        if (error.response && error.response.status === 422) {
+          const errors = error.response.data.errors;
+          let messages = "";
+          for (const key in errors) {
+            messages += errors[key].join("\n") + "\n";
+          }
+          showError(messages);
+        } else {
+          showError("Registrasi Gagal!");
+        }
       }
     },
     nextImage() {
       this.currentImage = (this.currentImage + 1) % this.images.length;
-    },
-    changeImage(index) {
-      this.currentImage = index;
     },
     checkScreen() {
       this.isDesktop = window.innerWidth >= 768;
     },
   },
   beforeUnmount() {
+    clearInterval(this.intervalId);
     window.removeEventListener("resize", this.checkScreen);
   },
 };

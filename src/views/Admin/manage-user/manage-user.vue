@@ -1,7 +1,18 @@
 <template>
   <adminside>
     <div class="p-6 overflow-x-auto">
-      <h1 class="text-3xl font-bold mb-6">User Management</h1>
+      <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold">Manage User</h1>
+
+          <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
+            <div class="flex-1">
+              <p class="text-sm font-bold">{{ user.name }}</p>
+              <p class="text-xs text-gray-600">{{ user.email }}</p>
+            </div>
+            <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
+          </div>
+        </div>
+
       <input
           v-model="searchQuery"
           id="search-query"
@@ -99,6 +110,7 @@ import api from "@/plugins/axios";
 
 
 const users = ref([]);
+const user = ref({});
 const isLoading = ref(true);
 const searchQuery = ref('');
 
@@ -106,6 +118,15 @@ const pagination = ref({
   current_page: 1,
   last_page: 1,
 });
+
+const getProfile = async () => {
+  try {
+    const response = await api.get('/profile')
+    user.value = response.data.data 
+  } catch (error) {
+    console.error('Gagal mengambil profil:', error)
+  }
+}
 
 const getUsers = async (page = 1) => {
   try {
@@ -165,6 +186,7 @@ const deleteUser = async (id) => {
 
 onMounted(() => {
   getUsers(1);
+  getProfile();
 });
 </script>
 

@@ -1,7 +1,19 @@
 <template>
   <sellerside>
     <div class="p-6 overflow-x-auto">
-        <h1 class="text-3xl font-bold mb-6">Manage Foto Produk</h1>
+        
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold">Manage Foto Produk</h1>
+
+          <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
+            <div class="flex-1">
+              <p class="text-sm font-bold">{{ user.name }}</p>
+              <p class="text-xs text-gray-600">{{ user.email }}</p>
+            </div>
+            <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
+          </div>
+        </div>
+
         <router-link
           class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
           to="/create-foto-product"

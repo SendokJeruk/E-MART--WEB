@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen inter-font">
+  <div class="flex h-screen">
     <div
       v-if="isSidebarOpen"
       @click="toggleSidebar"
@@ -14,16 +14,15 @@
         'bg-[#7D0A0A]' 
       ]"
     >
-      <div class="px-4 py-6">
-        <ul class="mt-6 space-y-1">
+      <div class="px-4 py-6 h-full flex flex-col justify-center">
+        <ul class="space-y-1">
+
           <li>
             <router-link
               to="/seller"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/seller',
-                'bg-[#5E0A0A]': $route.path === '/seller'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A] oswald-font"
+              :class="linkClass('/seller')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+              :disabled="!hasToko"
             >
               Home
             </router-link>
@@ -32,11 +31,9 @@
           <li>
             <router-link
               to="/manage-produk"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/manage-produk',
-                'bg-[#5E0A0A]': $route.path === '/manage-produk'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A] oswald-font"
+              :class="linkClass('/manage-produk')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+              :disabled="!hasToko"
             >
               Manage Produk
             </router-link>
@@ -45,11 +42,9 @@
           <li>
             <router-link
               to="/manage-kategori-produk"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/manage-kategori-produk',
-                'bg-[#5E0A0A]': $route.path === '/manage-kategori-produk'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A] oswald-font"
+              :class="linkClass('/manage-kategori-produk')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+              :disabled="!hasToko"
             >
               Manage Kategori Produk
             </router-link>
@@ -58,11 +53,8 @@
           <li>
             <router-link
               to="/manage-toko"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/manage-toko',
-                'bg-[#5E0A0A]': $route.path === '/manage-toko'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A] oswald-font"
+              :class="linkClass('/manage-toko')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
             >
               Manage Toko
             </router-link>
@@ -71,32 +63,14 @@
           <li>
             <router-link
               to="/dashboard"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/dashboard',
-                'bg-[#5E0A0A]': $route.path === '/dashboard'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A] oswald-font"
+              :class="linkClass('/dashboard')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+              :disabled="!hasToko"
             >
               Kembali
             </router-link>
           </li>
         </ul>
-      </div>
-
-      <div class="sticky inset-x-0 bottom-0 border-t border-gray-100 bg-[#7D0A0A]">
-        <a href="#" class="flex items-center gap-2 p-4 hover:bg-BF3131">
-          <img
-            alt=""
-            src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1770&q=80"
-            class="size-10 rounded-full object-cover"
-          />
-          <div class="inter-font">
-            <p class="text-xs">
-              <strong class="block font-medium text-white">{{ email }}</strong>
-              <span class="text-white">{{ userName }}</span>
-            </p>
-          </div>
-        </a>
       </div>
     </div>
 
@@ -114,26 +88,55 @@
   </div>
 </template>
   
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import api from '@/plugins/axios'
-  
-  const userName = ref('')
-  const email = ref('')
-  const isSidebarOpen = ref(false)
-  
-  onMounted(async () => {
-    try {
-      const response = await api.get('/profile')
-      userName.value = response.data.data.name
-      email.value = response.data.data.email
-    } catch (error) {
-      console.log('User not logged in')
-    }
-  })
-  
-  function toggleSidebar() {
-    isSidebarOpen.value = !isSidebarOpen.value
+<script setup>
+import { ref, onMounted } from 'vue'
+import api from '@/plugins/axios'
+import { useRouter, useRoute } from 'vue-router'
+
+const user = ref(null)
+const tokoseller = ref([])
+const hasToko = ref(false)
+const isSidebarOpen = ref(false)
+const router = useRouter()
+
+function linkClass(path) {
+  return [
+    'text-white',
+    router.currentRoute.value.path === path ? 'bg-[#5E0A0A]' : 'bg-[#7D0A0A] hover:bg-[#A61D1D]',
+    !hasToko.value && path !== '/manage-toko' ? 'opacity-50 pointer-events-none' : ''
+  ]
+}
+
+const getProfile = async () => {
+  try {
+    const res = await api.get('/profile')
+    user.value = res.data.data
+    await getToko()
+  } catch (err) {
+    console.log('User not logged in')
   }
-  </script>
-  
+}
+
+const getToko = async () => {
+  try {
+    const res = await api.get('/toko')
+    const alltoko = res.data.data.data
+    tokoseller.value = alltoko.filter(t => t.user_id === user.value.id)
+    hasToko.value = tokoseller.value.length > 0
+
+    if (!hasToko.value && router.currentRoute.value.path !== '/create-toko') {
+      router.push('/create-toko')
+    }
+  } catch (err) {
+    console.error('Gagal ambil toko:', err)
+  }
+}
+
+onMounted(() => {
+  getProfile()
+})
+
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+</script>

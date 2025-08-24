@@ -56,7 +56,6 @@ const getAlamatUser = async () => {
   try {
     const response = await api.get('/alamat');
     alamatUser.value = response.data.data.data;
-    console.log('Alamat User:', alamatUser.value);
   } catch (error) {
     console.error('Error fetching alamat user:', error);
   }

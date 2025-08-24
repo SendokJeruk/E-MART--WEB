@@ -59,7 +59,7 @@
   
   const user = ref({})
   const products = ref([])
-  const categories = ref([]) // Tambahkan ini
+  const categories = ref([]) 
   const ProductSeller = ref([])
   
   const form = ref({

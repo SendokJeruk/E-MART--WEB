@@ -107,18 +107,6 @@
           </select>
         </div>
 
-        <!-- Alamat: Kode Pos -->
-        <div class="mb-4">
-          <label for="zip_code" class="block mb-1">Kode Pos</label>
-          <input
-            type="text"
-            id="zip_code"
-            v-model="form.zip_code"
-            class="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
-
         <!-- Alamat: Detail -->
         <div class="mb-4">
           <label for="detail_alamat" class="block mb-1">Detail Alamat (Jalan, RT/RW, dsb)</label>
@@ -133,34 +121,23 @@
 
         <!-- Cari Kode Domestik -->
         <div class="mb-4 flex items-center space-x-2">
-          <button
-            type="button"
-            @click="cariKodeDomestik"
-            class="bg-yellow-600 text-white px-3 py-2 rounded hover:bg-yellow-700"
-          >
-            Cari Kode Domestik
-          </button>
           <span class="text-sm text-gray-700" v-if="form.kode_domestik">
             Kode: {{ form.kode_domestik }}
           </span>
         </div>
 
-        <div v-if="searchResults.length" class="mb-4">
-          <label for="selectedAlamat" class="block mb-1 font-semibold">Pilih Kode Domestik</label>
-          <select
-            id="selectedAlamat"
-            class="w-full border px-3 py-2 rounded"
-            @change="pilihAlamatDariDropdown($event)"
-          >
-            <option value="" disabled selected>Pilih salah satu alamat</option>
-            <option
+        <div v-if="searchResults.length" class="border rounded p-3 max-h-48 overflow-auto mt-3 bg-gray-50">
+          <p class="mb-2 font-semibold">Pilih alamat yang sesuai:</p>
+          <ul>
+            <li
               v-for="item in searchResults"
               :key="item.id"
-              :value="JSON.stringify(item)"
+              class="cursor-pointer p-2 hover:bg-gray-200 rounded"
+              @click="pilihAlamat(item)"
             >
               {{ item.label }}
-            </option>
-          </select>
+            </li>
+          </ul>
         </div>
 
         <button
@@ -178,13 +155,14 @@
 import { ref, onMounted, watch } from 'vue';
 import Sellerside from '@/components/navbar/seller-side.vue';
 import api from '@/plugins/axios';
+import { showSuccess,showError } from '@/utils/alert';
 
-// Data alamat
 const provinces = ref([]);
 const cities = ref([]);
 const districts = ref([]);
 const subdistricts = ref([]);
 const searchResults = ref([]);
+const showKodeDomestik = ref(false);
 const errorMessages = ref(null);
 const successMessage = ref(null);
 
@@ -216,7 +194,6 @@ watch(
     const { subdistrict_name, district_name, city_name, province_name, zip_code } = form.value;
     const parts = [subdistrict_name, district_name, city_name, province_name, zip_code].filter(Boolean);
     form.value.label = parts.join(', ');
-    form.value.kode_domestik = '';
     searchResults.value = [];
   }
 );
@@ -302,31 +279,40 @@ const getKelurahan = async () => {
       if (!response.ok) throw new Error('Gagal load kelurahan');
       subdistricts.value = await response.json();
       form.value.subdistrict_name = '';
+
+      watch(
+        () => form.value.subdistrict_name,
+        (newVal) => {
+          if (newVal) {
+            setTimeout(() => {
+              cariKodeDomestik();
+            }, 1000);
+          }
+        }
+      );
+
     } catch (error) {
       console.error(error);
+      showError(error.message);
     }
   }
 };
 
-// Cari Kode Domestik
 const cariKodeDomestik = async () => {
-  if (!form.value.label) {
-    errorMessages.value = { general: 'Lengkapi alamat sebelum mencari kode domestik.' };
-    return;
-  }
-  errorMessages.value = null;
-  successMessage.value = null;
+  if (!form.value.label) return;
+
   try {
     const searchQuery = encodeURIComponent(form.value.label);
     const response = await api.get(`/rajaongkir/domestic?search=${searchQuery}`);
     const results = response.data.data || [];
 
     if (results.length === 0) {
-      errorMessages.value = { general: 'Kode domestik tidak ditemukan untuk alamat ini.' };
       form.value.kode_domestik = '';
       searchResults.value = [];
     } else if (results.length === 1) {
-      form.value.kode_domestik = results[0].id;
+      form.value.kode_domestik = results[0].id; 
+      form.value.zip_code = results[0].zip_code || '';
+      console.log(form.value.zip_code);
       searchResults.value = [];
     } else {
       searchResults.value = results;
@@ -334,17 +320,23 @@ const cariKodeDomestik = async () => {
     }
   } catch (err) {
     console.error(err);
-    errorMessages.value = { general: 'Gagal mengambil kode domestik.' };
     form.value.kode_domestik = '';
     searchResults.value = [];
   }
 };
 
-const pilihAlamatDariDropdown = (event) => {
-  const selectedItem = JSON.parse(event.target.value);
-  form.value.kode_domestik = selectedItem.id;
-  form.value.label = selectedItem.label;
+const pilihAlamat = (item) => {
+  form.value.kode_domestik = item.kode_domestik || item.id;
+  form.value.label = item.label;
+  form.value.zip_code = item.zip_code || '';
+
   searchResults.value = [];
+  showSuccess('Alamat berhasil dipilih');
+
+  showKodeDomestik.value = false;
+  setTimeout(() => {
+    showKodeDomestik.value = true;
+  }, 1000);
 };
 
 

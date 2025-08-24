@@ -1,7 +1,19 @@
 <template>
     <sellerside>
       <div class="p-6 overflow-x-auto">
-        <h1 class="text-3xl font-bold mb-6">Manage Produk</h1>
+
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold">Manage Produk</h1>
+
+          <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
+            <div class="flex-1">
+              <p class="text-sm font-bold">{{ user.name }}</p>
+              <p class="text-xs text-gray-600">{{ user.email }}</p>
+            </div>
+            <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
+          </div>
+        </div>
+        
         <router-link
           class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
           to="/create-produk"
@@ -46,7 +58,7 @@
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-            <tr v-for="produk in ProductSeller" :key="produk.id">
+            <tr v-for="produk in product" :key="produk.id">
                 <td class="px-4 py-2 text-sm text-gray-900">{{ produk.nama_product }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 truncate max-w-[200px]">{{ produk.deskripsi }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900">{{ produk.harga }}</td>
@@ -79,13 +91,13 @@
     </sellerside>
   </template>
   
-  <script setup>
+<script setup>
 import sellerside from '@/components/navbar/seller-side.vue';
 import { ref, onMounted } from 'vue';
 import api from "@/plugins/axios";
 
 const product = ref([]);
-const user = ref({})
+const user = ref({});
 const ProductSeller = ref([]);
 
 const deleteProduct = async (id) => {
@@ -94,32 +106,35 @@ const deleteProduct = async (id) => {
 
   try {
     await api.delete(`/product/${id}`);
-    product.value = product.value.filter(product => product.id !== id);
-    alert('product berhasil dihapus.');
+    product.value = product.value.filter(p => p.id !== id);
+    alert('Produk berhasil dihapus.');
     await getProduct();
   } catch (error) {
-    console.error('Gagal menghapus product:', error);
-    alert(error.response?.data?.message || 'Terjadi kesalahan saat menghapus product.');
+    console.error('Gagal menghapus produk:', error);
+    alert(error.response?.data?.message || 'Terjadi kesalahan saat menghapus produk.');
   }
 };
 
 const getProfile = async () => {
-    try {
-      const response = await api.get('/profile')
-      user.value = response.data.data 
-    } catch (error) {
-      console.error('Gagal mengambil profil:', error)
-    }
-  }
-
-  const getProduct = async () => {
   try {
-    const response = await api.get('/product');
+    const response = await api.get('/profile');
+    user.value = response.data.data;
+  } catch (error) {
+    console.error('Gagal mengambil profil:', error);
+  }
+};
+
+const getProduct = async () => {
+  try {
+    const response = await api.get('/product', {
+      params: { myproducts: true }
+    });
+
     if (Array.isArray(response.data.data.data)) {
       product.value = response.data.data.data;
-      ProductSeller.value = product.value.filter(p => p.user_id === user.value.id);
+      console.log("Produk:", product.value);
     } else {
-      console.error("Data Produk tidak berupa array:", response.data.data.data);
+      console.error("Data produk tidak berupa array:", response.data.data);
     }
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -127,27 +142,28 @@ const getProfile = async () => {
 };
 
 onMounted(async () => {
-  await getProfile(); 
-  await getProduct(); 
+  await getProfile();
+  await getProduct();
 });
 </script>
 
-  
-  <style scoped>
+<style scoped>
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+}
+
+@media (max-width: 768px) {
   table {
-    border-collapse: collapse;
+    width: 100%;
+    display: block;
+    overflow-x: auto;
   }
-  
-  th, td {
-    text-align: left;
-  }
-  
-  @media (max-width: 768px) {
-    table {
-      width: 100%;
-      display: block;
-      overflow-x: auto;
-    }
-  }
-  </style>
+}
+</style>
+
   

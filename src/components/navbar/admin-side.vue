@@ -77,22 +77,6 @@
 
         </ul>
       </div>
-
-      <div class="sticky inset-x-0 bottom-0 border-t border-gray-100 bg-[#7D0A0A]">
-        <a href="#" class="flex items-center gap-2 p-4 hover:bg-BF3131">
-          <img
-            alt=""
-            src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1770&q=80"
-            class="size-10 rounded-full object-cover"
-          />
-          <div>
-            <p class="text-xs">
-              <strong class="block font-medium text-white">{{ email }}</strong>
-              <span class="text-white">{{ userName }}</span>
-            </p>
-          </div>
-        </a>
-      </div>
     </div>
 
     <div class="flex-1 p-4 lg:p-8 bg-gray-100 w-full overflow-auto">

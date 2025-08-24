@@ -4,10 +4,10 @@
 
 
 <script>
-import Index from './views/index.vue';
+import Dashboard from './views/dashboard.vue';
 export default {
   components: {
-    Index
+    Dashboard
   }
 };
 </script>

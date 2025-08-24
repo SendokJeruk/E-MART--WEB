@@ -1,7 +1,18 @@
 <template>
   <adminside>
     <div>
-      <h1 class="text-3xl font-bold mb-6">Dashboard Admin</h1>
+      <div class="flex justify-between items-start mb-6">
+        <h1 class="text-2xl font-bold">Dashboard Admin</h1>
+
+        <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
+          <div class="flex-1">
+            <p class="text-sm font-bold">{{ user.name }}</p>
+            <p class="text-xs text-gray-600">{{ user.email }}</p>
+          </div>
+          <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white rounded-2xl shadow p-6 text-center">
           <h2 class="text-xl font-semibold mb-2">Total Pengguna</h2>
@@ -29,6 +40,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const users = ref([])
+const user = ref({})
 const Product = ref([])
 
 const isLoggedIn = ref(false)
@@ -36,6 +48,15 @@ const userName = ref('')
 const userRole = ref('')
 
 const totalUsers = ref(0)
+
+const getProfile = async () => {
+  try {
+    const response = await api.get('/profile')
+    user.value = response.data.data 
+  } catch (error) {
+    console.error('Gagal mengambil profil:', error)
+  }
+}
 
 const getUsers = async () => {
   try {
@@ -90,5 +111,6 @@ onMounted(async () => {
   await checkRoleAndRedirect()
   getUsers()
   getProducts()
+  getProfile()
 })
 </script>

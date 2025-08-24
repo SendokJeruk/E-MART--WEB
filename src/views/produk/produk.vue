@@ -14,27 +14,28 @@
 
         <div v-if="produk.foto && produk.foto.length" class="flex gap-3 flex-wrap">
           <img
-            :src="produk.foto_cover"
-            alt="Cover"
-            class="w-20 h-20 object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
-            @click="changeMainImage(produk.foto_cover)"
-          />
-          <img
-            v-for="(foto, index) in produk.foto"
-            :key="index"
-            :src="foto.foto"
-            alt="Foto Tambahan"
-            class="w-20 h-20 object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
-            @click="changeMainImage(foto.foto)"
-          />
+          :src="produk.foto_cover"
+          alt="Cover"
+          class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
+          @click="changeMainImage(produk.foto_cover)"
+        />
+
+        <img
+          v-for="(foto, index) in produk.foto"
+          :key="index"
+          :src="foto.foto"
+          alt="Foto Tambahan"
+          class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
+          @click="changeMainImage(foto.foto)"
+        />
         </div>
       </div>
 
       <div class="flex flex-col space-y-6">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-1">{{ produk.nama_product }}</h1>
-          <div class="text-sm text-gray-500 mb-2">{{ produk.user.toko.nama_toko }}</div>
-          <p class="text-2xl font-bold text-red-600">Rp {{ formatRupiah(produk.harga) }}</p>
+          <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1">{{ produk.nama_product }}</h1>
+          <div class="text-sm text-[#7D0A0A] mb-2">{{ produk.user.toko.nama_toko }}</div>
+          <p class="text-2xl font-bold text-[#7D0A0A]">Rp {{ formatRupiah(produk.harga) }}</p>
         </div>
 
         <div class="text-sm text-yellow-700 font-medium">
@@ -44,49 +45,56 @@
         <div class="flex items-center flex-wrap gap-4">
           <form @submit.prevent="formTransaction">
             <button
-              class="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+              class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
             >
               Beli Sekarang
             </button>
           </form>
 
           <button
-            class="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+            class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
             @click="handleAddToCart"
           >
             + Keranjang
           </button>
 
-          <div class="flex items-center gap-2 border rounded-lg px-3 py-1">
+          <div class="flex items-center gap-2 rounded-lg px-3 py-1">
             <button class="text-xl font-bold" @click="decreaseQuantity">-</button>
-            <span class="text-lg font-semibold">{{ produk.quantity }}</span>
-            <button class="text-xl font-bold" @click="increaseQuantity">+</button>
+            <input type="number" min="1" v-model="produk.quantity" class="text-lg font-semibold border rounded px-2 py-1 w-20"/>            <button class="text-xl font-bold" @click="increaseQuantity">+</button>
           </div>
         </div>
 
         <div>
-          <h2 class="text-lg font-semibold text-gray-800 mb-2">Deskripsi Produk</h2>
+          <h2 class="text-lg font-semibold text-[#7D0A0A] mb-2">Deskripsi Produk</h2>
           <p class="text-gray-700 text-sm whitespace-pre-wrap">
             <span v-if="!readMore">
               {{ produk.deskripsi.slice(0, 100) }}...
               <br />
-              <button @click="readMore = true" class="text-blue-600 underline mt-2">Baca selengkapnya</button>
+              <button @click="readMore = true" class="text-[#7D0A0A] underline mt-2">Baca selengkapnya</button>
             </span>
             <span v-else>
               {{ produk.deskripsi }}
               <br />
-              <button @click="readMore = false" class="text-blue-600 underline mt-2">Tutup</button>
+              <button @click="readMore = false" class="text-[#7D0A0A] underline mt-2">Tutup</button>
             </span>
           </p>
         </div>
       </div>
     </div>
   </div>
+  <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4 p-4">
+  <product
+      v-for="product in products"
+      :key="product.id"
+      :product="product"
+    />
+  </div>
 </template>
 
 <script setup>
 import Navbar from '@/components/navbar/navbar.vue';
-import { ref, onMounted } from 'vue';
+import product from '@/components/card/product.vue'
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from "@/plugins/axios";
 
@@ -94,23 +102,54 @@ const route = useRoute();
 const router = useRouter();
 
 const produk = ref(null);
+const products = ref([]);
 const readMore = ref(false);
+const kodeTransaksi = ref(route.params.kode || "");
+
+const fetchProducts = async () => {
+  try {
+    const response = await api.get("/product", {
+      params: {
+        status: 'publish'
+      }
+    })
+
+    if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
+      products.value = response.data.data.data.sort(() => Math.random() - 0.5)
+    } else {
+      console.error("Expected an array but got:", typeof response.data.data)
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error)
+  }
+}
 
 const getProductById = async () => {
-  try {
-    const response = await api.get('/product');
-    const allProducts = response.data.data.data;
-    const id = parseInt(route.params.id); 
+  const id = parseInt(route.params.id);
+  let page = 1;
+  let found = null;
 
-    const found = allProducts.find(p => p.id === id);
-    if (found) {
-      produk.value = {
-        ...found,
-        selectedImage: found.foto_cover,
-        quantity: 1
-      };
-    } else {
-      console.error('Produk tidak ditemukan');
+  try {
+    while (true) {
+      const response = await api.get(`/product?page=${page}`);
+      const products = response.data.data.data;
+
+      found = products.find(p => p.id === id);
+      if (found) {
+        produk.value = {
+          ...found,
+          selectedImage: found.foto_cover,
+          quantity: 1
+        };
+        break;
+      }
+
+      if (products.length < 10) {
+        console.error('Produk tidak ditemukan di semua halaman');
+        break;
+      }
+
+      page++; 
     }
   } catch (error) {
     console.error('Gagal mengambil produk:', error);
@@ -155,7 +194,7 @@ const formTransaction = async () => {
 
     const response = await api.post('/transaction', payload);
     await formDetailTransaction(response.data.data.id);
-    router.push(`/checkout`);
+    router.push(`/list-transaksi`);
   } catch (error) {
     console.error('Gagal transaksi:', error);
   }
@@ -219,5 +258,6 @@ const handleAddToCart = async () => {
 
 onMounted(() => {
   getProductById();
+  fetchProducts();
 });
 </script>
