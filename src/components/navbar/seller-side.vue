@@ -91,7 +91,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const user = ref(null)
 const tokoseller = ref([])
@@ -111,9 +111,21 @@ const getProfile = async () => {
   try {
     const res = await api.get('/profile')
     user.value = res.data.data
-    await getToko()
+    const role = user.value.nama_role
+
+    if (role === 'admin') {
+      router.push('/admin')
+      return
+    }
+    if (role === 'buyer') {
+      router.push('/dashboard')
+      return
+    }
+    if (role === 'seller') {
+      await getToko()
+    }
   } catch (err) {
-    console.log('User not logged in')
+    router.push('/auth/login')
   }
 }
 
@@ -127,9 +139,7 @@ const getToko = async () => {
     if (!hasToko.value && router.currentRoute.value.path !== '/create-toko') {
       router.push('/create-toko')
     }
-  } catch (err) {
-    console.error('Gagal ambil toko:', err)
-  }
+  } catch (err) {}
 }
 
 onMounted(() => {

@@ -5,7 +5,7 @@
 
     <div class="bg-white rounded-lg shadow p-4">
       <h3 class="font-semibold mb-3">Alamat Pengiriman</h3>
-      <select v-model="selectedAlamat" class="border rounded p-2 w-full text-sm">
+      <select v-model="selectedAlamat" class="border rounded p-2 w-full text-sm" @change="handleAlamatChange">
         <option disabled value="">Pilih Alamat</option>
         <option 
           v-for="alamat in alamatList" 
@@ -14,8 +14,10 @@
         >
           {{ alamat.label }}
         </option>
+        <option value="create">+ Tambah Alamat Baru</option>
       </select>
     </div>
+
 
     <div v-if="checkout.length" class="space-y-5">
       <div
@@ -120,16 +122,17 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import { useRoute } from 'vue-router'; 
+import { useRoute,useRouter } from 'vue-router'; 
 import Navbar from '@/components/navbar/navbar.vue';
 import api from '@/plugins/axios';
 
+const router = useRouter()
 const route = useRoute();
-const checkout = ref([]); // daftar produk di transaksi
+const checkout = ref([]); 
 const kodeTransaksi = ref(route.params.kode || ""); 
-const alamatList = ref([]); // daftar alamat user
-const selectedAlamat = ref(""); // alamat yg dipilih user
-const kodeDomestikList = ref([]); // daftar kode_domestik toko
+const alamatList = ref([]); 
+const selectedAlamat = ref(""); 
+const kodeDomestikList = ref([]); 
 const biayaPengiriman = ref(0);
 
 const kurirList = [
@@ -273,6 +276,12 @@ const checkoutCart = async () => {
     console.error(error);
   }
 };
+
+const handleAlamatChange = () => {
+  if (selectedAlamat.value === "create") {
+    router.push("/create-alamat")
+  }
+}
 
 const postRajaOngkir = async (group) => {
   console.log("=== postRajaOngkir start ===");

@@ -99,7 +99,7 @@ const checkRoleAndRedirect = async () => {
     userName.value = response.data.data.name
     userRole.value = role
 
-    if (role === 'seller' || role === 'user') {
+    if (role === 'seller' || role === 'buyer') {
   router.push('/dashboard')
 }
   } catch (error) {

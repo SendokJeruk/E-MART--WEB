@@ -33,6 +33,8 @@ import EditToko from "@/views/seller/managetoko/edit-toko.vue";
 import Settings from "@/views/Settings/settings.vue";
 import ListTransaksi from "@/views/checkout/list-transaksi.vue";
 import TransaksiSelesai from "@/views/checkout/transaksi-selesai.vue";
+import History from "@/views/checkout/history.vue";
+import Toko from "@/views/toko/toko.vue";
 
 const routes = [
     // Dashboard
@@ -223,6 +225,17 @@ const routes = [
         path: '/transaksi-selesai',
         name: 'transaksiSelesai',
         component: TransaksiSelesai
+    },
+    {
+        path: '/history-transaksi',
+        name: 'historyTransaksi',
+        component: History
+    },
+    //Toko
+    {
+        path: '/toko/:nama_toko',
+        name: 'toko',
+        component: Toko
     }
 ]
 

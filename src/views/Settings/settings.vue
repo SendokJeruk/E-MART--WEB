@@ -30,6 +30,12 @@
                 <span>&gt;</span>
             </li>
         </router-link>
+        <router-link to="/history-transaksi" class="block">
+            <li class="bg-white px-5 py-4 flex justify-between items-center hover:bg-[#FCE8E8] transition">
+                <span>History Transaksi</span>
+                <span>&gt;</span>
+            </li>
+        </router-link>
       </ul>
     </section>
   </main>

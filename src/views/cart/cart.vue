@@ -3,7 +3,7 @@
   <div class="p-4 min-h-screen bg-[#FFFFFF]">
     <h1 class="text-2xl font-bold navbar-font mb-4">| Keranjang</h1>
 
-    <div v-if="cart && cart.cart_detail.length" class="space-y-4">
+    <div v-if="cart?.cart_detail?.length" class="space-y-4">
       <div
         v-for="item in cart.cart_detail"
         :key="item.id"
@@ -106,7 +106,6 @@ import router from '@/router'
 import { showSuccess, showError, showConfirm } from '@/utils/alert' 
 
 const cart = ref(null)
-const allProducts = ref([])
 let updateTimeout = null 
 
 const formatRupiah = (value) => {
@@ -116,33 +115,23 @@ const formatRupiah = (value) => {
   }).format(value)
 }
 
-const getAllProducts = async () => {
-  try {
-    const response = await api.get('/product')
-    allProducts.value = response.data.data.data
-  } catch (error) {
-    showError('Gagal mengambil semua produk')
-    console.error(error)
-  }
-}
-
 const getCart = async () => {
   try {
     const response = await api.get('/cart')
-    if (response.data.data.length > 0) {
-      const cartData = response.data.data[0]
-      for (const item of cartData.cart_detail) {
-        const found = allProducts.value.find(p => p.id === item.product_id)
-        item.product = found || null
-        console.log(item.product)
-      }
-      cart.value = cartData
+    const data = response.data.data
+
+    if (Array.isArray(data)) {
+      cart.value = data[0] || { cart_detail: [], total_harga: 0 }
+    } else {
+      cart.value = data || { cart_detail: [], total_harga: 0 }
     }
+
   } catch (error) {
     showError('Gagal mengambil data keranjang')
     console.error(error)
   }
 }
+
 
 const onQuantityChange = (item) => {
   if (item.jumlah < 1) item.jumlah = 1
@@ -195,10 +184,11 @@ const checkoutCart = async () => {
     const confirmed = await showConfirm('Yakin ingin melakukan checkout?')
     if (!confirmed) return
 
-    await api.post('/checkout')
+    const response = await api.post('/checkout')
+    console.log(response)
     showSuccess('Checkout berhasil!')
     cart.value = null
-    router.push('/list-transaksi')
+    router.push('/checkout/'+response.data.data.kode_transaksi)
   } catch (error) {
     showError('Checkout gagal, coba lagi.')
     console.error(error)
@@ -220,7 +210,6 @@ const deleteProductcart = async (cartDetailId) => {
 }
 
 onMounted(async () => {
-  await getAllProducts()
   await getCart()
 })
 </script>

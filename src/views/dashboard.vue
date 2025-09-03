@@ -80,7 +80,6 @@ const checkRoleAndRedirect = async () => {
   }
 }
 
-
 const fetchProducts = async (page = 1) => {
   try {
     isLoading.value = true

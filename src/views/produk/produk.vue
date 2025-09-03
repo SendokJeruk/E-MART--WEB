@@ -34,7 +34,12 @@
       <div class="flex flex-col space-y-6">
         <div>
           <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1">{{ produk.nama_product }}</h1>
-          <div class="text-sm text-[#7D0A0A] mb-2">{{ produk.user.toko.nama_toko }}</div>
+          <router-link 
+            :to="{ name: 'toko', params: { nama_toko: produk.user.toko.nama_toko } }" 
+            class="text-sm text-[#7D0A0A] mb-2 hover:underline cursor-pointer"
+          >
+            {{ produk.user.toko.nama_toko }}
+          </router-link>
           <p class="text-2xl font-bold text-[#7D0A0A]">Rp {{ formatRupiah(produk.harga) }}</p>
         </div>
 
@@ -82,7 +87,7 @@
       </div>
     </div>
   </div>
-  <div class="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4 p-4">
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-4 p-4">
   <product
       v-for="product in products"
       :key="product.id"

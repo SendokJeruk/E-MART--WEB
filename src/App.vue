@@ -1,13 +1,14 @@
 <template>
+  <loader />
   <router-view />
 </template>
 
 
 <script>
-import Dashboard from './views/dashboard.vue';
+import loader from './Loader.vue';
 export default {
   components: {
-    Dashboard
+    loader
   }
 };
 </script>

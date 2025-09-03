@@ -42,19 +42,6 @@
             </router-link>
           </li>
 
-          <!-- <li>
-            <router-link
-              to="/role"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/role',
-                'bg-[#5E0A0A]': $route.path === '/role'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
-            >
-              Manage Role
-            </router-link>
-          </li> -->
-
           <li>
             <router-link
               to="/kategori"
@@ -64,7 +51,7 @@
               }"
               class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
             >
-              Manage kategori
+              Manage Kategori
             </router-link>
           </li>
 
@@ -101,6 +88,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const userName = ref('')
 const email = ref('')
+const userRole = ref('')
 const isSidebarOpen = ref(false)
 
 const logout = async () => {
@@ -118,14 +106,18 @@ const logout = async () => {
   }
 }
 
-
 onMounted(async () => {
   try {
     const response = await api.get('/profile')
     userName.value = response.data.data.name
     email.value = response.data.data.email
+    userRole.value = response.data.data.nama_role
+
+    if (userRole.value === 'seller' || userRole.value === 'buyer') {
+      router.push('/dashboard')
+    }
   } catch (error) {
-    console.log('User not logged in')
+    router.push('/auth/login')
   }
 })
 

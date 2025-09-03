@@ -2,7 +2,7 @@
   <header class="bg-[#BF3131] shadow-md">
     <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-4 py-4">
-        <router-link to="/">
+        <router-link to="/dashboard">
           <img src="@/assets/img/LOGO E-MART APP.png" alt="Logo" class="h-10 sm:h-14 w-auto object-contain" />
         </router-link>
 
@@ -79,6 +79,7 @@ const logout = async () => {
     userName.value = ''
     userRole.value = ''
     alert('Logged out successfully!')
+    router.push('/login')
   } catch (error) {
     alert('Logout failed, please try again.')
   }

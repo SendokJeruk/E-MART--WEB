@@ -27,10 +27,10 @@
               <p class="text-xs text-gray-500">Harga: Rp {{ formatRupiah(item.harga) }}</p>
             </div>
             <button
-              @click="deleteProductscheckout(trx.id)"
+              @click="deleteProductscheckout(trx.kode_transaksi)"
               class="text-red-500 text-xs"
             >
-              ✕
+              Hapus Transaksi
             </button>
           </div>
         </div>
@@ -66,19 +66,17 @@ import api from '@/plugins/axios';
 const route = useRoute();
 const transaksiList = ref([]);
 
-// Ambil semua transaksi
 const getTransaksi = async () => {
   try {
     const response = await api.get('/transaction');
-    const allData = response.data.data.data;
+    const allData = response.data?.data?.data ?? []; 
     transaksiList.value = allData;
-    console.log("Semua transaksi:", transaksiList.value);
   } catch (error) {
     console.error('Gagal mengambil data transaksi:', error);
   }
 };
 
-// Format angka ke Rupiah
+
 const formatRupiah = (value) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -86,16 +84,15 @@ const formatRupiah = (value) => {
   }).format(value).replace("Rp", "").trim();
 };
 
-const deleteProductscheckout = async (trxId) => {
+const deleteProductscheckout = async (kodeTransaksi) => {
   if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
   try {
-    await api.delete(`/transaction/${trxId}`);
+    await api.delete(`/transaction/${kodeTransaksi}`);
     await getTransaksi();
   } catch (error) {
     console.error('Gagal menghapus transaksi:', error);
   }
 };
-
 
 onMounted(() => {
   getTransaksi();
