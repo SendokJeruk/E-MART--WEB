@@ -13,7 +13,6 @@
         </div>
       </div>
 
-
       <router-link
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
         to="/create-kategori-produk"
@@ -28,33 +27,28 @@
         <table class="min-w-full table-fixed divide-y divide-gray-200">
           <thead class="bg-gray-200">
             <tr>
-              <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Nama Produk</th>
+              <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Produk</th>
               <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Kategori</th>
-              <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr v-for="item in ProductSeller" :key="item.id">
-              <td class="px-4 py-2 text-sm text-gray-900">{{ item.nama_product }}</td>
+            <tr v-for="produk in groupedProducts" :key="produk.id">
+              <td class="px-4 py-2 text-sm text-gray-900">{{ produk.nama }}</td>
               <td class="px-4 py-2 text-sm text-gray-900">
-                <ul>
-                  <li v-for="category in item.categories" :key="category.id">{{ category.nama_category }}</li>
-                </ul>
-              </td>
-              <td class="px-4 py-2 text-sm text-gray-900">
-                <div v-for="category in item.categories" :key="category.id">
-                  <button
-                    @click="deleteCategoryProduct(item.id, category.id)"
-                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded mb-2 ml-3"
+                <div class="flex gap-2 flex-wrap">
+                  <span 
+                    v-for="kategori in produk.categories" 
+                    :key="kategori.id"
+                    class="px-2 py-1 bg-gray-200 text-sm rounded flex items-center gap-1"
                   >
-                    Hapus
-                  </button>
-                  <router-link
-                    :to="`/edit-kategori-produk/${item.id}`"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded mb-2 ml-3"
-                  >
-                    Edit
-                  </router-link>
+                    {{ kategori.nama }}
+                    <button 
+                      @click="deleteCategoryProduct(kategori.pivotId)" 
+                      class="text-red-600 hover:underline text-xs ml-1"
+                    >
+                      ✕
+                    </button>
+                  </span>
                 </div>
               </td>
             </tr>
@@ -67,13 +61,13 @@
 
 <script setup>
 import sellerside from '@/components/navbar/seller-side.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from "@/plugins/axios";
 
-const product = ref([]);
 const user = ref({});
-const ProductSeller = ref([]);
+const categoryProducts = ref([]);
 
+// ambil profile
 const getProfile = async () => {
   try {
     const response = await api.get('/profile');
@@ -83,25 +77,45 @@ const getProfile = async () => {
   }
 };
 
-const getProduct = async () => {
+// ambil data pivot
+const getCategoryProduct = async () => {
   try {
-    const response = await api.get('/product');
-    const allProducts = response.data.data.data;
-    product.value = allProducts;
-    ProductSeller.value = allProducts.filter(p => p.user_id === user.value.id);
+    const response = await api.get('/category-product');
+    categoryProducts.value = response.data.data.data; 
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('Error fetching category product:', error);
   }
 };
 
-const deleteCategoryProduct = async (productId, categoryId) => {
+// transform → group by product
+const groupedProducts = computed(() => {
+  const map = {};
+  categoryProducts.value.forEach(item => {
+    const p = item.product;
+    if (!map[p.id]) {
+      map[p.id] = {
+        id: p.id,
+        nama: p.nama_product,
+        categories: []
+      };
+    }
+    map[p.id].categories.push({
+      id: item.category.id,
+      nama: item.category.nama_category,
+      pivotId: item.id
+    });
+  });
+  return Object.values(map);
+});
+
+const deleteCategoryProduct = async (id) => {
   const konfirmasi = confirm('Yakin ingin menghapus kategori ini dari produk ini?');
   if (!konfirmasi) return;
 
   try {
-    await api.delete(`/category-product/${productId}/${categoryId}`);
-    await getProduct();
-    alert('Kategori berhasil dihapus dari produk.');
+    await api.delete(`/category-product/${id}`);
+    await getCategoryProduct();
+    alert('Kategori berhasil dihapus.');
   } catch (error) {
     console.error('Gagal menghapus kategori dari produk:', error);
     alert(error.response?.data?.message || 'Terjadi kesalahan.');
@@ -110,6 +124,6 @@ const deleteCategoryProduct = async (productId, categoryId) => {
 
 onMounted(async () => {
   await getProfile();
-  await getProduct();
+  await getCategoryProduct();
 });
 </script>

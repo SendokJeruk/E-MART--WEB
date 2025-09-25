@@ -98,7 +98,6 @@ import api from "@/plugins/axios";
 
 const product = ref([]);
 const user = ref({});
-const ProductSeller = ref([]);
 
 const deleteProduct = async (id) => {
   const konfirmasi = confirm('Yakin ingin menghapus Produk ini?');
@@ -126,18 +125,24 @@ const getProfile = async () => {
 
 const getProduct = async () => {
   try {
-    const response = await api.get('/product', {
+    const response = await api.get('/product/myproducts', {
       params: { myproducts: true }
     });
 
-    if (Array.isArray(response.data.data.data)) {
+    console.log("Response:", response.data);
+
+    // kalau ada field data dan isinya array
+    if (response.data.data && Array.isArray(response.data.data.data)) {
       product.value = response.data.data.data;
       console.log("Produk:", product.value);
     } else {
-      console.error("Data produk tidak berupa array:", response.data.data);
+      // fallback kalau kosong
+      product.value = [];
+      console.warn("Tidak ada produk:", response.data.message || "No Data");
     }
   } catch (error) {
     console.error('Error fetching product:', error);
+    product.value = [];
   }
 };
 

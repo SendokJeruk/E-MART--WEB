@@ -17,28 +17,36 @@ import Checkout from "@/views/checkout/checkout.vue";
 import Cart from "@/views/cart/cart.vue";
 import path from "node:path";
 import { createRouter, createWebHistory } from "vue-router";
-import ManageKategoriProduk from "@/views/seller/managekategori/manage-kategori-produk.vue";
-import CreateKategoriProduk from "@/views/seller/managekategori/create-kategori-produk.vue";
-import EditKategoriProduk from "@/views/seller/managekategori/edit-kategori-produk.vue";
+import ManageKategoriProduk from "@/views/seller/manage-kategori/manage-kategori-produk.vue";
+import CreateKategoriProduk from "@/views/seller/manage-kategori/create-kategori-produk.vue";
+import EditKategoriProduk from "@/views/seller/manage-kategori/edit-kategori-produk.vue";
 import Seller from "@/views/seller/seller.vue";
-import ManageProduk from "@/views/seller/manageproduct/manage-produk.vue";
-import CreateProduk from "@/views/seller/manageproduct/create-produk.vue";
-import EditProduk from "@/views/seller/manageproduct/edit-produk.vue";
-import ManageFotoProduk from "@/views/seller/manageproduct/manage-foto-produk.vue";
-import EditFotoProduct from "@/views/seller/manageproduct/edit-foto-product.vue";
-import CreateFotoProduct from "@/views/seller/manageproduct/create-foto-product.vue";
-import ManageToko from "@/views/seller/managetoko/manage-toko.vue";
-import CreateToko from "@/views/seller/managetoko/create-toko.vue";
-import EditToko from "@/views/seller/managetoko/edit-toko.vue";
+import ManageProduk from "@/views/seller/manage-product/manage-produk.vue";
+import CreateProduk from "@/views/seller/manage-product/create-produk.vue";
+import EditProduk from "@/views/seller/manage-product/edit-produk.vue";
+import ManageFotoProduk from "@/views/seller/manage-product/manage-foto-produk.vue";
+import EditFotoProduct from "@/views/seller/manage-product/edit-foto-product.vue";
+import CreateFotoProduct from "@/views/seller/manage-product/create-foto-product.vue";
+import ManageToko from "@/views/seller/manage-toko/manage-toko.vue";
+import CreateToko from "@/views/seller/manage-toko/create-toko.vue";
+import EditToko from "@/views/seller/manage-toko/edit-toko.vue";
 import Settings from "@/views/Settings/settings.vue";
 import ListTransaksi from "@/views/checkout/list-transaksi.vue";
 import TransaksiSelesai from "@/views/checkout/transaksi-selesai.vue";
 import History from "@/views/checkout/history.vue";
 import Toko from "@/views/toko/toko.vue";
+import RequestSeller from "@/views/Settings/request-seller.vue";
+import ManageRequest from "@/views/Admin/manage-request/manage-request.vue";
+import Track from "@/views/checkout/track.vue";
+import SettingsAdmin from "@/views/Admin/settings/settings-admin.vue";
+import ManagePengiriman from "@/views/seller/manage-pengiriman/manage-pengiriman.vue";
 
 const routes = [
     // Dashboard
-
+    {
+        path: '/',
+        redirect: '/dashboard' 
+    },
     {
         path: '/dashboard',
         name: 'Dashboard',
@@ -236,9 +244,34 @@ const routes = [
         path: '/toko/:nama_toko',
         name: 'toko',
         component: Toko
+    },
+    //Pengajuan Seller
+    {
+        path: '/pengajuan-seller',
+        name: 'pengajuanSeller',
+        component: RequestSeller
+    },
+    {
+        path: '/manage-request',
+        name: 'manageRequest',
+        component: ManageRequest
+    },
+    {
+        path: '/track-order/:id',
+        name: 'trackOrder',
+        component: Track
+    },
+    {
+        path: '/settings-admin',
+        name: 'settingsAdmin',
+        component: SettingsAdmin
+    },
+    {
+        path: '/manage-pengiriman/',
+        name: 'managePengiriman',
+        component: ManagePengiriman
     }
 ]
-
 const router = createRouter({
     history: createWebHistory(),
     routes

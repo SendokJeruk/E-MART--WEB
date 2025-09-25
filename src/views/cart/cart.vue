@@ -9,6 +9,14 @@
         :key="item.id"
         class="flex items-center bg-white rounded-2xl shadow-md p-4 border border-gray-200"
       >
+        <!-- ✅ Checkbox -->
+        <input
+          type="checkbox"
+          v-model="selectedIds"
+          :value="item.id"
+          class="mr-3 w-5 h-5 text-[#BF3131] border-gray-300 rounded"
+        />
+
         <img
           :src="item.product?.foto_cover || 'https://via.placeholder.com/100'"
           alt="Produk"
@@ -74,20 +82,18 @@
         class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 px-4 py-3 flex justify-end items-center space-x-4 shadow-md"
       >
         <div class="flex items-center pr-4 border-r border-gray-300">
+          <!-- ✅ Ganti total pakai selectedTotal -->
           <span class="font-bold text-lg">
-            Total : Rp {{ formatRupiah(cart.total_harga) }}
+            Total : Rp {{ formatRupiah(selectedTotal) }}
           </span>
         </div>
 
+        <!-- ✅ Tombol checkout -->
         <button
           class="bg-[#BF3131] hover:bg-[#a32727] text-white px-6 py-2 rounded-md font-semibold"
-          @click="checkoutCart"
+          @click="checkoutSelected"
         >
           Checkout
-        </button>
-
-        <button class="bg-gray-200 px-4 py-2 rounded-md text-sm">
-          Voucher <span class="font-bold">0</span>
         </button>
       </div>
     </div>
@@ -99,14 +105,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '@/plugins/axios'
 import Navbar from '@/components/navbar/navbar.vue'
 import router from '@/router'
-import { showSuccess, showError, showConfirm } from '@/utils/alert' 
+import { showSuccess, showError, showConfirm } from '@/utils/alert'
 
 const cart = ref(null)
-let updateTimeout = null 
+const selectedIds = ref([])
+let updateTimeout = null
 
 const formatRupiah = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -114,6 +121,14 @@ const formatRupiah = (value) => {
     minimumFractionDigits: 0,
   }).format(value)
 }
+
+// ✅ Hitung total harga dari item yang dicentang
+const selectedTotal = computed(() => {
+  if (!cart.value?.cart_detail) return 0
+  return cart.value.cart_detail
+    .filter(item => selectedIds.value.includes(item.id))
+    .reduce((sum, item) => sum + (item.harga || 0), 0)
+})
 
 const getCart = async () => {
   try {
@@ -125,13 +140,11 @@ const getCart = async () => {
     } else {
       cart.value = data || { cart_detail: [], total_harga: 0 }
     }
-
   } catch (error) {
     showError('Gagal mengambil data keranjang')
     console.error(error)
   }
 }
-
 
 const onQuantityChange = (item) => {
   if (item.jumlah < 1) item.jumlah = 1
@@ -179,22 +192,6 @@ const decrementQuantity = (item) => {
   }
 }
 
-const checkoutCart = async () => {
-  try {
-    const confirmed = await showConfirm('Yakin ingin melakukan checkout?')
-    if (!confirmed) return
-
-    const response = await api.post('/checkout')
-    console.log(response)
-    showSuccess('Checkout berhasil!')
-    cart.value = null
-    router.push('/checkout/'+response.data.data.kode_transaksi)
-  } catch (error) {
-    showError('Checkout gagal, coba lagi.')
-    console.error(error)
-  }
-}
-
 const deleteProductcart = async (cartDetailId) => {
   try {
     const confirmed = await showConfirm('Yakin ingin menghapus item ini dari keranjang?')
@@ -205,6 +202,28 @@ const deleteProductcart = async (cartDetailId) => {
     showSuccess('Produk berhasil dihapus dari keranjang')
   } catch (error) {
     showError('Gagal menghapus produk dari keranjang')
+    console.error(error)
+  }
+}
+
+const checkoutSelected = async () => {
+  if (selectedIds.value.length === 0) {
+    showError('Pilih minimal satu produk untuk checkout')
+    return
+  }
+
+  try {
+    const confirmed = await showConfirm('Yakin ingin checkout produk terpilih?')
+    if (!confirmed) return
+
+    const response = await api.post('/checkout/products', {
+      cart_detail_ids: selectedIds.value
+    })
+
+    showSuccess('Checkout berhasil!')
+    router.push('/checkout/' + response.data.data.kode_transaksi)
+  } catch (error) {
+    showError('Checkout gagal, coba lagi.')
     console.error(error)
   }
 }

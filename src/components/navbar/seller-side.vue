@@ -62,6 +62,16 @@
 
           <li>
             <router-link
+              to="/manage-pengiriman"
+              :class="linkClass('/manage-pengiriman')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+            >
+              Manage Pengiriman
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
               to="/dashboard"
               :class="linkClass('/dashboard')"
               class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"

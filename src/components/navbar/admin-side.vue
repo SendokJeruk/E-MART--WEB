@@ -55,6 +55,32 @@
             </router-link>
           </li>
 
+          <li>
+            <router-link
+              to="/manage-request"
+              :class="{
+                'bg-[#7D0A0A]': $route.path !== '/manage-request',
+                'bg-[#5E0A0A]': $route.path === '/manage-request'
+              }"
+              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
+            >
+              Manage Request Seller
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              to="/settings-admin"
+              :class="{
+                'bg-[#7D0A0A]': $route.path !== '/settings-admin',
+                'bg-[#5E0A0A]': $route.path === '/settings-admin'
+              }"
+              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
+            >
+              Manage Setting Admin
+            </router-link>
+          </li>
+
           <button
             @click="logout"
             class="w-full text-left rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#A61D1D]"

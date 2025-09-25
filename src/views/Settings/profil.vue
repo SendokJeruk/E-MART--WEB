@@ -50,6 +50,14 @@
       >
         {{ tokoseller.length > 0 ? 'Seller Dashboard' : 'Buat Toko' }}
       </router-link>
+
+      <router-link
+        v-if="userRole === 'buyer'"
+        to="/pengajuan-seller"
+        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-green-600 text-center block mt-3"
+      >
+        Jadi Seller
+      </router-link>
     </div>
   </div>
 </template>
@@ -83,7 +91,7 @@ const getProfile = async () => {
 
 const getToko = async () => {
   try {
-    const response = await api.get('/toko');
+    const response = await api.get('/toko?self');
     const alltoko = response.data.data.data;
     tokoseller.value = alltoko.filter((t) => t.user_id === user.value.id);
   } catch (error) {

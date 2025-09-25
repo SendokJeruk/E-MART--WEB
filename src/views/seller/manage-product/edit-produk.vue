@@ -185,7 +185,7 @@ const submitForm = async () => {
     });
 
     alert('Produk berhasil diperbarui!');
-    router.push('/manageproduk');  
+    router.push('/manage-produk');  
   } catch (error) {
     console.error('Gagal submit form:', error);
     alert(error.response?.data?.message || 'Gagal mengubah produk.');

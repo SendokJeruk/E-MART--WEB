@@ -1,11 +1,18 @@
 <template>
   <Navbar />
+
   <div class="p-4 space-y-4 bg-[#FFF5F5] min-h-screen">
+    <!-- Judul Halaman -->
     <h1 class="text-xl font-bold navbar-font mb-4">| Checkout</h1>
 
+    <!-- Pilihan Alamat Pengiriman -->
     <div class="bg-white rounded-lg shadow p-4">
       <h3 class="font-semibold mb-3">Alamat Pengiriman</h3>
-      <select v-model="selectedAlamat" class="border rounded p-2 w-full text-sm" @change="handleAlamatChange">
+      <select 
+        v-model="selectedAlamat" 
+        class="border rounded p-2 w-full text-sm" 
+        @change="handleAlamatChange"
+      >
         <option disabled value="">Pilih Alamat</option>
         <option 
           v-for="alamat in alamatList" 
@@ -14,45 +21,49 @@
         >
           {{ alamat.label }}
         </option>
+        <!-- Tambah alamat baru -->
         <option value="create">+ Tambah Alamat Baru</option>
       </select>
     </div>
 
-
+    <!-- Checkout per toko -->
     <div v-if="checkout.length" class="space-y-5">
       <div
-        v-for="(group, kode) in groupedCheckout"
-        :key="kode"
+        v-for="toko in checkout"
+        :key="toko.toko_id"
         class="bg-white rounded-lg shadow p-4 space-y-4"
       >
-        <h2 class="font-semibold text-gray-800">
-          {{ group.items[0]?.product?.user?.toko?.nama_toko || 'Nama Toko' }}
-        </h2>
+        <!-- Nama Toko -->
+        <h2 class="font-semibold text-gray-800">{{ toko.nama_toko }}</h2>
 
+        <!-- List produk di toko ini -->
         <div
-          v-for="item in group.items"
-          :key="item.id"
+          v-for="item in toko.items"
+          :key="item.product_id"
           class="flex items-center gap-4 border-b pb-3 last:border-0"
         >
+          <!-- Foto produk -->
           <img
-            :src="item.product?.foto_cover"
+            :src="item.foto_cover || ''"
             alt="Produk"
             class="w-20 h-20 object-cover rounded border"
           />
 
+          <!-- Nama & harga produk -->
           <div class="flex-1">
             <h3 class="text-base font-semibold text-gray-800">
-              {{ item.product?.nama_product || 'Produk tidak ditemukan' }}
+              {{ item.nama_product || 'Produk tidak ditemukan' }}
             </h3>
             <p class="text-sm font-bold text-red-600 mt-1">
               Rp {{ formatRupiah(item.harga) }}
             </p>
           </div>
 
+          <!-- Jumlah & tombol hapus -->
           <div class="flex flex-col items-end gap-2">
             <span class="text-sm">x{{ item.jumlah }}</span>
             <button
-              @click="deleteProductscheckout(item.id, item.transaction_id)"
+              @click="deleteProductscheckout(item.detail_transaction_id, toko.toko_id)"
               class="text-red-500 text-xs"
             >
               ✕
@@ -60,12 +71,12 @@
           </div>
         </div>
 
-        <!-- Pilih Kurir per toko -->
+        <!-- Pilih kurir utama -->
         <div>
           <h3 class="font-semibold mb-2 text-sm">Pilih Kurir</h3>
           <select 
-            v-model="group.items[0].selectedKurir" 
-            @change="postRajaOngkir(group)" 
+            v-model="toko.items[0].selectedKurir" 
+            @change="postRajaOngkir(toko)" 
             class="border rounded p-2 w-full text-sm"
           >
             <option disabled value="">-- Pilih Kurir --</option>
@@ -74,20 +85,47 @@
             </option>
           </select>
         </div>
+
+        <!-- Pilih sub layanan kurir -->
+        <div v-if="toko.items[0].ongkirList?.length" class="mt-2">
+          <h3 class="font-semibold mb-1 text-sm">Pilih Layanan</h3>
+          <select
+            v-model="toko.items[0].selectedService"
+            @change="updateSelectedOngkir(toko)"
+            class="border rounded p-2 w-full text-sm"
+          >
+            <option disabled value="">-- Pilih Layanan --</option>
+            <option
+              v-for="ongkir in toko.items[0].ongkirList"
+              :key="ongkir.service"
+              :value="ongkir.service"
+            >
+              {{ ongkir.service }} - Rp {{ formatRupiah(ongkir.cost) }} ({{ ongkir.etd }})
+            </option>
+          </select>
+        </div>
       </div>
 
+      <!-- Ringkasan pembayaran -->
       <div class="bg-white rounded-lg shadow p-4">
         <h3 class="font-semibold mb-3">Rincian Pembayaran</h3>
         <div class="text-sm space-y-1">
+          <!-- Daftar produk per toko -->
           <div
-            class="flex justify-between"
-            v-for="item in checkout"
-            :key="item.id"
+            v-for="toko in checkout"
+            :key="toko.toko_id"
           >
-            <span>{{ item.product?.nama_product }}</span>
-            <span>Rp {{ formatRupiah(item.harga * item.jumlah) }}</span>
+            <div
+              v-for="item in toko.items"
+              :key="item.product_id"
+              class="flex justify-between"
+            >
+              <span>{{ item.nama_product }}</span>
+              <span>Rp {{ formatRupiah(item.harga * item.jumlah) }}</span>
+            </div>
           </div>
 
+          <!-- Tambahan biaya -->
           <div class="flex justify-between text-gray-500">
             <span>Total Ongkir</span>
             <span>Rp {{ formatRupiah(totalOngkir) }}</span>
@@ -104,16 +142,20 @@
         </div>
       </div>
 
+      <!-- Tombol bayar -->
       <div class="bg-white rounded-lg shadow p-4">
         <button
           @click="checkoutCart"
-          class="w-full py-3 bg-[#BF3131] text-white rounded-md hover:bg-[#a32727] text-sm font-semibold"
+          :disabled="!canCheckout"
+          class="w-full py-3 bg-[#BF3131] text-white rounded-md text-sm font-semibold 
+                hover:bg-[#a32727] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Bayar Sekarang
         </button>
       </div>
     </div>
 
+    <!-- Jika belum ada produk di checkout -->
     <div v-else class="text-center py-20 text-gray-400">
       Checkout masih kosong...
     </div>
@@ -122,19 +164,20 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import { useRoute,useRouter } from 'vue-router'; 
+import { useRoute, useRouter } from 'vue-router'; 
 import Navbar from '@/components/navbar/navbar.vue';
 import api from '@/plugins/axios';
 
-const router = useRouter()
+const router = useRouter();
 const route = useRoute();
-const checkout = ref([]); 
-const kodeTransaksi = ref(route.params.kode || ""); 
-const alamatList = ref([]); 
-const selectedAlamat = ref(""); 
-const kodeDomestikList = ref([]); 
-const biayaPengiriman = ref(0);
 
+// Data utama
+const checkout = ref([]);                 // Data checkout per toko
+const kodeTransaksi = ref(route.params.kode || ""); // Kode transaksi dari URL
+const alamatList = ref([]);               // Daftar alamat user
+const selectedAlamat = ref("");           // Alamat yang dipilih user
+
+// Daftar kurir yang tersedia
 const kurirList = [
   { kode: 'jne', nama: 'Jalur Nugraha Ekakurir (JNE)' },
   { kode: 'pos', nama: 'POS Indonesia (POS)' },
@@ -145,94 +188,148 @@ const kurirList = [
   { kode: 'anteraja', nama: 'AnterAja (ANTERAJA)' }
 ];
 
-const groupedCheckout = computed(() => {
-  const groups = {};
-  checkout.value.forEach(item => {
-    const kode = item.product?.user?.toko?.alamat_toko?.kode_domestik || "default";
-
-    if (!groups[kode]) {
-      groups[kode] = {
-        items: [],
-        totalWeight: 0,
-        subtotal: 0,
-        kode_transaksi: item.transaction?.kode_transaksi || item.kode_transaksi || kodeTransaksi.value
-      };
-    }
-
-    groups[kode].items.push(item);
-    groups[kode].totalWeight += Number(item.product?.berat || 0) * Number(item.jumlah || 0);
-    groups[kode].subtotal += Number(item.harga) * Number(item.jumlah);
-  });
-  return groups;
+// Validasi tombol checkout aktif/tidak
+const canCheckout = computed(() => {
+  if (!selectedAlamat.value || selectedAlamat.value === 'create') return false;
+  return checkout.value.every(toko => toko.items[0].selectedKurir && toko.items[0].selectedService);
 });
 
-const getCheckout = async () => {
-  if (!kodeTransaksi.value) return;
-  try {
-    const response = await api.get('/transaction');
-    const allData = response.data.data.data;
-    const trx = allData.find(t => t.kode_transaksi === kodeTransaksi.value);
-    checkout.value = trx ? trx.detail_transaction : [];
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const getAlamat = async () => {
-  try {
-    const response = await api.get('/alamat');
-    alamatList.value = response.data.data.data;
-    kodeDomestikList.value = alamatList.value
-      .map(alamat => alamat.kode_domestik)
-      .filter(kode => kode);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const getAlamatToko = async () => {
-  try {
-    const response = await api.get('/transaction');
-    const transaksi = response.data.data.data;
-    kodeDomestikList.value = [];
-    transaksi.forEach(trx => {
-      trx.detail_transaction.forEach(item => {
-        const kodeDomestik = item.product?.user?.toko?.alamat_toko?.kode_domestik;
-        if (kodeDomestik) kodeDomestikList.value.push(kodeDomestik);
-      });
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const totalOngkir = computed(() => {
-  return checkout.value.reduce((sum, item) => sum + (item.biayaPengiriman || 0), 0);
-});
-
-const totalHarga = computed(() => {
-  return checkout.value.reduce((sum, item) => sum + (item.harga * item.jumlah), 0) + totalOngkir.value;
-});
-
+// Format angka ke Rupiah
 const formatRupiah = (value) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' })
     .format(value).replace("Rp","").trim();
 };
 
-const deleteProductscheckout = async (id) => {
-  if (!confirm('Yakin ingin menghapus Produk ini?')) return;
+// Hitung total ongkir semua toko
+const totalOngkir = computed(() => {
+  return checkout.value.reduce((sum, toko) => sum + (toko.biayaPengiriman || 0), 0);
+});
+
+
+// Hitung total harga produk + ongkir
+const totalHarga = computed(() => {
+  const totalProduk = checkout.value.reduce((sum, toko) => {
+    return sum + toko.items.reduce((s, item) => s + (item.harga * item.jumlah), 0);
+  }, 0);
+  return totalProduk + totalOngkir.value;
+});
+
+// Ambil daftar alamat user dari API
+const getAlamat = async () => {
   try {
-    if (checkout.value.length <= 1) {
-      await api.delete(`/transaction/${kodeTransaksi.value}`);
-    } else {
-      await api.delete(`/detail-transaction/${id}`);
-    }
-    await getCheckout();
+    const response = await api.get('/alamat');
+    alamatList.value = response.data.data.data;
   } catch (error) {
     console.error(error);
   }
 };
 
+// Ambil data detail checkout berdasarkan kode transaksi
+const getCheckout = async () => {
+  if (!kodeTransaksi.value) return;
+  try {
+    const response = await api.get(`/transaction/get-transaction-detail/${kodeTransaksi.value}`);
+    const data = response.data.data;
+    checkout.value = Object.values(data).map(toko => ({
+      ...toko,
+      items: toko.items.map(item => ({
+        ...item,
+        detail_transaction_id: item.detail_transaction_id,
+        biayaPengiriman: 0,    // default ongkir 0
+        selectedKurir: '',     // belum pilih kurir
+        selectedService: '',   // belum pilih layanan kurir
+        ongkirList: []         // daftar ongkir kosong
+      }))
+    }));
+
+    console.log("Data checkout:", checkout.value);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const deleteProductscheckout = async (detailId, toko_id) => {
+  if (!confirm('Yakin ingin menghapus produk ini?')) return;
+
+  try {
+    // Cari toko yang sesuai
+    const toko = checkout.value.find(t => t.toko_id === toko_id);
+    if (!toko) return;
+
+    if (toko.items.length === 1) {
+      // Kalau tinggal 1 produk → hapus transaksi
+      await api.delete(`/transaction/${kodeTransaksi.value}`);
+      checkout.value = []; // kosongkan checkout
+      alert('Produk terakhir dihapus, transaksi dibatalkan.');
+    } else {
+      // Kalau masih banyak → hapus detail produk
+      await api.delete(`/detail-transaction/${detailId}`);
+      await getCheckout(); // refresh data checkout
+    }
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// Request ongkir ke API RajaOngkir
+const postRajaOngkir = async (toko) => {
+  const origin = toko.kode_domestik;
+  const destination = alamatList.value.find(a => a.id === selectedAlamat.value)?.kode_domestik;
+  const courier = toko.items[0].selectedKurir;
+  const weight = toko.items.reduce((sum, i) => sum + (i.totalberat || 0), 0);
+
+  if (!origin || !destination || !courier || weight <= 0) return;
+
+  // Payload dikirim ke backend
+  const payload = { 
+    origin, 
+    destination, 
+    weight, 
+    courier, 
+    price: 'lowest' // isi default supaya validasi backend lewat
+  };
+
+  try {
+    const response = await api.post('/rajaongkir/cost', payload);
+    const results = response.data.data || [];
+
+    // Simpan hasil ongkir ke setiap produk di toko
+    toko.items.forEach(item => {
+      item.ongkirList = results;
+      item.selectedService = '';
+      item.biayaPengiriman = 0;
+    });
+  } catch (error) {
+    console.error("Error postRajaOngkir:", error);
+  }
+};
+
+// Update ongkir saat user pilih layanan kurir
+const updateSelectedOngkir = (toko) => {
+  const selected = toko.items[0].ongkirList.find(
+    o => o.service === toko.items[0].selectedService
+  );
+  if (selected) {
+    toko.biayaPengiriman = selected.cost; // simpan sekali per toko
+  }
+
+  // Update ongkir di transaksi
+  api.put(`/transaction/${kodeTransaksi.value}`, { total_ongkir: totalOngkir.value })
+    .catch(err => console.error("Gagal update ongkir:", err));
+
+  // 🔹 Tambahkan ini untuk cek payload kurir langsung
+  const kurirPayload = checkout.value.map(t => ({
+    toko_id: t.toko_id,
+    kurir: t.items[0].selectedKurir,
+    ongkir: t.biayaPengiriman
+  }));
+  console.log("Kurir payload terbaru:", kurirPayload);
+};
+
+
+
+// Load script Midtrans Snap
 const loadMidtransScript = () => {
   if (!document.getElementById('midtrans-script')) {
     const script = document.createElement('script');
@@ -243,95 +340,69 @@ const loadMidtransScript = () => {
   }
 };
 
+// Checkout dan panggil Midtrans Snap
 const checkoutCart = async () => {
   if (!kodeTransaksi.value) return;
   try {
-    const payload = {
-      ongkir: totalOngkir.value,
-      total: totalHarga.value  
+    // 🔹 Ambil payload kurir per toko
+    const dataOngkir = checkout.value.map(t => ({
+      toko_id: t.toko_id,
+      kurir: t.items[0].selectedKurir,
+      ongkir: t.biayaPengiriman
+    }));
+
+    // 🔹 Kirim ongkir total + detail ongkir per toko
+    const payload = { 
+      ongkir: totalOngkir.value, 
+      total: totalHarga.value,
+      data_ongkir: dataOngkir
     };
+
+    console.log("Payload checkout dikirim:", payload);
 
     const res = await api.post(`/transaction/payment/${kodeTransaksi.value}`, payload);
     const snapToken = res.data.data.snap_token;
 
     if (!window.snap) return;
+
+    // 🔹 Panggil Midtrans Snap popup
     window.snap.pay(snapToken, {
-      onSuccess: result => { 
-        console.log("Pembayaran berhasil!", result); 
-        window.location.href = "/transaksi-selesai";
+      onSuccess: async result => {
+        try {
+          // Jika pembayaran sukses → buat data pengiriman
+          await api.post('/pengiriman', {
+            kode_transaksi: kodeTransaksi.value,
+            status_pengiriman: 'dibuat',
+            kurir: null,
+            plat_nomor: null,
+            estimasi_tiba: null
+          });
+          window.location.href = "/transaksi-selesai";
+        } catch (err) {
+          console.error('Gagal buat shipment:', err);
+          alert('Pembayaran sukses tapi gagal membuat data pengiriman.');
+        }
       },
-      onPending: result => { 
-        console.log("Menunggu pembayaran...", result); 
-        window.location.href = "/list-transaksi";
-      },
-      onError: result => { 
-        console.log("Pembayaran gagal!", result); 
-        window.location.href = "/list-transaksi";
-      },
-      onClose: () => { 
-        alert("Popup ditutup sebelum pembayaran selesai."); 
-      }
+      onPending: () => { window.location.href = "/list-transaksi"; },
+      onError: () => { window.location.href = "/list-transaksi"; },
+      onClose: () => { alert("Popup ditutup sebelum pembayaran selesai."); }
     });
   } catch (error) {
     console.error(error);
   }
 };
 
+
+// Handler untuk pilihan alamat baru
 const handleAlamatChange = () => {
-  if (selectedAlamat.value === "create") {
-    router.push("/create-alamat")
-  }
-}
-
-const postRajaOngkir = async (group) => {
-  console.log("=== postRajaOngkir start ===");
-
-  const origin = group.items[0]?.product?.user?.toko?.alamat_toko?.kode_domestik;
-  const destination = alamatList.value.find(a => a.id === selectedAlamat.value)?.kode_domestik;
-  const courier = group.items[0]?.selectedKurir;
-  const weight = group.totalWeight;
-
-  if (!origin || !destination || !courier || weight <= 0) {
-    console.warn("Data ongkir tidak lengkap, proses dihentikan");
-    return;
-  }
-
-  const payload = { origin, destination, weight, courier, price: 'lowest' };
-  try {
-    const response = await api.post('/rajaongkir/cost', payload);
-    const results = response.data.data || [];
-    if (!results.length) return;
-
-    let lowest = results[0];
-    results.forEach(s => { if (s.cost < lowest.cost) lowest = s; });
-
-    group.items.forEach(item => {
-      item.ongkirList = [lowest];
-      item.selectedService = lowest.service;
-      item.biayaPengiriman = lowest.cost;
-    });
-
-    // update total ongkir global (akumulasi semua toko)
-    const updateRes = await api.put(`/transaction/${group.kode_transaksi}`, { total_ongkir: totalOngkir.value });
-    console.log("Update backend berhasil:", updateRes.data);
-  } catch (error) {
-    console.error("Error postRajaOngkir:", error);
-  }
+  if (selectedAlamat.value === "create") router.push("/create-alamat");
 };
 
+
+// Lifecycle hook saat komponen mount
 onMounted(async () => {
-  loadMidtransScript();
-  await getAlamat();
-  await getAlamatToko();
-  if (kodeTransaksi.value) {
-    await getCheckout();
-  } else {
-    const res = await api.get('/transaction');
-    const transaksiList = res.data.data.data;
-    if (transaksiList.length) {
-      kodeTransaksi.value = transaksiList[transaksiList.length - 1]?.kode_transaksi;
-      await getCheckout();
-    }
-  }
+  loadMidtransScript(); // load Midtrans Snap
+  await getAlamat();    // ambil daftar alamat
+  await getCheckout();  // ambil data checkout
 });
 </script>

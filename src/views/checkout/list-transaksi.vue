@@ -70,12 +70,12 @@ const getTransaksi = async () => {
   try {
     const response = await api.get('/transaction');
     const allData = response.data?.data?.data ?? []; 
-    transaksiList.value = allData;
+
+    transaksiList.value = allData.filter(trx => trx.status !== 'success');
   } catch (error) {
     console.error('Gagal mengambil data transaksi:', error);
   }
 };
-
 
 const formatRupiah = (value) => {
   return new Intl.NumberFormat('id-ID', {

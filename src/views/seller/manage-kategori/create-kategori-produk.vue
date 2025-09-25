@@ -119,6 +119,7 @@
         product_id: '',
         category_id: ''
       }
+      router.push('/manage-kategori-produk')
     } catch (error) {
       console.error('Gagal submit form:', error.response?.data)
       alert(error.response?.data?.message || 'Gagal menambahkan produk.')

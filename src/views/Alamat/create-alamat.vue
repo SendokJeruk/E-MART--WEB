@@ -90,6 +90,16 @@
         </ul>
       </div>
 
+      <div>
+        <label class="block mb-1 font-semibold text-gray-700">Nama Penerima</label>
+        <input 
+          type="text" 
+          v-model="form.nama_penerima" 
+          placeholder="Masukkan nama penerima" 
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-500 focus:outline-none"
+        />
+      </div>
+
       <!-- Detail Alamat -->
       <div>
         <label class="block mb-1 font-semibold text-gray-700">Detail Alamat</label>
@@ -121,6 +131,9 @@ import Navbar from '@/components/navbar/navbar.vue';
 import { ref, watch, onMounted } from 'vue';
 import api from "@/plugins/axios";
 import { showSuccess, showError } from '@/utils/alert';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const provinces = ref([]);
 const cities = ref([]);
@@ -131,6 +144,7 @@ const successMessage = ref('');
 const errorMessages = ref([]);
 
 const form = ref({
+  nama_penerima: '',
   kode_domestik: '',
   label: '',
   province_name: '',
@@ -152,12 +166,17 @@ watch(() => form.value.subdistrict_name, (newVal) => {
   cariKodeDomestik();
 });
 
-// Tambah alamat
 const tambahAlamat = async () => {
   try {
     const response = await api.post('/alamat', form.value);
     successMessage.value = response.data.message || 'Alamat berhasil disimpan';
     showSuccess(successMessage.value);
+
+    // Delay dikit biar user lihat pesan sukses
+    setTimeout(() => {
+      router.back(); // balik ke halaman sebelumnya
+    }, 1000);
+
   } catch (error) {
     if (error.response && error.response.status === 422) {
       const messages = Object.values(error.response.data.errors).flat();
@@ -168,6 +187,7 @@ const tambahAlamat = async () => {
     }
   }
 };
+
 
 // Ambil provinsi
 const dapat_Alamat = async () => {

@@ -30,61 +30,61 @@
         </div>
       </div>
 
-      <!-- List Transaksi -->
+      <!-- List Pengiriman -->
       <div class="space-y-6 max-h-[700px] overflow-y-auto pr-2">
         <div
-          v-for="(transaksi, tIndex) in transaksiList"
-          :key="tIndex"
+          v-for="(shipment, sIndex) in shipmentList"
+          :key="sIndex"
           class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200"
         >
           <!-- Header -->
           <div class="bg-gray-50 px-6 py-4 flex justify-between items-center border-b">
             <div class="flex items-center gap-6">
               <span class="text-sm text-gray-500">
-                {{ formatDate(transaksi.tanggal_transaksi) }}
+                {{ formatDate(shipment.created_at) }}
               </span>
               <span class="text-sm">
-                No. Pesanan: {{ transaksi.id || generateOrderNumber() }}
+                No. Pesanan: {{ shipment.id || generateOrderNumber() }}
               </span>
             </div>
             <span
               :class="{
-                'text-green-600 font-medium': transaksi.status === 'Sudah selesai',
-                'text-orange-500 font-medium': transaksi.status === 'Dalam pengiriman',
-                'text-blue-600 font-medium': transaksi.status === 'Diproses',
-                'text-red-600 font-medium': transaksi.status === 'Dibatalkan',
+                'text-green-600 font-medium': shipment.status_pengiriman === 'sudah selesai',
+                'text-orange-500 font-medium': shipment.status_pengiriman === 'dalam pengiriman',
+                'text-blue-600 font-medium': shipment.status_pengiriman === 'dibuat',
+                'text-red-600 font-medium': shipment.status_pengiriman === 'dibatalkan',
               }"
               class="text-sm font-semibold"
             >
-              {{ transaksi.status }}
+              {{ shipment.status_pengiriman }}
             </span>
           </div>
 
           <!-- Detail Produk -->
           <div class="divide-y divide-gray-100">
             <div
-              v-for="(detail, index) in transaksi.detail_transaction"
+              v-for="(detail, index) in shipment.detail_shipments"
               :key="index"
               class="flex p-6"
             >
               <img
-                :src="detail.product.foto_cover || '/placeholder-product.jpg'"
-                :alt="detail.product.nama_product"
+                :src="detail.detail_transaction.product.foto_cover || '/placeholder-product.jpg'"
+                :alt="detail.detail_transaction.product.nama_product"
                 class="w-20 h-20 object-cover rounded-lg border"
               />
               <div class="ml-5 flex-1">
                 <h3 class="text-base font-medium text-gray-800 mb-1 line-clamp-2">
-                  {{ detail.product.nama_product }}
+                  {{ detail.detail_transaction.product.nama_product }}
                 </h3>
                 <p class="text-xs text-gray-500 mb-1">Variasi: Standar</p>
-                <p class="text-xs text-gray-500">Jumlah: {{ detail.jumlah }}</p>
+                <p class="text-xs text-gray-500">Jumlah: {{ detail.detail_transaction.jumlah }}</p>
               </div>
               <div class="text-right">
                 <p class="text-sm font-semibold text-gray-800">
-                  Rp {{ formatPrice(detail.harga) }}
+                  Rp {{ formatPrice(detail.detail_transaction.harga) }}
                 </p>
                 <p class="text-xs text-gray-500 mt-1">
-                  Total: Rp {{ formatPrice(detail.harga * detail.jumlah) }}
+                  Total: Rp {{ formatPrice(detail.detail_transaction.harga * detail.detail_transaction.jumlah) }}
                 </p>
               </div>
             </div>
@@ -95,35 +95,37 @@
             <div class="flex items-center gap-2 text-sm">
               <span class="text-gray-600">Total Belanja:</span>
               <span class="text-lg font-bold text-[#FF5722]">
-                Rp {{ formatPrice(transaksi.total_harga) }}
+                Rp {{ formatPrice(shipment.transaction.total_harga) }}
               </span>
             </div>
           </div>
 
           <!-- Action Buttons -->
           <div class="px-6 py-4 flex justify-end gap-3 border-t">
-            <button
-              class="px-5 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition"
+            <router-link
+              :to="`/track-order/${shipment.id}`"
+              class="px-5 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition inline-block"
             >
               Lihat Detail
-            </button>
-            <button
+            </router-link>
+
+            <!-- <button
               class="px-5 py-2 text-sm bg-[#FF5722] text-white rounded-md hover:bg-orange-600 transition"
             >
               Beli Lagi
             </button>
+
             <button
-              v-if="transaksi.status === 'Sudah selesai'"
               class="px-5 py-2 text-sm border border-[#FF5722] text-[#FF5722] rounded-md hover:bg-orange-50 transition"
             >
               Beri Ulasan
-            </button>
+            </button> -->
           </div>
         </div>
       </div>
 
-      <!-- Jika Belum Ada Transaksi -->
-      <div v-if="transaksiList.length === 0" class="text-center py-10">
+      <!-- Jika Belum Ada Pengiriman -->
+      <div v-if="shipmentList.length === 0" class="text-center py-10">
         <div class="inline-block p-4 bg-gray-100 rounded-full mb-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -141,10 +143,10 @@
           </svg>
         </div>
         <h3 class="text-lg font-medium text-gray-700 mb-1">
-          Belum ada transaksi
+          Belum ada pengiriman
         </h3>
         <p class="text-gray-500 text-sm">
-          Transaksi yang Anda lakukan akan muncul di halaman ini
+          Pengiriman yang Anda lakukan akan muncul di halaman ini
         </p>
         <button
           class="mt-4 px-6 py-2 bg-[#FF5722] text-white rounded-md hover:bg-orange-600 transition"
@@ -161,7 +163,7 @@ import Navbar from '@/components/navbar/navbar.vue'
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 
-const transaksiList = ref([])
+const shipmentList = ref([])
 
 const formatPrice = (price) => {
   return Number(price).toLocaleString('id-ID')
@@ -177,16 +179,18 @@ const generateOrderNumber = () => {
   return 'INV' + Math.floor(10000000 + Math.random() * 90000000)
 }
 
-const getTransaksi = async () => {
+const getShipment = async () => {
   try {
-    const response = await api.get('/transaction')
-    transaksiList.value = response.data?.data?.data || []
+    const response = await api.get('/pengiriman')
+    const data = response.data.data.data
+    shipmentList.value = data
+    console.log('Data pengiriman:', shipmentList.value)
   } catch (error) {
     console.error(error)
   }
 }
 
 onMounted(() => {
-  getTransaksi()
+  getShipment()
 })
 </script>

@@ -18,6 +18,7 @@
             type="text"
             placeholder="Cari di E-MART"
             class="w-full p-2 text-sm sm:text-base border border-gray-300 rounded-md bg-white"
+            @keyup.enter="$emit('search', search)"
           />
         </div>
 
@@ -47,27 +48,42 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import api from "@/plugins/axios"
 import buttonred from "@/components/button/buttonred.vue"
 
-const search = defineModel()
+const search = ref('')
 const isLoggedIn = ref(false)
 const isLoading = ref(false)
 const userName = ref('')
 const userRole = ref('')
-const user = ref(null);
+const user = ref(null)
+const router = useRouter()
 
 const getProfile = async () => {
   try {
-    isLoading.value = true;
-    const response = await api.get('/profile');
-    user.value = response.data.data;
+    isLoading.value = true
+    const response = await api.get('/profile')
+    user.value = response.data.data
+    userName.value = user.value.name
+    userRole.value = user.value.nama_role
+    isLoggedIn.value = true
   } catch (error) {
-    console.error('Gagal mengambil profil:', error);
+    console.error('Gagal mengambil profil:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
+
+const searchBar = async () => {
+  if (!search.value) return
+  try {
+    const response = await api.get(`/product?nama_product=${search.value}`)
+    console.log("Hasil search:", response.data)
+  } catch (error) {
+    console.error("Search error:", error)
+  }
+}
 
 const logout = async () => {
   const confirmed = window.confirm("Are you sure you want to log out?")
@@ -85,16 +101,7 @@ const logout = async () => {
   }
 }
 
-onMounted(async () => {
-  try {
-    const response = await api.get('/profile')
-    isLoggedIn.value = true
-    userName.value = response.data.data.name
-    userRole.value = response.data.data.nama_role
-  } catch {}
-})
-
 onMounted(() => {
-  getProfile();
-});
+  getProfile()
+})
 </script>

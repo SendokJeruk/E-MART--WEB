@@ -83,7 +83,7 @@
 
 const getToko = async () => {
     try {
-        const response = await api.get('/toko');
+        const response = await api.get('/toko?self');
         const alltoko = response.data.data.data;
         tokoseller.value = alltoko.filter(t => t.user_id === user.value.id);
     } catch (error) {
