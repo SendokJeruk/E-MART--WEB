@@ -40,6 +40,8 @@ import ManageRequest from "@/views/Admin/manage-request/manage-request.vue";
 import Track from "@/views/checkout/track.vue";
 import SettingsAdmin from "@/views/Admin/settings/settings-admin.vue";
 import ManagePengiriman from "@/views/seller/manage-pengiriman/manage-pengiriman.vue";
+import ManageIncome from "@/views/Admin/manage-income/manage-income.vue";
+import Withdraw from "@/views/seller/withdraw/withdraw.vue";
 
 const routes = [
     // Dashboard
@@ -270,6 +272,18 @@ const routes = [
         path: '/manage-pengiriman/',
         name: 'managePengiriman',
         component: ManagePengiriman
+    },
+    //Manage Income
+    {
+        path: '/manage-income',
+        name: 'manageIncome',
+        component: ManageIncome
+    },
+    //Withdraw
+    {
+        path: '/withdraw',
+        name: 'withdraw',
+        component: Withdraw
     }
 ]
 const router = createRouter({

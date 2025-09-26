@@ -9,7 +9,10 @@
             <p class="text-sm font-bold">{{ user.name }}</p>
             <p class="text-xs text-gray-600">{{ user.email }}</p>
           </div>
-          <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
+          <img 
+            :src="user?.foto_profil || 'https://via.placeholder.com/100'" 
+            class="w-10 h-10 bg-gray-300 rounded-full" 
+          />
         </div>
       </div>
 
@@ -37,10 +40,15 @@
                   v-model="item.status_pengiriman" 
                   @change="updateStatus(item)" 
                   class="border rounded px-2 py-1"
-                  :disabled="item.status_pengiriman === 'dijadwalkan'"
+                  :disabled="isFinalStatus(item.status_pengiriman)"
                 >
-                  <option value="dibuat">Dibuat</option>
-                  <option value="dijadwalkan">Dijadwalkan</option>
+                  <option 
+                    v-for="status in getAvailableStatuses(item.status_pengiriman)" 
+                    :key="status" 
+                    :value="status"
+                  >
+                    {{ status }}
+                  </option>
                 </select>
               </td>
               <td class="px-4 py-2 text-sm text-gray-900">{{ item.estimasi_tiba || '-' }}</td>
@@ -48,10 +56,10 @@
                 <button 
                   @click="deletePengiriman(item.id)" 
                   class="px-3 py-1 rounded"
-                  :class="item.status_pengiriman === 'dijadwalkan' 
+                  :class="isFinalStatus(item.status_pengiriman) 
                     ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
                     : 'bg-red-500 hover:bg-red-600 text-white'"
-                  :disabled="item.status_pengiriman === 'dijadwalkan'"
+                  :disabled="isFinalStatus(item.status_pengiriman)"
                 >
                   Hapus
                 </button>
@@ -72,6 +80,27 @@ import { onMounted, ref } from 'vue';
 const user = ref({});
 const pengiriman = ref([]);
 
+const statusOrder = [
+  "dibuat",
+  "dijadwalkan",
+  "kurir_ditugaskan",
+  "dalam_proses",
+  "tiba",
+  "diterima",
+  "batal"
+];
+
+// ambil opsi berdasarkan status saat ini
+const getAvailableStatuses = (current) => {
+  const index = statusOrder.indexOf(current);
+  return statusOrder.slice(index, index + 2); // status sekarang + berikutnya
+};
+
+// cek apakah sudah final (tidak bisa diubah lagi)
+const isFinalStatus = (status) => {
+  return status === "diterima" || status === "batal";
+};
+
 const getProfile = async () => {
   try {
     const response = await api.get('/profile');
@@ -85,7 +114,6 @@ const getPengiriman = async () => {
   try {
     const response = await api.get('/pengiriman');
     pengiriman.value = response.data.data?.data || [];
-    console.log(pengiriman.value);
   } catch (error) {
     console.log(error);
     pengiriman.value = [];
@@ -94,19 +122,22 @@ const getPengiriman = async () => {
 
 const updateStatus = async (item) => {
   try {
-    await api.put(`/pengiriman/${item.id}`, {
+    const res = await api.put(`/pengiriman/${item.id}`, {
       status_pengiriman: item.status_pengiriman,
       kode_transaksi: item.kode_transaksi
     });
+    console.log("Update response:", res.data);
     alert('Status berhasil diperbarui!');
+    await getPengiriman(); // refresh dari server
   } catch (error) {
-    console.log(error);
+    console.log("Update error:", error.response?.data || error);
     alert('Gagal update status');
-    getPengiriman(); // reset data jika gagal
+    await getPengiriman(); // reset data jika gagal
   }
 };
 
-// Hapus pengiriman
+
+// hapus pengiriman
 const deletePengiriman = async (id) => {
   if (!confirm('Yakin ingin menghapus pengiriman ini?')) return;
   try {

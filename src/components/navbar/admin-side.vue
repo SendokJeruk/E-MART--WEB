@@ -81,6 +81,19 @@
             </router-link>
           </li>
 
+          <li>
+            <router-link
+              to="/manage-income"
+              :class="{
+                'bg-[#7D0A0A]': $route.path !== '/manage-income',
+                'bg-[#5E0A0A]': $route.path === '/manage-income'
+              }"
+              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
+            >
+              Manage Income
+            </router-link>
+          </li>
+
           <button
             @click="logout"
             class="w-full text-left rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#A61D1D]"

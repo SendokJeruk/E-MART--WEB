@@ -2,7 +2,7 @@
     <sellerside>
       <div class="p-6 overflow-x-auto">
         <div class="flex justify-between items-center mb-6">
-          <h1 class="text-3xl font-bold">Manage Produk</h1>
+          <h1 class="text-3xl font-bold">Manage Toko</h1>
 
           <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
             <div class="flex-1">

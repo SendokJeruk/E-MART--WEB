@@ -67,13 +67,14 @@
     </div>
 
     <!-- Modal Detail -->
-    <transition name="fade">
+    <transition name="modal-fade">
       <div
         v-if="selectedItem"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        class="fixed inset-0 flex items-center justify-center z-50 bg-black/30 backdrop-blur-sm"
       >
         <div
-          class="bg-white rounded-xl shadow-xl w-11/12 md:w-2/3 lg:w-1/2 p-8 relative animate-fadeIn"
+          class="bg-white rounded-xl shadow-xl w-11/12 md:w-2/3 lg:w-1/2 p-8 relative transform transition-all duration-300 scale-95 opacity-0"
+          :class="{'scale-100 opacity-100': selectedItem}"
         >
           <button
             @click="selectedItem = null"
@@ -142,7 +143,7 @@
 <script setup>
 import AdminSide from '@/components/navbar/admin-side.vue'
 import api from '@/plugins/axios'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const user = ref({})
 const requests = ref([])
@@ -194,3 +195,21 @@ onMounted(() => {
   getRequestSeller()
 })
 </script>
+
+<style>
+/* Animasi modal fade + scale */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+</style>

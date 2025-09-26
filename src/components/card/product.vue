@@ -34,10 +34,10 @@
       <div class="flex items-center text-xs mt-2">
         <div class="text-gray-600 text-xs inter-font mr-7">
           {{ product.stock || 0 }} Stock
-          {{ product.sold || 0 }} Sold
+          {{ product.terjual || 0 }} Sold
         </div>
 
-        <span class="font-bold">{{'0.0' }}</span>
+        <span class="font-bold">{{ product.average_rating || 0 }}</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500 ml-1" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.853 1.507 8.341L12 18.896l-7.443 4.604 1.507-8.341-6.064-5.853 8.332-1.151z" />
         </svg>

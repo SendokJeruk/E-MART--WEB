@@ -3,8 +3,11 @@
 
   <div class="max-w-6xl mx-auto px-4 py-8" v-if="produk">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <!-- Gambar Produk -->
       <div class="space-y-4">
-        <div class="w-full aspect-square bg-white border rounded-xl shadow-sm flex items-center justify-center overflow-hidden">
+        <div
+          class="w-full aspect-square bg-white border rounded-xl shadow-sm flex items-center justify-center overflow-hidden"
+        >
           <img
             :src="produk.selectedImage"
             alt="Produk"
@@ -12,35 +15,46 @@
           />
         </div>
 
-        <div v-if="produk.foto && produk.foto.length" class="flex gap-3 flex-wrap">
+        <div
+          v-if="produk.foto && produk.foto.length"
+          class="flex gap-3 flex-wrap"
+        >
           <img
-          :src="produk.foto_cover"
-          alt="Cover"
-          class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
-          @click="changeMainImage(produk.foto_cover)"
-        />
+            :src="produk.foto_cover"
+            alt="Cover"
+            class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
+            @click="changeMainImage(produk.foto_cover)"
+          />
 
-        <img
-          v-for="(foto, index) in produk.foto"
-          :key="index"
-          :src="foto.foto"
-          alt="Foto Tambahan"
-          class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
-          @click="changeMainImage(foto.foto)"
-        />
+          <img
+            v-for="(foto, index) in produk.foto"
+            :key="index"
+            :src="foto.foto"
+            alt="Foto Tambahan"
+            class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
+            @click="changeMainImage(foto.foto)"
+          />
         </div>
       </div>
 
+      <!-- Detail Produk -->
       <div class="flex flex-col space-y-6">
         <div>
-          <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1">{{ produk.nama_product }}</h1>
-          <router-link 
-            :to="{ name: 'toko', params: { nama_toko: produk.user.toko.nama_toko } }" 
+          <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1">
+            {{ produk.nama_product }}
+          </h1>
+          <router-link
+            :to="{
+              name: 'toko',
+              params: { nama_toko: produk.user.toko.nama_toko }
+            }"
             class="text-sm text-[#7D0A0A] mb-2 hover:underline cursor-pointer"
           >
             {{ produk.user.toko.nama_toko }}
           </router-link>
-          <p class="text-2xl font-bold text-[#7D0A0A]">Rp {{ formatRupiah(produk.harga) }}</p>
+          <p class="text-2xl font-bold text-[#7D0A0A]">
+            Rp {{ formatRupiah(produk.harga) }}
+          </p>
         </div>
 
         <div class="text-sm text-yellow-700 font-medium">
@@ -64,44 +78,111 @@
           </button>
 
           <div class="flex items-center gap-2 rounded-lg px-3 py-1">
-            <button class="text-xl font-bold" @click="decreaseQuantity">-</button>
-            <input type="number" min="1" v-model="produk.quantity" class="text-lg font-semibold border rounded px-2 py-1 w-20"/>            <button class="text-xl font-bold" @click="increaseQuantity">+</button>
+            <button class="text-xl font-bold" @click="decreaseQuantity">
+              -
+            </button>
+            <input
+              type="number"
+              min="1"
+              v-model="produk.quantity"
+              class="text-lg font-semibold border rounded px-2 py-1 w-20"
+            />
+            <button class="text-xl font-bold" @click="increaseQuantity">
+              +
+            </button>
           </div>
         </div>
 
         <div>
-          <h2 class="text-lg font-semibold text-[#7D0A0A] mb-2">Deskripsi Produk</h2>
+          <h2 class="text-lg font-semibold text-[#7D0A0A] mb-2">
+            Deskripsi Produk
+          </h2>
           <p class="text-gray-700 text-sm whitespace-pre-wrap">
             <span v-if="!readMore">
               {{ produk.deskripsi.slice(0, 100) }}...
               <br />
-              <button @click="readMore = true" class="text-[#7D0A0A] underline mt-2">Baca selengkapnya</button>
+              <button
+                @click="readMore = true"
+                class="text-[#7D0A0A] underline mt-2"
+              >
+                Baca selengkapnya
+              </button>
             </span>
             <span v-else>
               {{ produk.deskripsi }}
               <br />
-              <button @click="readMore = false" class="text-[#7D0A0A] underline mt-2">Tutup</button>
+              <button
+                @click="readMore = false"
+                class="text-[#7D0A0A] underline mt-2"
+              >
+                Tutup
+              </button>
             </span>
           </p>
+        </div>
+
+        <!-- Tombol Rating -->
+        <div>
+          <button
+            class="text-sm text-[#7D0A0A] underline hover:text-red-800"
+            @click="openModal"
+          >
+            Lihat Rating & Review
+          </button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Produk Lain -->
   <div class="grid grid-cols-2 md:grid-cols-6 gap-4 p-4">
-  <product
-      v-for="product in products"
-      :key="product.id"
-      :product="product"
-    />
+    <product v-for="product in products" :key="product.id" :product="product" />
   </div>
+
+  <!-- Modal Rating -->
+  <transition name="fade-scale">
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+    >
+      <div
+        class="bg-white w-full max-w-lg rounded-2xl shadow-lg p-6 relative transform transition-all"
+      >
+        <h2 class="text-xl font-bold text-[#7D0A0A] mb-4">
+          Rating & Review
+        </h2>
+
+        <div v-if="ratings.length" class="space-y-4 max-h-96 overflow-y-auto">
+          <div
+            v-for="(rating, index) in ratings"
+            :key="index"
+            class="border rounded-lg p-3 hover:bg-gray-50 transition"
+          >
+            <p class="font-semibold text-yellow-600">★ {{ rating.bintang }}/5</p>
+            <p class="text-gray-700 text-sm">{{ rating.komentar }}</p>
+            <p class="text-xs text-gray-500">oleh {{ rating.user }}</p>
+          </div>
+        </div>
+        <div v-else class="text-gray-500">Belum ada rating.</div>
+
+        <!-- Tombol Close -->
+        <button
+          class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+          @click="closeModal"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script setup>
 import Navbar from '@/components/navbar/navbar.vue';
-import product from '@/components/card/product.vue'
-import { ref, onMounted, computed } from 'vue';
+import product from '@/components/card/product.vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import api from "@/plugins/axios";
+import api from '@/plugins/axios';
 
 const route = useRoute();
 const router = useRouter();
@@ -109,25 +190,32 @@ const router = useRouter();
 const produk = ref(null);
 const products = ref([]);
 const readMore = ref(false);
-const kodeTransaksi = ref(route.params.kode || "");
+const showModal = ref(false);
+const ratings = ref([]);
+
+const kodeTransaksi = ref(route.params.kode || '');
 
 const fetchProducts = async () => {
   try {
-    const response = await api.get("/product", {
+    const response = await api.get('/product', {
       params: {
         status: 'publish'
       }
-    })
+    });
 
-    if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
-      products.value = response.data.data.data.sort(() => Math.random() - 0.5)
-    } else {
-      console.error("Expected an array but got:", typeof response.data.data)
+    if (
+      response.data &&
+      response.data.data &&
+      Array.isArray(response.data.data.data)
+    ) {
+      products.value = response.data.data.data.sort(
+        () => Math.random() - 0.5
+      );
     }
   } catch (error) {
-    console.error("Error fetching products:", error)
+    console.error('Error fetching products:', error);
   }
-}
+};
 
 const getProductById = async () => {
   const id = parseInt(route.params.id);
@@ -139,7 +227,7 @@ const getProductById = async () => {
       const response = await api.get(`/product?page=${page}`);
       const products = response.data.data.data;
 
-      found = products.find(p => p.id === id);
+      found = products.find((p) => p.id === id);
       if (found) {
         produk.value = {
           ...found,
@@ -150,14 +238,34 @@ const getProductById = async () => {
       }
 
       if (products.length < 10) {
-        console.error('Produk tidak ditemukan di semua halaman');
         break;
       }
 
-      page++; 
+      page++;
     }
   } catch (error) {
     console.error('Gagal mengambil produk:', error);
+  }
+};
+
+const getRating = async (productId) => {
+  try {
+    // dummy 10 data
+    ratings.value = [
+      { bintang: 5, komentar: 'Kualitas bagus banget!', user: 'Andi' },
+      { bintang: 4, komentar: 'Nyaman dipakai, tapi agak sempit.', user: 'Budi' },
+      { bintang: 3, komentar: 'Lumayan lah untuk harga segini.', user: 'Citra' },
+      { bintang: 5, komentar: 'Barang sesuai deskripsi!', user: 'Dewi' },
+      { bintang: 4, komentar: 'Pengiriman cepat 👍', user: 'Eka' },
+      { bintang: 2, komentar: 'Kurang sesuai ekspektasi', user: 'Fajar' },
+      { bintang: 5, komentar: 'Top seller, mantap!', user: 'Gita' },
+      { bintang: 3, komentar: 'Biasa aja sih', user: 'Hari' },
+      { bintang: 5, komentar: 'Recommended seller 💯', user: 'Indra' },
+      { bintang: 4, komentar: 'Bagus, tapi packaging kurang rapi', user: 'Joko' }
+    ];
+  } catch (error) {
+    console.error('Gagal mengambil rating:', error);
+    ratings.value = [];
   }
 };
 
@@ -170,9 +278,9 @@ const changeMainImage = (imageUrl) => {
 const formatRupiah = (value) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'decimal',
-    minimumFractionDigits: 0,
-  }).format(value)
-}
+    minimumFractionDigits: 0
+  }).format(value);
+};
 
 const increaseQuantity = () => {
   if (produk.value) {
@@ -218,26 +326,21 @@ const formDetailTransaction = async (transactionId) => {
   }
 };
 
-
 const addToCart = async (payload) => {
   try {
     const response = await api.post('/detailcart', payload);
-    
-    console.log('Item berhasil ditambahkan:');
-    return response.data; 
+    return response.data;
   } catch (error) {
     if (error.response) {
-      console.error('Gagal menambahkan item:', error.response.data);
       return {
         success: false,
         message: error.response.data.message,
-        errors: error.response.data.errors || null,
+        errors: error.response.data.errors || null
       };
     } else {
-      console.error('Terjadi kesalahan:', error.message);
       return {
         success: false,
-        message: 'Terjadi kesalahan pada jaringan atau server.',
+        message: 'Terjadi kesalahan pada jaringan atau server.'
       };
     }
   }
@@ -256,13 +359,35 @@ const handleAddToCart = async () => {
   if (result.success === false) {
     alert(result.message);
   } else {
-    alert("Produk berhasil ditambahkan ke keranjang!");
+    alert('Produk berhasil ditambahkan ke keranjang!');
   }
 };
 
+// Animasi buka modal
+const openModal = () => {
+  showModal.value = true;
+  getRating(produk.value?.id);
+};
+
+// Animasi tutup modal
+const closeModal = () => {
+  showModal.value = false;
+};
 
 onMounted(() => {
   getProductById();
   fetchProducts();
 });
 </script>
+
+<style>
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-scale-enter-from,
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+</style>
