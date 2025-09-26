@@ -143,24 +143,33 @@
   <transition name="fade-scale">
     <div
       v-if="showModal"
-      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50"
     >
-      <div
-        class="bg-white w-full max-w-lg rounded-2xl shadow-lg p-6 relative transform transition-all"
-      >
-        <h2 class="text-xl font-bold text-[#7D0A0A] mb-4">
-          Rating & Review
-        </h2>
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-lg p-6 relative">
+        <h2 class="text-xl font-bold text-[#7D0A0A] mb-4">Rating & Review</h2>
 
-        <div v-if="ratings.length" class="space-y-4 max-h-96 overflow-y-auto">
+        <!-- Scrollable dengan padding kanan -->
+        <div v-if="ratings.length" class="space-y-4 max-h-96 overflow-y-auto pr-3">
           <div
             v-for="(rating, index) in ratings"
             :key="index"
-            class="border rounded-lg p-3 hover:bg-gray-50 transition"
+            class="border rounded-lg p-3 space-y-2"
           >
             <p class="font-semibold text-yellow-600">★ {{ rating.bintang }}/5</p>
             <p class="text-gray-700 text-sm">{{ rating.komentar }}</p>
             <p class="text-xs text-gray-500">oleh {{ rating.user }}</p>
+
+            <!-- Foto Review -->
+            <div v-if="rating.foto && rating.foto.length" class="grid grid-cols-3 gap-2 mt-2">
+              <img
+                v-for="(foto, fIndex) in rating.foto"
+                :key="fIndex"
+                :src="foto"
+                class="w-full h-24 object-cover rounded-lg border hover:scale-105 transition cursor-pointer"
+                alt="Foto review"
+                @click="openImage(foto)"
+              />
+            </div>
           </div>
         </div>
         <div v-else class="text-gray-500">Belum ada rating.</div>
@@ -168,11 +177,26 @@
         <!-- Tombol Close -->
         <button
           class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-          @click="closeModal"
+          @click="showModal = false"
         >
           ✕
         </button>
       </div>
+    </div>
+  </transition>
+
+  <!-- Modal Preview Foto -->
+  <transition name="fade-scale">
+    <div
+      v-if="selectedImage"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+      @click="closeImage"
+    >
+      <img
+        :src="selectedImage"
+        class="max-h-[90%] max-w-[90%] rounded-lg shadow-lg"
+        alt="Preview"
+      />
     </div>
   </transition>
 </template>
@@ -192,25 +216,16 @@ const products = ref([]);
 const readMore = ref(false);
 const showModal = ref(false);
 const ratings = ref([]);
+const rating = ref([]);
+const selectedImage = ref(null);
 
 const kodeTransaksi = ref(route.params.kode || '');
 
 const fetchProducts = async () => {
   try {
-    const response = await api.get('/product', {
-      params: {
-        status: 'publish'
-      }
-    });
-
-    if (
-      response.data &&
-      response.data.data &&
-      Array.isArray(response.data.data.data)
-    ) {
-      products.value = response.data.data.data.sort(
-        () => Math.random() - 0.5
-      );
+    const response = await api.get('/product', { params: { status: 'publish' } });
+    if (response.data?.data?.data && Array.isArray(response.data.data.data)) {
+      products.value = response.data.data.data.sort(() => Math.random() - 0.5);
     }
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -229,18 +244,11 @@ const getProductById = async () => {
 
       found = products.find((p) => p.id === id);
       if (found) {
-        produk.value = {
-          ...found,
-          selectedImage: found.foto_cover,
-          quantity: 1
-        };
+        produk.value = { ...found, selectedImage: found.foto_cover, quantity: 1 };
         break;
       }
 
-      if (products.length < 10) {
-        break;
-      }
-
+      if (products.length < 10) break;
       page++;
     }
   } catch (error) {
@@ -248,20 +256,23 @@ const getProductById = async () => {
   }
 };
 
-const getRating = async (productId) => {
+const getRatings = async (productId) => {
   try {
-    // dummy 10 data
+    const response = await api.get(`/rating?id_product=${productId}`);
+    rating.value = response.data.data || [];
+    console.log(rating.value); 
+  } catch (error) {
+    console.error('Gagal mengambil rating:', error);
+    rating.value = [];
+  }
+};
+
+const getRating = async () => {
+  try {
     ratings.value = [
-      { bintang: 5, komentar: 'Kualitas bagus banget!', user: 'Andi' },
-      { bintang: 4, komentar: 'Nyaman dipakai, tapi agak sempit.', user: 'Budi' },
-      { bintang: 3, komentar: 'Lumayan lah untuk harga segini.', user: 'Citra' },
-      { bintang: 5, komentar: 'Barang sesuai deskripsi!', user: 'Dewi' },
-      { bintang: 4, komentar: 'Pengiriman cepat 👍', user: 'Eka' },
-      { bintang: 2, komentar: 'Kurang sesuai ekspektasi', user: 'Fajar' },
-      { bintang: 5, komentar: 'Top seller, mantap!', user: 'Gita' },
-      { bintang: 3, komentar: 'Biasa aja sih', user: 'Hari' },
-      { bintang: 5, komentar: 'Recommended seller 💯', user: 'Indra' },
-      { bintang: 4, komentar: 'Bagus, tapi packaging kurang rapi', user: 'Joko' }
+      { bintang: 5, komentar: 'Kualitas bagus banget!', user: 'Andi', foto: ['/img/rev1.jpg'] },
+      { bintang: 4, komentar: 'Nyaman dipakai, tapi agak sempit.', user: 'Budi', foto: [] },
+      { bintang: 3, komentar: 'Lumayan lah untuk harga segini.', user: 'Citra', foto: ['/img/rev2.jpg'] }
     ];
   } catch (error) {
     console.error('Gagal mengambil rating:', error);
@@ -270,29 +281,14 @@ const getRating = async (productId) => {
 };
 
 const changeMainImage = (imageUrl) => {
-  if (produk.value) {
-    produk.value.selectedImage = imageUrl;
-  }
+  if (produk.value) produk.value.selectedImage = imageUrl;
 };
 
-const formatRupiah = (value) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'decimal',
-    minimumFractionDigits: 0
-  }).format(value);
-};
+const formatRupiah = (value) =>
+  new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(value);
 
-const increaseQuantity = () => {
-  if (produk.value) {
-    produk.value.quantity++;
-  }
-};
-
-const decreaseQuantity = () => {
-  if (produk.value && produk.value.quantity > 1) {
-    produk.value.quantity--;
-  }
-};
+const increaseQuantity = () => { if (produk.value) produk.value.quantity++; };
+const decreaseQuantity = () => { if (produk.value && produk.value.quantity > 1) produk.value.quantity--; };
 
 const formTransaction = async () => {
   try {
@@ -304,7 +300,6 @@ const formTransaction = async () => {
       produk_id: produk.value.id,
       quantity: produk.value.quantity
     };
-
     const response = await api.post('/transaction', payload);
     await formDetailTransaction(response.data.data.id);
     router.push(`/list-transaksi`);
@@ -315,11 +310,7 @@ const formTransaction = async () => {
 
 const formDetailTransaction = async (transactionId) => {
   try {
-    const payload = {
-      transaction_id: transactionId,
-      product_id: produk.value.id,
-      jumlah: produk.value.quantity
-    };
+    const payload = { transaction_id: transactionId, product_id: produk.value.id, jumlah: produk.value.quantity };
     await api.post('/detail-transaction', payload);
   } catch (error) {
     console.error('Gagal detail transaksi:', error);
@@ -332,52 +323,32 @@ const addToCart = async (payload) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      return {
-        success: false,
-        message: error.response.data.message,
-        errors: error.response.data.errors || null
-      };
+      return { success: false, message: error.response.data.message, errors: error.response.data.errors || null };
     } else {
-      return {
-        success: false,
-        message: 'Terjadi kesalahan pada jaringan atau server.'
-      };
+      return { success: false, message: 'Terjadi kesalahan pada jaringan atau server.' };
     }
   }
 };
 
 const handleAddToCart = async () => {
   if (!produk.value) return;
-
-  const payload = {
-    product_id: produk.value.id,
-    jumlah: produk.value.quantity
-  };
-
+  const payload = { product_id: produk.value.id, jumlah: produk.value.quantity };
   const result = await addToCart(payload);
+  alert(result.success === false ? result.message : 'Produk berhasil ditambahkan ke keranjang!');
+};
 
-  if (result.success === false) {
-    alert(result.message);
-  } else {
-    alert('Produk berhasil ditambahkan ke keranjang!');
+// Modal actions
+const openModal = () => { showModal.value = true; getRating(produk.value?.id); };
+const closeModal = () => { showModal.value = false; };
+const openImage = (url) => { selectedImage.value = url; };
+const closeImage = () => { selectedImage.value = null; };
+
+onMounted( async () => { 
+    await getProductById(); 
+    await fetchProducts();
+    await getRatings();
   }
-};
-
-// Animasi buka modal
-const openModal = () => {
-  showModal.value = true;
-  getRating(produk.value?.id);
-};
-
-// Animasi tutup modal
-const closeModal = () => {
-  showModal.value = false;
-};
-
-onMounted(() => {
-  getProductById();
-  fetchProducts();
-});
+);
 </script>
 
 <style>
@@ -389,5 +360,17 @@ onMounted(() => {
 .fade-scale-leave-to {
   opacity: 0;
   transform: scale(0.9);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 </style>

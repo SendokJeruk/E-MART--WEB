@@ -214,10 +214,12 @@ const postConfirmation = async (id) => {
     alert('Pesanan dikonfirmasi!')
     getShipment()
   } catch (error) {
+    const msg = error.response?.data?.message || 'Gagal konfirmasi pesanan'
+    alert(msg)
     console.error('Gagal konfirmasi pesanan:', error)
-    alert('Gagal konfirmasi pesanan')
   }
 }
+  
 
 // modal handler
 const openRatingModal = (shipment) => {

@@ -123,19 +123,22 @@ const getPengiriman = async () => {
 const updateStatus = async (item) => {
   try {
     const res = await api.put(`/pengiriman/${item.id}`, {
+      kode_transaksi: item.kode_transaksi,
       status_pengiriman: item.status_pengiriman,
-      kode_transaksi: item.kode_transaksi
+      resi: item.kode_resi ?? null,
+      ekspedisi: item.kurir ?? null,
+      plat_nomor: item.plat_nomor ?? null,
+      estimasi_tiba: item.estimasi_tiba ?? null,
+      bukti_pengiriman: item.bukti_pengiriman ?? null,
     });
-    console.log("Update response:", res.data);
-    alert('Status berhasil diperbarui!');
-    await getPengiriman(); // refresh dari server
+
+    alert("Status berhasil diperbarui!");
+    await getPengiriman();
   } catch (error) {
-    console.log("Update error:", error.response?.data || error);
-    alert('Gagal update status');
-    await getPengiriman(); // reset data jika gagal
+    alert("Gagal update status");
+    await getPengiriman();
   }
 };
-
 
 // hapus pengiriman
 const deletePengiriman = async (id) => {

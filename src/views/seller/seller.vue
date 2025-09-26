@@ -147,6 +147,8 @@ const getIncome = async () => {
     const response = await api.get("/income")
     const myIncome = response.data.data.income
 
+    console.log("My income:", myIncome) 
+
     totalIncome.value = myIncome.jumlah_total || 0
     totalPenjualan.value = myIncome.total_penjualan || 0
 
