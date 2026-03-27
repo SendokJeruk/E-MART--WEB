@@ -79,12 +79,7 @@ const userName = ref('')       // Nama user
 const userRole = ref('')       // Role user
 
 // Gambar carousel
-const imagesA = [
-  'https://placehold.co/300',
-  'https://placehold.co/300',
-  'https://placehold.co/300',
-  'https://placehold.co/300'
-]
+const imagesA = ref([])
 
 // Fungsi untuk menangani pencarian
 const doSearch = (query) => {
@@ -155,10 +150,23 @@ const loadMore = () => {
   }
 }
 
+const getBannerDashboard = async () => {
+  try {
+    const res = await api.get('/content?section=dashboard')
+    imagesA.value = res.data.data.map(item => item.image) || []
+    console.log("Fetched dashboard banners:", res)
+  } catch (error) {
+    console.error('Gagal ambil banner dashboard:', error)
+  } finally{
+    isLoading.value = false
+  }
+}
+
 // Lifecycle hook
 onMounted(async () => {
   await checkRoleAndRedirect()
   await fetchProducts(currentPage.value)
+  await getBannerDashboard()
 })
 </script>
 

@@ -4,9 +4,13 @@
       
       <!-- Carousel Image (desktop only) -->
       <div v-if="isDesktop" class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4">
-        <div class="w-11/12">
-          <img :src="images[currentImage]" class="w-full rounded-lg" alt="Carousel Image" />
-        </div>
+        <div class="w-11/12 h-[500px] bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
+          <img
+            v-if="images.length"
+            :src="images[currentImage]"
+            class="max-w-full max-h-full object-contain rounded-lg"
+          />
+        </div>  
       </div>
 
       <!-- Login Form -->
@@ -55,11 +59,7 @@ import { showError } from "@/utils/alert";
 
 const router = useRouter();
 const form = ref({ email: "", password: "" });
-const images = ref([
-  "https://placehold.co/400x500",
-  "https://placehold.co/400x500/7D0A0A/FFF",
-  "https://placehold.co/400x500/EAD196/000",
-]);
+const images = ref([])
 const currentImage = ref(0);
 const isDesktop = ref(window.innerWidth >= 768);
 const loading = ref(false);
@@ -92,10 +92,23 @@ const loginUser = async () => {
   }
 };
 
+const getBannerLogin = async () => {
+  try {
+    const response = await api.get("/content?section=login")
+    const data = response.data.data || []
+    images.value = data.map(item => item.image)
+
+    console.log("Images:", images.value)
+  } catch (error) {
+    console.error("Error fetching login banners:", error)
+  }
+}
+
 onMounted(() => {
-  interval = setInterval(nextImage, 3000);
-  window.addEventListener("resize", checkScreen);
-});
+  interval = setInterval(nextImage, 3000)
+  window.addEventListener("resize", checkScreen)
+  getBannerLogin()
+})
 
 onUnmounted(() => {
   clearInterval(interval);

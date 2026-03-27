@@ -8,13 +8,13 @@
         v-if="isDesktop"
         class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4"
       >
-        <div class="w-11/12">
+        <div class="w-11/12 h-[500px] bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
           <img
+            v-if="images.length"
             :src="images[currentImage]"
-            class="w-full rounded-lg"
-            alt="Carousel Image"
+            class="max-w-full max-h-full object-contain rounded-lg"
           />
-        </div>
+        </div>  
       </div>
 
       <!-- Form Section -->
@@ -88,77 +88,93 @@
   </div>
 </template>
 
-<script>
-import api from "@/plugins/axios";
-import { showError, showSuccess } from "@/utils/alert";
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '@/plugins/axios'
+import { showSuccess, showError } from '@/utils/alert'
 
-export default {
-  data() {
-    return {
-      form: {
-        name: "",
-        email: "",
-        no_telp: "",
-        password: "",
-        role_id: 3,
-      },
-      images: [
-        "https://placehold.co/400x500",
-        "https://placehold.co/400x500/7D0A0A/FFF",
-        "https://placehold.co/400x500/EAD196/000",
-      ],
-      currentImage: 0,
-      isDesktop: window.innerWidth >= 768,
-      intervalId: null,
-      requirements: [
-        { label: "Minimal 8 karakter", test: (pw) => pw.length >= 8 },
-        { label: "Huruf besar", test: (pw) => /[A-Z]/.test(pw) },
-        { label: "Huruf kecil", test: (pw) => /[a-z]/.test(pw) },
-        { label: "Angka", test: (pw) => /\d/.test(pw) },
-        { label: "Simbol (@, #, $, dll)", test: (pw) => /[!@#$%^&*(),.?\":{}|<>]/.test(pw) },
-      ],
-    };
-  },
-  computed: {
-    unmetRequirements() {
-      return this.requirements
-        .filter((rule) => !rule.test(this.form.password))
-        .map((rule) => rule.label);
-    },
-  },
-  mounted() {
-    this.intervalId = setInterval(this.nextImage, 3000);
-    window.addEventListener("resize", this.checkScreen);
-  },
-  methods: {
-    async registerUser() {
-      try {
-        await api.post("/auth/register", this.form);
-        showSuccess("Registrasi Berhasil! Silakan Login.");
-        this.$router.push("/login");
-      } catch (error) {
-        if (error.response && error.response.status === 422) {
-          const errors = error.response.data.errors;
-          let messages = "";
-          for (const key in errors) {
-            messages += errors[key].join("\n") + "\n";
-          }
-          showError(messages);
-        } else {
-          showError("Registrasi Gagal!");
-        }
+const router = useRouter()
+
+/* ================= STATE ================= */
+const form = ref({
+  name: "",
+  email: "",
+  no_telp: "",
+  password: "",
+  role_id: 3,
+})
+
+const images = ref([])
+
+const currentImage = ref(0)
+const isDesktop = ref(window.innerWidth >= 768)
+const intervalId = ref(null)
+
+const requirements = [
+  { label: "Minimal 8 karakter", test: (pw) => pw.length >= 8 },
+  { label: "Huruf besar", test: (pw) => /[A-Z]/.test(pw) },
+  { label: "Huruf kecil", test: (pw) => /[a-z]/.test(pw) },
+  { label: "Angka", test: (pw) => /\d/.test(pw) },
+  { label: "Simbol (@, #, $, dll)", test: (pw) => /[!@#$%^&*(),.?\":{}|<>]/.test(pw) },
+]
+
+/* ================= COMPUTED ================= */
+const unmetRequirements = computed(() => {
+  return requirements
+    .filter(rule => !rule.test(form.value.password))
+    .map(rule => rule.label)
+})
+
+/* ================= METHODS ================= */
+const registerUser = async () => {
+  try {
+    await api.post("/auth/register", form.value)
+    showSuccess("Registrasi Berhasil! Silakan Login.")
+    router.push("/login")
+  } catch (error) {
+    if (error.response && error.response.status === 422) {
+      const errors = error.response.data.errors
+      let messages = ""
+      for (const key in errors) {
+        messages += errors[key].join("\n") + "\n"
       }
-    },
-    nextImage() {
-      this.currentImage = (this.currentImage + 1) % this.images.length;
-    },
-    checkScreen() {
-      this.isDesktop = window.innerWidth >= 768;
-    },
-  },
-  beforeUnmount() {
-    clearInterval(this.intervalId);
-    window.removeEventListener("resize", this.checkScreen);
-  },
-};
+      showError(messages)
+    } else {
+      showError("Registrasi Gagal!")
+    }
+  }
+}
+
+const nextImage = () => {
+  currentImage.value = (currentImage.value + 1) % images.value.length
+}
+
+const checkScreen = () => {
+  isDesktop.value = window.innerWidth >= 768
+}
+
+const getBannerLogin = async () => {
+  try {
+    const response = await api.get("/content?section=login")
+    const data = response.data.data || []
+    images.value = data.map(item => item.image)
+
+    console.log("Images:", images.value)
+  } catch (error) {
+    console.error("Error fetching login banners:", error)
+  }
+}
+
+/* ================= LIFECYCLE ================= */
+onMounted(() => {
+  intervalId.value = setInterval(nextImage, 3000)
+  window.addEventListener("resize", checkScreen)
+  getBannerLogin()
+})
+
+onUnmounted(() => {
+  clearInterval(intervalId.value)
+  window.removeEventListener("resize", checkScreen)
+})
 </script>
