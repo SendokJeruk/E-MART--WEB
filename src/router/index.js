@@ -42,6 +42,7 @@ import SettingsAdmin from "@/views/Admin/settings/settings-admin.vue";
 import ManagePengiriman from "@/views/seller/manage-pengiriman/manage-pengiriman.vue";
 import ManageIncome from "@/views/Admin/manage-income/manage-income.vue";
 import Withdraw from "@/views/seller/withdraw/withdraw.vue";
+import ManageBanner from "@/views/Admin/manage-banner/manage-banner.vue";
 
 const routes = [
     // Dashboard
@@ -284,6 +285,12 @@ const routes = [
         path: '/withdraw',
         name: 'withdraw',
         component: Withdraw
+    },
+    //
+    {
+        path: '/manage-banner',
+        name: 'manageBanner',
+        component: ManageBanner
     }
 ]
 const router = createRouter({
