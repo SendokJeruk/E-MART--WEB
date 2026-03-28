@@ -43,6 +43,9 @@ import ManagePengiriman from "@/views/seller/manage-pengiriman/manage-pengiriman
 import ManageIncome from "@/views/Admin/manage-income/manage-income.vue";
 import Withdraw from "@/views/seller/withdraw/withdraw.vue";
 import ManageBanner from "@/views/Admin/manage-banner/manage-banner.vue";
+import VerifyPage from "@/views/Auth/verify.vue";
+import ResetPass from "@/views/Auth/forget-pass.vue";
+import RequestResetPass from "@/views/Auth/request-forget-pass.vue";
 
 const routes = [
     // Dashboard
@@ -68,6 +71,21 @@ const routes = [
         path: '/register',
         name: 'Register',
         component: Register
+    },
+    {
+        path: '/verify',
+        name: 'Verify',
+        component: VerifyPage
+    },
+    {
+        path: '/forget-password',
+        name: 'Forget Password',
+        component: RequestResetPass
+    },
+    {
+        path: '/reset-password',
+        name: 'reset Password',
+        component: ResetPass
     },
 
     // Admin
