@@ -29,11 +29,11 @@
     <div v-else class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-4 py-4">
 
-        <router-link to="/dashboard">
+        <a href="/dashboard">
           <img src="@/assets/img/LOGO E-MART APP.png"
-          alt="Logo"
-          class="h-10 sm:h-14 w-auto object-contain" />
-        </router-link>
+              alt="Logo"
+              class="h-10 sm:h-14 w-auto object-contain" />
+        </a>
 
         <img
           :src="user?.foto_profil || 'https://placehold.co/100'"
@@ -47,8 +47,8 @@
             type="text"
             placeholder="Cari di E-MART"
             class="w-full p-2 text-sm sm:text-base border border-gray-300 rounded-md bg-white"
-            @keyup.enter="$emit('search', search)"
-          />
+            @keyup.enter="searchBar"          
+            />
         </div>
 
         <div v-if="!isLoggedIn"></div>
@@ -93,6 +93,7 @@ const userName = ref('')
 const userRole = ref('')
 const user = ref(null)
 const router = useRouter()
+const emit = defineEmits(['search'])
 
 const getProfile = async () => {
   try {
@@ -111,9 +112,32 @@ const getProfile = async () => {
 
 const searchBar = async () => {
   if (!search.value) return
+
   try {
-    const response = await api.get(`/product?nama_product=${search.value}`)
-    console.log("Hasil search:", response.data)
+    const response = await api.get(`/product`, {
+      params: {
+        nama_product: search.value,
+        page: 1
+      }
+    })
+
+    const result = response?.data?.data?.data || []
+
+    if (result.length === 0) {
+      emit('search', {
+        products: [],
+        query: search.value,
+        notFound: true
+      })
+      return
+    }
+
+    emit('search', {
+      products: result,
+      query: search.value,
+      notFound: false
+    })
+
   } catch (error) {
     console.error("Search error:", error)
   }

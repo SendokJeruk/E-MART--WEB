@@ -1,6 +1,6 @@
 <template>
   <!-- Navbar dengan search input -->
-  <Navbar v-model="searchQuery" @search="doSearch" />
+  <Navbar @search="doSearch" />
 
   <!-- Carousel/Slider gambar -->
   <div class="p-4">
@@ -9,12 +9,35 @@
 
   <!-- Kategori produk -->
   <div class="flex space-x-2 overflow-x-auto p-4">
-    <button class="px-4 py-1 bg-[#7D0A0A] text-white rounded-full whitespace-nowrap">Semua Kategori</button>
-    <button class="px-4 py-1 border border-[#7D0A0A] text-[#7D0A0A] rounded-full whitespace-nowrap">Pedas</button>
-    <button class="px-4 py-1 border border-[#7D0A0A] text-[#7D0A0A] rounded-full whitespace-nowrap">Manis</button>
-    <button class="px-4 py-1 border border-[#7D0A0A] text-[#7D0A0A] rounded-full whitespace-nowrap">Asin</button>
-    <button class="px-4 py-1 border border-[#7D0A0A] text-[#7D0A0A] rounded-full whitespace-nowrap">Murah</button>
-    <button class="px-4 py-1 border border-[#7D0A0A] text-[#7D0A0A] rounded-full whitespace-nowrap">Promo</button>
+    
+    <!-- Semua kategori -->
+    <button
+      @click="clearCategory"
+      :class="[
+        'px-4 py-1 rounded-full whitespace-nowrap',
+        selectedCategories.length === 0
+          ? 'bg-[#7D0A0A] text-white'
+          : 'border border-[#7D0A0A] text-[#7D0A0A]'
+      ]"
+    >
+      Semua Kategori
+    </button>
+
+    <!-- Loop kategori -->
+    <button
+      v-for="cat in categories"
+      :key="cat.id"
+      @click="toggleCategory(cat.id)"
+      :class="[
+        'px-4 py-1 rounded-full whitespace-nowrap',
+        selectedCategories.includes(cat.id)
+          ? 'bg-[#7D0A0A] text-white'
+          : 'border border-[#7D0A0A] text-[#7D0A0A]'
+      ]"
+    >
+      {{ cat.nama_category }}
+    </button>
+
   </div>
 
   <!-- Daftar Produk -->
@@ -37,8 +60,8 @@
     </template>
 
     <!-- Tidak ada produk -->
-    <div v-if="!isLoading && products.length === 0" class="col-span-full text-gray-500 py-10 text-center">
-      Tidak ada produk ditemukan.
+    <div v-if="!isLoading && isNotFound" class="col-span-full text-gray-500 py-10 text-center">
+      Produk tidak ditemukan
     </div>
 
   </div>
@@ -72,6 +95,11 @@ const currentPage = ref(1)     // Halaman saat ini
 const lastPage = ref(null)     // Halaman terakhir dari API
 const isLoading = ref(false)   // Loading state
 const searchQuery = ref("")    // Query pencarian produk
+const isNotFound = ref(false)
+
+// state categories
+const categories = ref([])
+const selectedCategories = ref([])
 
 // State user
 const isLoggedIn = ref(false)  // Status login
@@ -81,10 +109,11 @@ const userRole = ref('')       // Role user
 // Gambar carousel
 const imagesA = ref([])
 
-// Fungsi untuk menangani pencarian
-const doSearch = (query) => {
-  searchQuery.value = query
-  fetchProducts(1) // Fetch ulang dari halaman 1
+const doSearch = (data) => {
+  products.value = data.products
+  searchQuery.value = data.query
+  currentPage.value = 1
+  isNotFound.value = data.notFound
 }
 
 // Fungsi cek role user & redirect jika admin
@@ -110,9 +139,10 @@ const fetchProducts = async (page = 1) => {
 
     const response = await api.get("/product", {
       params: { 
-        status: 'publish',      // Hanya produk publish
-        page: page,             // Pagination
-        nama_product: searchQuery.value // Search filter
+        status: 'publish',
+        page: page,
+        nama_product: searchQuery.value,
+        categories: selectedCategories.value.join(',') // 🔥 ini dia
       }
     })
 
@@ -154,7 +184,6 @@ const getBannerDashboard = async () => {
   try {
     const res = await api.get('/content?section=dashboard')
     imagesA.value = res.data.data.map(item => item.image) || []
-    console.log("Fetched dashboard banners:", res)
   } catch (error) {
     console.error('Gagal ambil banner dashboard:', error)
   } finally{
@@ -162,11 +191,40 @@ const getBannerDashboard = async () => {
   }
 }
 
+const getCategories = async () => {
+  try {
+    const res = await api.get('/category')
+    categories.value = res.data.data.data || []
+  } catch (error) {
+    console.error('Gagal ambil kategori:', error)
+  }
+}
+
+const toggleCategory = async (id) => {
+  const index = selectedCategories.value.indexOf(id)
+
+  if (index === -1) {
+    selectedCategories.value.push(id) 
+  } else {
+    selectedCategories.value.splice(index, 1)
+  }
+
+  currentPage.value = 1
+  await fetchProducts(1)
+}
+
+const clearCategory = async () => {
+  selectedCategories.value = []
+  currentPage.value = 1
+  await fetchProducts(1)
+}
+
 // Lifecycle hook
 onMounted(async () => {
   await checkRoleAndRedirect()
   await fetchProducts(currentPage.value)
   await getBannerDashboard()
+  await getCategories()
 })
 </script>
 
