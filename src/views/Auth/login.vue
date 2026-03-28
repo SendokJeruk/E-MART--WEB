@@ -45,6 +45,12 @@
           >
             Don't Have an Account? Register
           </router-link>
+          <router-link
+            to="/forget-password"
+            class="block text-[#EAD196] underline mt-2 inter-font"
+          >
+            Forgot Password 
+          </router-link>
         </form>
       </div>
     </div>
