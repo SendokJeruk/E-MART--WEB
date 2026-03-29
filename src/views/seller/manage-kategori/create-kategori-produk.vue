@@ -82,7 +82,7 @@
   
   const getProduct = async () => {
     try {
-      const response = await api.get('/product/myproduct')
+      const response = await api.get('/product/myproducts')
       if (Array.isArray(response.data.data.data)) {
         products.value = response.data.data.data
         ProductSeller.value = products.value.filter(p => p.user_id === user.value.id)
