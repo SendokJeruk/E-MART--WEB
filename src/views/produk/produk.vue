@@ -105,9 +105,10 @@
         <div class="flex items-center flex-wrap gap-4">
           <form @submit.prevent="formTransaction">
             <button
-              class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
-            >
-              Beli Sekarang
+              class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="isFetching">
+              <span v-if="isFetching">Loading...</span>
+              <span v-else>Beli Sekarang</span>
             </button>
           </form>
 
@@ -128,7 +129,7 @@
               v-model="produk.quantity"
               class="text-lg font-semibold border rounded px-2 py-1 w-20"
             />
-            <button class="text-xl font-bold" @click="increaseQuantity">
+            <button class="text-xl font-bold " :disabled="produk.quantity >= produk.stock"  @click="increaseQuantity">
               +
             </button>
           </div>
@@ -285,6 +286,7 @@ const ratings = ref([]);
 const rating = ref([]);
 const selectedImage = ref(null);
 const isLoading = ref(true);
+const isFetching = ref(false);
 
 const kodeTransaksi = ref(route.params.kode || '');
 
@@ -298,6 +300,21 @@ watch(
     await getRatings(newId);  // fetch rating baru
   }
 );
+
+watch(
+  () => produk.value?.quantity,
+  (newVal) => {
+    if (!produk.value) return;
+
+    if (newVal > produk.value.stock) {
+      produk.value.quantity = produk.value.stock;
+    }
+
+    if (newVal < 1) {
+      produk.value.quantity = 1;
+    }
+  }
+); //? ANE NAMBAH INI BUAT BIAR DOUBLE SAFETY STOCK
 
 const toSlug = (text) => {
   return text
@@ -386,6 +403,7 @@ const decreaseQuantity = () => { if (produk.value && produk.value.quantity > 1) 
 
 const formTransaction = async () => {
   try {
+    isFetching.value = true
     const payload = {
       status: 'pending',
       tanggal_transaksi: null,
@@ -395,13 +413,26 @@ const formTransaction = async () => {
       quantity: produk.value.quantity
     };
 
+    if (produk.value.stock < produk.value.quantity) {
+      showError('Stock Produk Tidak Cukup');
+      return
+    }
+
     const response = await api.post('/transaction', payload);
     await formDetailTransaction(response.data.data.id);
 
     showSuccess('Transaksi berhasil dibuat!');
+    isFetching.value = false
     router.push(`/list-transaksi`);
+
+    
   } catch (error) {
     console.error('Gagal transaksi:', error);
+    if (error.response.data.status == 401) {
+      showError("Session Tidak Ada, Silahkan Login");
+      router.push(`/login`);
+      return
+    }
     showError('Gagal melakukan transaksi');
   }
 };
@@ -433,7 +464,12 @@ const handleAddToCart = async () => {
   const payload = { product_id: produk.value.id, jumlah: produk.value.quantity };
   const result = await addToCart(payload);
   if (result.success === false) {
-    showError(result.message);
+    if (result.message == "Unauthenticated" ) {
+      showError("Session Tidak Ada, Silahkan Login");
+      router.push(`/login`);
+      return
+    }
+    showError("Terjadi Kesalahan");
   } else {
     showSuccess('Produk berhasil ditambahkan ke keranjang!');
   }

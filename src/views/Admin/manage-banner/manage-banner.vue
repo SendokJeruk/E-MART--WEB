@@ -8,10 +8,10 @@
 
         <!-- PROFILE -->
         <div v-if="isProfileLoading" class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-          <Skeleton type="circle" size="40px"/>
+          <Skeleton type="circle" size="40px" />
           <div class="flex-1 space-y-2">
-            <Skeleton height="14px" width="70%"/>
-            <Skeleton height="12px" width="90%"/>
+            <Skeleton height="14px" width="70%" />
+            <Skeleton height="12px" width="90%" />
           </div>
         </div>
 
@@ -20,15 +20,13 @@
             <p class="text-sm font-bold">{{ user.name }}</p>
             <p class="text-xs text-gray-600">{{ user.email }}</p>
           </div>
-          <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 rounded-full"/>
+          <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 rounded-full" />
         </div>
       </div>
 
       <!-- BUTTON -->
-      <button
-        @click="openCreate"
-        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-6"
-      >
+      <button @click="openCreate"
+        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-6">
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
         <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
           Tambah Banner
@@ -50,11 +48,15 @@
           <!-- LOADING -->
           <tbody v-if="isLoading">
             <tr v-for="n in 5" :key="n" class="border-t">
-              <td class="px-4 py-3"><Skeleton width="80px"/></td>
-              <td class="px-4 py-3"><Skeleton width="100px" height="60px"/></td>
+              <td class="px-4 py-3">
+                <Skeleton width="80px" />
+              </td>
+              <td class="px-4 py-3">
+                <Skeleton width="100px" height="60px" />
+              </td>
               <td class="px-4 py-3 flex gap-2">
-                <Skeleton width="60px" height="30px"/>
-                <Skeleton width="60px" height="30px"/>
+                <Skeleton width="60px" height="30px" />
+                <Skeleton width="60px" height="30px" />
               </td>
             </tr>
           </tbody>
@@ -70,17 +72,13 @@
 
               <td class="px-4 py-2">
                 <div class="flex justify-center gap-2">
-                  <button
-                    @click="openEdit(banner)"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                  >
+                  <button @click="openEdit(banner)"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
                     Edit
                   </button>
 
-                  <button
-                    @click="deleteBanner(banner.id)"
-                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                  >
+                  <button @click="deleteBanner(banner.id)"
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
                     Hapus
                   </button>
                 </div>
@@ -102,28 +100,25 @@
           <!-- SECTION -->
           <div class="mb-4">
             <label class="block text-sm mb-1">Section</label>
-            <input v-model="form.section" class="w-full border px-3 py-2 rounded"/>
+            <input v-model="form.section" class="w-full border px-3 py-2 rounded" />
           </div>
 
           <!-- FILE -->
           <div class="mb-4">
             <label class="block text-sm mb-1">Upload Gambar</label>
-            <input type="file" @change="handleFile" class="w-full border px-3 py-2 rounded"/>
+            <input type="file" @change="handleFile" class="w-full border px-3 py-2 rounded" />
           </div>
 
           <!-- PREVIEW -->
           <div v-if="form.preview" class="mb-4">
-            <img :src="form.preview" class="w-full h-40 object-cover rounded"/>
+            <img :src="form.preview" class="w-full h-40 object-cover rounded" />
           </div>
 
           <!-- ACTION -->
           <div class="flex justify-end gap-2">
             <button @click="closeModal" class="px-4 py-2 border rounded">Batal</button>
 
-            <button
-              @click="isEdit ? updateBanner() : submitForm()"
-              class="px-4 py-2 bg-[#7D0A0A] text-white rounded"
-            >
+            <button @click="isEdit ? updateBanner() : submitForm()" class="px-4 py-2 bg-[#7D0A0A] text-white rounded">
               Simpan
             </button>
           </div>
@@ -178,7 +173,11 @@ const submitForm = async () => {
     formData.append('section', form.value.section)
     formData.append('image', form.value.file)
 
-    const res = await api.post('/content', formData)
+    const res = await api.post('/content', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
 
     banners.value.unshift(res.data.data)
 
