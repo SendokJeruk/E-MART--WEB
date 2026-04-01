@@ -118,6 +118,8 @@ import { onMounted, ref } from 'vue'
 import api from '@/plugins/axios'
 import sellerside from '@/components/navbar/seller-side.vue'
 import router from '@/router'
+import { showError, showSuccess } from '@/utils/alert'
+
 
 const selectedFileName = ref('')
 
@@ -156,7 +158,7 @@ const getProfile = async () => {
 
   const submitForm = async () => {
     if (!form.value.user_id) {
-  alert('User belum dikenali, silakan tunggu beberapa saat...');
+   showError('User belum dikenali, silakan tunggu beberapa saat...');
   return;
 }
 
@@ -177,7 +179,7 @@ const getProfile = async () => {
       },
     })
 
-    alert('Produk berhasil ditambahkan!')
+    showSuccess('Produk berhasil ditambahkan!')
     form.value = {
       nama_product: '',
       deskripsi: '',
@@ -192,7 +194,7 @@ const getProfile = async () => {
     router.push('/manage-produk')
   } catch (error) {
     console.error('Gagal submit form:', error.response?.data)
-    alert(error.response?.data?.message || 'Gagal menambahkan produk.')
+    showError(error.response?.data?.message || 'Gagal menambahkan produk.')
   }
 }
 

@@ -91,6 +91,7 @@ import Sellerside from '@/components/navbar/seller-side.vue'
 import api from '@/plugins/axios'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
+import { showError, showSuccess } from '@/utils/alert'
 
 // State
 const ProductSeller = ref([])
@@ -178,7 +179,7 @@ const getCategories = async () => {
 
 const submitForm = async () => {
   if (!form.value.product_id || !form.value.category_id) {
-    alert('Harap pilih produk dan kategori terlebih dahulu!')
+    showError('Harap pilih produk dan kategori terlebih dahulu!')
     return
   }
   try {
@@ -186,9 +187,10 @@ const submitForm = async () => {
       product_id: form.value.product_id,
       category_id: form.value.category_id
     })
-    alert('Kategori produk berhasil diperbarui!')
+    showSuccess('Kategori produk berhasil diperbarui!')
   } catch (err) {
     console.error('Gagal update kategori produk:', err)
+    showError(err.response?.data?.message || 'Gagal update kategori produk')
   }
 }
 

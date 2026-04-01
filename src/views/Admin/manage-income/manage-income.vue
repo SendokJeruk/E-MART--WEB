@@ -68,6 +68,41 @@
         </div>
       </div>
 
+      <div
+        v-if="pagination.last_page > 1"
+        class="flex justify-center mt-6 space-x-2"
+      >
+        <button
+          @click="changePage(pagination.current_page - 1)"
+          :disabled="pagination.current_page === 1"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <button
+          v-for="page in pagination.last_page"
+          :key="page"
+          @click="changePage(page)"
+          :class="[
+            'px-4 py-2 rounded',
+            page === pagination.current_page
+              ? 'bg-red-700 text-white'
+              : 'bg-gray-200 text-gray-700'
+          ]"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          @click="changePage(pagination.current_page + 1)"
+          :disabled="pagination.current_page === pagination.last_page"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
       <!-- Empty -->
       <div v-if="!isLoading && withdraws.length === 0" class="p-6 text-center text-gray-500">
         Tidak ada data withdraw
@@ -141,6 +176,10 @@ const withdraws = ref([]);
 const selectedWithdraw = ref(null);
 const loading = ref(false);
 const isLoading = ref(true);
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+});
 
 const getProfile = async () => {
   try {
@@ -151,15 +190,32 @@ const getProfile = async () => {
   }
 };
 
-const getWithdraw = async () => {
+const getWithdraw = async (page = 1) => {
+  isLoading.value = true;
   try {
-    const response = await api.get('/withdraw');
-    withdraws.value = response.data.data.data;
+    const response = await api.get('/withdraw', {
+      params: { page }
+    });
+
+    const resData = response.data.data;
+
+    withdraws.value = Array.isArray(resData.data) ? resData.data : [];
+
+    pagination.value.current_page = resData.current_page;
+    pagination.value.last_page = resData.last_page;
+
   } catch (error) {
     console.error('Gagal mengambil data withdraw:', error);
+    withdraws.value = [];
   } finally {
     isLoading.value = false;
   }
+};
+
+const changePage = async (page) => {
+  if (page < 1 || page > pagination.value.last_page) return;
+
+  await getWithdraw(page);
 };
 
 const updateStatus = async (id, status) => {
@@ -183,7 +239,7 @@ const openDetail = (withdraw) => {
 
 onMounted(async () => {
   await getProfile();
-  await getWithdraw();
+  await getWithdraw(1);
 });
 </script>
 

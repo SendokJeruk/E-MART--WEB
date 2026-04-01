@@ -54,6 +54,35 @@
             </tr>
           </tbody>
         </table>
+        <div class="flex justify-center mt-4 space-x-2 mb-4">
+          <!-- Previous -->
+          <button
+            @click="changePage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <!-- Page Numbers -->
+          <button
+            v-for="page in lastPage"
+            :key="page"
+            @click="changePage(page)"
+            :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+          >
+            {{ page }}
+          </button>
+
+          <!-- Next -->
+          <button
+            @click="changePage(currentPage + 1)"
+            :disabled="currentPage === lastPage"
+            class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   </sellerside>
@@ -63,9 +92,14 @@
 import sellerside from '@/components/navbar/seller-side.vue';
 import { ref, onMounted, computed } from 'vue';
 import api from "@/plugins/axios";
+import { showError, showSuccess } from '@/utils/alert';
 
 const user = ref({});
 const categoryProducts = ref([]);
+
+// Pagination
+const currentPage = ref(1);
+const lastPage = ref(1);
 
 // ambil profile
 const getProfile = async () => {
@@ -77,12 +111,13 @@ const getProfile = async () => {
   }
 };
 
-// ambil data pivot
-const getCategoryProduct = async () => {
+// ambil data pivot dengan pagination
+const getCategoryProduct = async (page = 1) => {
   try {
-    const response = await api.get('/category-product');
-    categoryProducts.value = response.data.data; 
-    console.log('Data category-product:', categoryProducts.value);
+    const response = await api.get(`/category-product?page=${page}`);
+    categoryProducts.value = response.data.data.data; 
+    currentPage.value = response.data.data.current_page;
+    lastPage.value = response.data.data.last_page;
   } catch (error) {
     console.error('Error fetching category product:', error);
   }
@@ -115,12 +150,18 @@ const deleteCategoryProduct = async (id) => {
 
   try {
     await api.delete(`/category-product/${id}`);
-    await getCategoryProduct();
-    alert('Kategori berhasil dihapus.');
+    await getCategoryProduct(currentPage.value); // refresh page yang sama
+    showSuccess('Kategori berhasil dihapus.');
   } catch (error) {
     console.error('Gagal menghapus kategori dari produk:', error);
-    alert(error.response?.data?.message || 'Terjadi kesalahan.');
+    showError(error.response?.data?.message || 'Terjadi kesalahan.');
   }
+};
+
+// ganti page
+const changePage = async (page) => {
+  if (page < 1 || page > lastPage.value) return;
+  await getCategoryProduct(page);
 };
 
 onMounted(async () => {

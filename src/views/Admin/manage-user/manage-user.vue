@@ -165,6 +165,7 @@ import adminside from '@/components/navbar/admin-side.vue';
 import { ref, onMounted } from 'vue';
 import api from "@/plugins/axios";
 import Skeleton from '@/components/Skeleton.vue';
+import { showSuccess } from '@/utils/alert';
 
 
 const users = ref([]);
@@ -235,10 +236,10 @@ const deleteUser = async (id) => {
   try {
     await api.delete(`/manage-user/${id}`);
     users.value = users.value.filter(user => user.id !== id);
-    alert('User berhasil dihapus.');
+    showSuccess('User berhasil dihapus.');
   } catch (error) {
     console.error('Gagal menghapus user:', error);
-    alert('Terjadi kesalahan saat menghapus user.');
+    showError('Terjadi kesalahan saat menghapus user.');
   }
 };
 

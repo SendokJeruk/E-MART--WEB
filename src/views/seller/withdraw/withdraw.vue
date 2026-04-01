@@ -71,6 +71,41 @@
           </div>
         </div>
 
+        <div
+          v-if="withdraws.length"
+          class="flex justify-center mt-4 space-x-2 mb-4"
+        >
+          <button
+            @click="changePage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+
+          <button
+            v-for="page in lastPage"
+            :key="page"
+            @click="changePage(page)"
+            :class="[
+              'px-3 py-1 rounded',
+              page === currentPage
+                ? 'bg-[#7D0A0A] text-white'
+                : 'bg-gray-200 text-gray-700'
+            ]"
+          >
+            {{ page }}
+          </button>
+
+          <button
+            @click="changePage(currentPage + 1)"
+            :disabled="currentPage === lastPage"
+            class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
       <!-- Modal (form withdraw tetap ada di bawah) -->
       <div
         v-if="showModal"
@@ -167,6 +202,8 @@ const loading = ref(false);
 const error = ref('');
 const success = ref('');
 const isLoading = ref(true);
+const currentPage = ref(1);
+const lastPage = ref(1);
 
 const form = ref({
   jumlah: '',
@@ -184,15 +221,28 @@ const getProfile = async () => {
   }
 };
 
-const getWithdraw = async () => {
+const getWithdraw = async (page = 1) => {
   try {
-    const response = await api.get('/withdraw/self');
-    withdraws.value = response.data.data.data; 
+    const response = await api.get('/withdraw/self', {
+      params: { page }
+    });
+
+    const resData = response.data.data;
+
+    withdraws.value = resData.data;
+    currentPage.value = resData.current_page;
+    lastPage.value = resData.last_page;
+
   } catch (err) {
     console.error('Gagal mengambil data withdraw:', err);
   } finally {
     isLoading.value = false;
   }
+};
+
+const changePage = async (page) => {
+  if (page < 1 || page > lastPage.value) return;
+  await getWithdraw(page);
 };
 
 const submitWithdraw = async () => {

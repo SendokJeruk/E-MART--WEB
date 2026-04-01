@@ -145,7 +145,7 @@ const getProfile = async () => {
       await getToko()
     }
   } catch (err) {
-    router.push('/auth/login')
+    router.push('/login')
   }
 }
 

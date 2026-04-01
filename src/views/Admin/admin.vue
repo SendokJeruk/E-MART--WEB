@@ -180,7 +180,7 @@ const checkRoleAndRedirect = async () => {
       router.push('/dashboard')
     }
   } catch {
-    router.push('/auth/login')
+    router.push('/login')
   }
 }
 

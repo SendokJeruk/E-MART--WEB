@@ -126,6 +126,35 @@
         </table>
 
       </div>
+
+      <!-- PAGINATION -->
+      <div class="flex justify-center mt-4 space-x-2 mb-4">
+        <button
+          @click="changePage(currentPage - 1)"
+          :disabled="currentPage === 1"
+          class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <button
+          v-for="page in lastPage"
+          :key="page"
+          @click="changePage(page)"
+          :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          @click="changePage(currentPage + 1)"
+          :disabled="currentPage === lastPage"
+          class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
     </div>
   </SellerSide>
 </template>
@@ -134,11 +163,16 @@
 import SellerSide from '@/components/navbar/seller-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import api from '@/plugins/axios'
+import { showConfirm, showError } from '@/utils/alert'
 import { onMounted, ref } from 'vue'
 
 const user = ref({})
 const pengiriman = ref([])
 const isLoading = ref(true)
+
+// Pagination
+const currentPage = ref(1)
+const lastPage = ref(1)
 
 const statusOrder = [
   "dibuat",
@@ -159,6 +193,7 @@ const isFinalStatus = (status) => {
   return status === "diterima" || status === "batal"
 }
 
+// Ambil profile
 const getProfile = async () => {
   try {
     const response = await api.get('/profile')
@@ -168,11 +203,14 @@ const getProfile = async () => {
   }
 }
 
-const getPengiriman = async () => {
+// Ambil data pengiriman dengan pagination
+const getPengiriman = async (page = 1) => {
+  isLoading.value = true
   try {
-    const response = await api.get('/pengiriman/seller')
+    const response = await api.get(`/pengiriman/seller?page=${page}`)
     pengiriman.value = response.data.data.data || []
-    console.log('Data pengiriman:', pengiriman.value)
+    currentPage.value = response.data.data.current_page
+    lastPage.value = response.data.data.last_page
   } catch (error) {
     pengiriman.value = []
   } finally {
@@ -180,12 +218,11 @@ const getPengiriman = async () => {
   }
 }
 
+// Update status
 const updateStatus = async (item) => {
-
-  // VALIDASI RESI
   if (item.status_pengiriman === "dijadwalkan" && !item.kode_resi) {
-    alert("Masukkan kode resi terlebih dahulu!")
-    await getPengiriman()
+    showError("Masukkan kode resi terlebih dahulu!")
+    await getPengiriman(currentPage.value)
     return
   }
 
@@ -200,15 +237,15 @@ const updateStatus = async (item) => {
       bukti_pengiriman: item.bukti_pengiriman ?? null
     })
 
-    alert("Status berhasil diperbarui!")
-    await getPengiriman()
-
+    showSuccess("Status berhasil diperbarui!")
+    await getPengiriman(currentPage.value)
   } catch (error) {
-    alert("Gagal update status")
-    await getPengiriman()
+    showError("Gagal update status")
+    await getPengiriman(currentPage.value)
   }
 }
 
+// Hapus pengiriman
 const deletePengiriman = async (id) => {
   if (!confirm('Yakin ingin menghapus pengiriman ini?')) return
 
@@ -218,6 +255,12 @@ const deletePengiriman = async (id) => {
   } catch (error) {
     console.log(error)
   }
+}
+
+// Ganti halaman
+const changePage = async (page) => {
+  if (page < 1 || page > lastPage.value) return
+  await getPengiriman(page)
 }
 
 onMounted(() => {

@@ -88,6 +88,7 @@
   import { ref, onMounted } from 'vue';
   import api from "@/plugins/axios";
   import Skeleton from '@/components/Skeleton.vue';
+import { showSuccess,showError } from '@/utils/alert';
 
 
   const user = ref({});
@@ -122,11 +123,11 @@ const deleteToko = async (id) => {
   try {
     await api.delete(`/toko/${id}`);
     tokoseller.value = tokoseller.value.filter(toko => toko.id !== id);
-    alert('toko berhasil dihapus.');
+    showSuccess('toko berhasil dihapus.');
     await getToko();
   } catch (error) {
     console.error('Gagal menghapus toko:', error);
-    alert(error.response?.data?.message || 'Terjadi kesalahan saat menghapus toko.');
+    showError(error.response?.data?.message || 'Terjadi kesalahan saat menghapus toko.');
   }
 };
 

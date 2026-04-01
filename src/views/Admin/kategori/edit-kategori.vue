@@ -30,6 +30,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import adminside from '@/components/navbar/admin-side.vue'
+import { showSuccess } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,11 +51,11 @@ const submitForm = async () => {
       },
     })
 
-    alert('Kategori berhasil diperbarui!')
+    showSuccess('Kategori berhasil diperbarui!')
     router.push('/kategori') 
   } catch (error) {
     console.error('Gagal submit form:', error)
-    alert(error.response?.data?.message || 'Gagal mengubah kategori.')
+    showError(error.response?.data?.message || 'Gagal mengubah kategori.')
   }
 }
 </script>

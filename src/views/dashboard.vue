@@ -60,7 +60,10 @@
     </template>
 
     <!-- Tidak ada produk -->
-    <div v-if="!isLoading && isNotFound" class="col-span-full text-gray-500 py-10 text-center">
+    <div 
+      v-if="!isLoading && products.length === 0"
+      class="col-span-full text-gray-500 py-10 text-center"
+    >
       Produk tidak ditemukan
     </div>
 

@@ -158,6 +158,7 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import adminside from '@/components/navbar/admin-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
+import { showError, showSuccess } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
@@ -208,7 +209,7 @@ const fetchUser = async () => {
     form.value.role_id = user.role_id;
   } catch (error) {
     console.error('Gagal mengambil data user:', error);
-    alert('Gagal mengambil data user.');
+    showError('Gagal mengambil data user.');
   } finally {
     isLoading.value = false;
   }
@@ -233,11 +234,11 @@ const submitForm = async () => {
       },
     });
 
-    alert('User berhasil diperbarui!');
+    showSuccess('User berhasil diperbarui!');
     router.push('/manageuser');
   } catch (error) {
     console.error('Gagal submit form:', error);
-    alert(error.response?.data?.message || 'Gagal mengubah User.');
+    showError(error.response?.data?.message || 'Gagal mengubah User.');
   }
 };
 

@@ -89,6 +89,41 @@
         </table>
       </div>
 
+      <div
+        v-if="pagination.last_page > 1"
+        class="flex justify-center mt-6 space-x-2"
+      >
+        <button
+          @click="changePage(pagination.current_page - 1)"
+          :disabled="pagination.current_page === 1"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <button
+          v-for="page in pagination.last_page"
+          :key="page"
+          @click="changePage(page)"
+          :class="[
+            'px-4 py-2 rounded',
+            page === pagination.current_page
+              ? 'bg-[#7D0A0A] text-white'
+              : 'bg-gray-200 text-gray-700'
+          ]"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          @click="changePage(pagination.current_page + 1)"
+          :disabled="pagination.current_page === pagination.last_page"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
       <!-- MODAL -->
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div class="bg-white w-[400px] rounded-lg shadow-lg p-6">
@@ -100,7 +135,14 @@
           <!-- SECTION -->
           <div class="mb-4">
             <label class="block text-sm mb-1">Section</label>
-            <input v-model="form.section" class="w-full border px-3 py-2 rounded" />
+              <select 
+                v-model="form.section" 
+                class="w-full border px-2 py-1 rounded text-sm"
+              >
+                <option disabled value="">Pilih Section</option>
+                <option value="login">Login</option>
+                <option value="dashboard">Dashboard</option>
+              </select>          
           </div>
 
           <!-- FILE -->
@@ -142,6 +184,10 @@ const user = ref({})
 
 const isLoading = ref(true)
 const isProfileLoading = ref(true)
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+});
 
 const showModal = ref(false)
 const isEdit = ref(false)
@@ -237,16 +283,30 @@ const deleteBanner = async (id) => {
 }
 
 /* ================= FETCH ================= */
-const getBanners = async () => {
+const getBanners = async (page = 1) => {
+  isLoading.value = true;
   try {
-    const res = await api.get('/content/all')
-    banners.value = res.data.data.data || []
-  } catch {
-    showError('Gagal ambil data')
+    const res = await api.get('/content/all', {
+      params: { page }
+    });
+    const data = res.data.data;
+    banners.value = Array.isArray(data.data) ? data.data : [];
+    pagination.value.current_page = data.current_page;
+    pagination.value.last_page = data.last_page;
+  } catch (error) {
+    console.error(error);
+    showError('Gagal ambil data');
+    banners.value = [];
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
+
+const changePage = async (page) => {
+  if (page < 1 || page > pagination.value.last_page) return;
+
+  await getBanners(page);
+};
 
 const getProfile = async () => {
   try {

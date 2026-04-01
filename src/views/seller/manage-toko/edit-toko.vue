@@ -188,6 +188,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import Skeleton from '@/components/Skeleton.vue'
+import { showError,showSuccess } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
@@ -283,7 +284,7 @@ const fetchToko = async () => {
     }
   } catch (error) {
     console.error('Gagal mengambil data toko:', error)
-    alert('Gagal mengambil data toko.')
+    showError('Gagal mengambil data toko.')
   }
 }
 
@@ -311,11 +312,11 @@ const submitForm = async () => {
 
     await api.post(`/toko/alamat/${route.params.id}`, alamatForm)
 
-    alert('Toko & alamat berhasil diperbarui!')
-    router.push('/managetoko')
+    showSuccess('Toko & alamat berhasil diperbarui!')
+    router.push('/manage-toko')
   } catch (error) {
     console.error('Gagal submit form:', error)
-    alert(error.response?.data?.message || 'Gagal mengubah data toko/alamat.')
+    showError(error.response?.data?.message || 'Gagal mengubah data toko/alamat.')
   }
 }
 

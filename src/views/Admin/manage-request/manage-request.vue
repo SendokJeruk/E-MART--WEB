@@ -91,6 +91,41 @@
         </div>
       </div>
 
+      <div
+        v-if="pagination.last_page > 1"
+        class="flex justify-center mt-6 space-x-2"
+      >
+        <button
+          @click="changePage(pagination.current_page - 1)"
+          :disabled="pagination.current_page === 1"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <button
+          v-for="page in pagination.last_page"
+          :key="page"
+          @click="changePage(page)"
+          :class="[
+            'px-4 py-2 rounded',
+            page === pagination.current_page
+              ? 'bg-[#7D0A0A] text-white'
+              : 'bg-gray-200 text-gray-700'
+          ]"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          @click="changePage(pagination.current_page + 1)"
+          :disabled="pagination.current_page === pagination.last_page"
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
       <!-- Empty -->
       <div v-if="!isLoading && requests.length === 0" class="text-center text-gray-500 mt-10">
         Tidak ada pengajuan seller
@@ -159,6 +194,7 @@
 import AdminSide from '@/components/navbar/admin-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import api from '@/plugins/axios'
+import { showSuccess } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
 const user = ref({})
@@ -166,6 +202,10 @@ const requests = ref([])
 const selectedItem = ref(null)
 const note = ref('')
 const isLoading = ref(true)
+const pagination = ref({
+  current_page: 1,
+  last_page: 1,
+});
 
 const getProfile = async () => {
   try {
@@ -176,16 +216,29 @@ const getProfile = async () => {
   }
 }
 
-const getRequestSeller = async () => {
+const getRequestSeller = async (page = 1) => {
+  isLoading.value = true;
   try {
-    const response = await api.get('/requestseller')
-    requests.value = response.data.data
+    const response = await api.get('/requestseller', {
+      params: { page }
+    });
+    const resData = response.data.data;
+    requests.value = Array.isArray(resData.data) ? resData.data : [];
+    pagination.value.current_page = resData.current_page;
+    pagination.value.last_page = resData.last_page;
   } catch (error) {
-    console.error('Gagal mengambil request seller:', error)
+    console.error('Gagal mengambil request seller:', error);
+    requests.value = [];
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
+
+const changePage = async (page) => {
+  if (page < 1 || page > pagination.value.last_page) return;
+
+  await getRequestSeller(page);
+};
 
 const openDetail = (item) => {
   selectedItem.value = item
@@ -202,16 +255,16 @@ const updateStatus = async (id, status) => {
     }
     selectedItem.value.status = status
     selectedItem.value.note = note.value
-    alert(`Pengajuan berhasil diubah menjadi ${status}`)
+    showSuccess(`Pengajuan berhasil diubah menjadi ${status}`)
   } catch (error) {
     console.error('Gagal update status:', error)
-    alert('Gagal mengubah status!')
+    showError('Gagal mengubah status!')
   }
 }
 
 onMounted(() => {
   getProfile()
-  getRequestSeller()
+  getRequestSeller(1)
 })
 </script>
 

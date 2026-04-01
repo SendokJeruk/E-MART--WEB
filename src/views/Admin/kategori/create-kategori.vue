@@ -29,6 +29,7 @@
   import { ref, onMounted } from 'vue'
   import api from '@/plugins/axios'
   import adminside from '@/components/navbar/admin-side.vue'
+import { showSuccess } from '@/utils/alert'
   
   const form = ref({
     nama_category: '',
@@ -45,12 +46,12 @@
       },
     })
 
-    alert('category berhasil ditambahkan!')
+    showSuccess('category berhasil ditambahkan!')
     form.value.nama_category = ''
 
   } catch (error) {
     console.error('Gagal submit form:', error)
-    alert(error.response?.data?.message || 'Gagal menambahkan category.')
+    showError(error.response?.data?.message || 'Gagal menambahkan category.')
   }
 } 
   </script>

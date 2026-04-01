@@ -143,6 +143,7 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import Sellerside from '@/components/navbar/seller-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
+import { showError, showSuccess } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
@@ -181,7 +182,7 @@ const fetchProduct = async () => {
     selectedFileName.value = product.foto_cover || 'Tidak ada file';
   } catch (error) {
     console.error('Gagal mengambil data produk:', error);
-    alert('Gagal mengambil data produk.');
+    showError('Gagal mengambil data produk.');
   } finally {
     isLoading.value = false;
   }
@@ -208,11 +209,11 @@ const submitForm = async () => {
       },
     });
 
-    alert('Produk berhasil diperbarui!');
+    showSuccess('Produk berhasil diperbarui!');
     router.push('/manage-produk');  
   } catch (error) {
     console.error('Gagal submit form:', error);
-    alert(error.response?.data?.message || 'Gagal mengubah produk.');
+    showError(error.response?.data?.message || 'Gagal mengubah produk.');
   }
 };
 

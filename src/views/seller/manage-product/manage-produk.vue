@@ -19,6 +19,23 @@
         </div>
       </div>
 
+      <!-- SEARCH BAR -->
+      <div class="mb-4 flex items-center gap-3">
+        <input
+          type="text"
+          v-model="searchQuery"
+          @keyup.enter="searchProduct"
+          placeholder="Cari produk..."
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7D0A0A]"
+        />
+        <button
+          @click="searchProduct"
+          class="px-4 py-2 bg-[#7D0A0A] text-white rounded hover:bg-[#5C0707]"
+        >
+          Cari
+        </button>
+      </div>
+
       <!-- BUTTON -->
       <router-link
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5 ml-2"
@@ -151,10 +168,34 @@
               </tr>
             </tbody>
           </table>
+          <div v-if="product.length" class="flex justify-center mt-4 space-x-2 mb-4">
+            <button
+              @click="changePage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+
+            <button
+              v-for="page in lastPage"
+              :key="page"
+              @click="changePage(page)"
+              :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              @click="changePage(currentPage + 1)"
+              :disabled="currentPage === lastPage"
+              class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </template>
-
-
 
       <!-- ================= EMPTY ================= -->
       <template v-else>
@@ -171,10 +212,14 @@ import sellerside from '@/components/navbar/seller-side.vue';
 import { ref, onMounted } from 'vue';
 import api from "@/plugins/axios";
 import Skeleton from '@/components/Skeleton.vue';
+import { showSuccess, showError } from '@/utils/alert';
 
 const product = ref([]);
 const user = ref({});
 const isLoading = ref(true);
+const currentPage = ref(1);
+const lastPage = ref(1);
+const searchQuery = ref(''); 
 
 const deleteProduct = async (id) => {
   const konfirmasi = confirm('Yakin ingin menghapus Produk ini?');
@@ -183,11 +228,11 @@ const deleteProduct = async (id) => {
   try {
     await api.delete(`/product/${id}`);
     product.value = product.value.filter(p => p.id !== id);
-    alert('Produk berhasil dihapus.');
+    showSuccess('Produk berhasil dihapus.');
     await getProduct();
   } catch (error) {
     console.error('Gagal menghapus produk:', error);
-    alert(error.response?.data?.message || 'Terjadi kesalahan saat menghapus produk.');
+    showError(error.response?.data?.message || 'Terjadi kesalahan saat menghapus produk.');
   }
 };
 
@@ -200,20 +245,17 @@ const getProfile = async () => {
   }
 };
 
-const getProduct = async () => {
+const getProduct = async (page = 1) => {
   try {
     const response = await api.get('/product/myproducts', {
-      params: { myproducts: true }
+      params: { myproducts: true, page }
     });
 
-    console.log("Response:", response.data);
-
-    // kalau ada field data dan isinya array
     if (response.data.data && Array.isArray(response.data.data.data)) {
       product.value = response.data.data.data;
-      console.log("Produk:", product.value);
+      currentPage.value = response.data.data.current_page;
+      lastPage.value = response.data.data.last_page;
     } else {
-      // fallback kalau kosong
       product.value = [];
       console.warn("Tidak ada produk:", response.data.message || "No Data");
     }
@@ -222,6 +264,39 @@ const getProduct = async () => {
     product.value = [];
   } finally {
     isLoading.value = false;
+  }
+};
+
+const searchProduct = async (page = 1) => {
+  isLoading.value = true;
+  try {
+    const response = await api.get('/product/myproducts', {
+      params: { myproducts: true, page, search: searchQuery.value }
+    });
+
+    if (response.data.data && Array.isArray(response.data.data.data)) {
+      product.value = response.data.data.data;
+      currentPage.value = response.data.data.current_page;
+      lastPage.value = response.data.data.last_page;
+    } else {
+      product.value = [];
+      console.warn("Tidak ada produk:", response.data.message || "No Data");
+    }
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    product.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const changePage = async (page) => {
+  if (page < 1 || page > lastPage.value) return;
+
+  if (searchQuery.value) {
+    await searchProduct(page); 
+  } else {
+    await getProduct(page);
   }
 };
 

@@ -101,6 +101,7 @@
   import { ref, onMounted } from 'vue';
   import api from "@/plugins/axios";
   import Skeleton from '@/components/Skeleton.vue';
+import { showSuccess } from '@/utils/alert';
   
   const categories = ref([]);
 
@@ -122,19 +123,30 @@ const getProfile = async () => {
   }
 }
   
-  const getCategories = async () => {
+const getCategories = async (page = 1) => {
+  isLoading.value = true;
+
   try {
-    const response = await api.get('/category');
-    if (Array.isArray(response.data.data.data)) {
-      categories.value = response.data.data.data;
-    } else {
-      console.error("Data category tidak berupa array:", response.data.data.data);
-    }
+    const response = await api.get('/category', {
+      params: { page }
+    });
+
+    const resData = response.data.data;
+
+    categories.value = resData.data;
+    pagination.value.current_page = resData.current_page;
+    pagination.value.last_page = resData.last_page;
+
   } catch (error) {
     console.error('Error fetching category:', error);
   } finally {
-    isLoading.value = false; 
+    isLoading.value = false;
   }
+};
+
+const changePage = async (page) => {
+  if (page < 1 || page > pagination.value.last_page) return;
+  await getCategories(page);
 };
 
   
@@ -143,15 +155,15 @@ const getProfile = async () => {
     try {
       await api.delete(`/category/${id}`);
       categories.value = categories.value.filter(cat => cat.id !== id);
-      alert('Kategori berhasil dihapus');
+      showSuccess('Kategori berhasil dihapus');
     } catch (error) {
       console.error('Gagal menghapus kategori:', error);
-      alert('Terjadi kesalahan saat menghapus kategori.');
+      showError('Terjadi kesalahan saat menghapus kategori.');
     }
   };
   
   onMounted(() => {
-    getCategories();
+    getCategories(1);
     getProfile();
   });
   </script>

@@ -156,7 +156,9 @@ import { ref, onMounted, watch } from 'vue';
 import Sellerside from '@/components/navbar/seller-side.vue';
 import api from '@/plugins/axios';
 import { showSuccess,showError } from '@/utils/alert';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const provinces = ref([]);
 const cities = ref([]);
 const districts = ref([]);
@@ -213,15 +215,15 @@ const getProfile = async () => {
 const submitForm = async () => {
   try {
     const response = await api.post('/toko', form.value);
-    alert('Toko berhasil dibuat!');
-    console.log(response.data);
+    showSuccess('Toko berhasil dibuat!');
+    router.push('/manage-toko');
   } catch (error) {
     if (error.response) {
-      alert(`Gagal: ${error.response.data.message}`);
+      showError(`Gagal: ${error.response.data.message}`);
       console.error(error.response.data.errors || error.response.data.error);
     } else {
       console.error(error);
-      alert('Terjadi kesalahan saat mengirim data.');
+      showError('Terjadi kesalahan saat mengirim data.');
     }
   }
 };
