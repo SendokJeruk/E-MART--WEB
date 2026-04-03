@@ -85,6 +85,7 @@ import { useRouter } from 'vue-router'
 import api from "@/plugins/axios"
 import buttonred from "@/components/button/buttonred.vue"
 import Skeleton from "@/components/Skeleton.vue"
+import { showConfirm, showSuccess, showError } from '@/utils/alert'
 
 const search = ref('')
 const isLoggedIn = ref(false)
@@ -144,7 +145,7 @@ const searchBar = async () => {
 }
 
 const logout = async () => {
-  const confirmed = window.confirm("Are you sure you want to log out?")
+  const confirmed = await showConfirm("Anda Yakin Mau Logout ?")
   if (!confirmed) return
 
   try {
@@ -152,10 +153,10 @@ const logout = async () => {
     isLoggedIn.value = false
     userName.value = ''
     userRole.value = ''
-    alert('Logged out successfully!')
+    showSuccess("Logout Berhasil")
     router.push('/login')
   } catch (error) {
-    alert('Logout failed, please try again.')
+    showError('Gagal Untuk Logout.')
   }
 }
 

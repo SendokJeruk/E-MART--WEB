@@ -212,8 +212,15 @@ const submitForm = async () => {
     showSuccess('Produk berhasil diperbarui!');
     router.push('/manage-produk');  
   } catch (error) {
-    console.error('Gagal submit form:', error);
-    showError(error.response?.data?.message || 'Gagal mengubah produk.');
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 };
 

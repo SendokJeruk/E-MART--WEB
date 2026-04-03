@@ -11,7 +11,7 @@
             <p class="text-xs text-gray-600">{{ user.email }}</p>
           </div>
           <img
-            :src="user?.foto_profil || 'https://via.placeholder.com/100'"
+            :src="user?.foto_profil || 'https://placehold.co/100'"
             class="w-10 h-10 bg-gray-300 rounded-full"
           />
         </div>

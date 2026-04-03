@@ -197,6 +197,7 @@
         :product="product"
         @click="goToProduct(product.id)"
         class="cursor-pointer"
+        :namaToko="getNamaToko(product)"
       />
 
     </template>
@@ -323,6 +324,9 @@ const toSlug = (text) => {
     .replace(/[^\w-]+/g, ''); 
 }
 
+const getNamaToko = (product) => {
+  return product.user?.toko?.nama_toko || 'Nama Seller'
+}
 
 const fetchProducts = async () => {
   try {

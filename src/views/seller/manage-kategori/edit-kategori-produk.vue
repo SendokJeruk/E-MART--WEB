@@ -90,7 +90,7 @@
 import Sellerside from '@/components/navbar/seller-side.vue'
 import api from '@/plugins/axios'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { showError, showSuccess } from '@/utils/alert'
 
 // State
@@ -133,48 +133,60 @@ const selectCategory = (category) => {
 }
 
 // Filtered list
-const filteredProducts = computed(() => {
-  return ProductSeller.value.filter(p =>
-    p.nama_product.toLowerCase().includes(searchProduct.value.toLowerCase())
-  )
-})
-
-const filteredCategories = computed(() => {
-  return categories.value.filter(c =>
-    c.nama_category.toLowerCase().includes(searchCategory.value.toLowerCase())
-  )
-})
+const filteredProducts = ref([])
+const filteredCategories = ref([])
 
 // Ambil data produk seller
-const getProducts = async () => {
+const getProducts = async (search = '') => {
   try {
     const res = await api.get('/product/myproducts', {
-      params: { myproducts: true }
+      params: { myproducts: true, nama_product: search }
     })
-    ProductSeller.value = res.data.data.data
+    ProductSeller.value = res.data.data.data || []
+    filteredProducts.value = ProductSeller.value
   } catch (err) {
     console.error('Gagal ambil produk:', err)
   }
 }
 
 // Ambil data kategori
-const getCategories = async () => {
+const getCategories = async (search = '') => {
   try {
-    const res = await api.get('/category')
+    const res = await api.get('/category', {
+      params: { nama_category: search }
+    })
 
     // cek apakah res.data.data array atau object
+    let cats = []
     if (Array.isArray(res.data.data)) {
-      categories.value = res.data.data
+      cats = res.data.data
     } else if (res.data.data?.data) {
-      categories.value = res.data.data.data
-    } else {
-      categories.value = []
+      cats = res.data.data.data
     }
+    categories.value = cats
+    filteredCategories.value = cats
   } catch (err) {
     console.error('Gagal ambil kategori:', err)
     categories.value = []
+    filteredCategories.value = []
   }
 }
+
+let productTimeout
+watch(searchProduct, (newVal) => {
+  clearTimeout(productTimeout)
+  productTimeout = setTimeout(() => {
+    getProducts(newVal)
+  }, 300)
+})
+
+let categoryTimeout
+watch(searchCategory, (newVal) => {
+  clearTimeout(categoryTimeout)
+  categoryTimeout = setTimeout(() => {
+    getCategories(newVal)
+  }, 300)
+})
 
 
 const submitForm = async () => {

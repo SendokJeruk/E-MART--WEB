@@ -97,9 +97,11 @@ const showProductDropdown = ref(false)
 const showCategoryDropdown = ref(false)
 
 // GET Products & Categories
-const getProduct = async () => {
+const getProduct = async (search = '') => {
   try {
-    const response = await api.get('/product/myproducts')
+    const response = await api.get('/product/myproducts', {
+      params: { nama_product: search }
+    })
     ProductSeller.value = response.data.data.data || []
     filteredProducts.value = ProductSeller.value
   } catch (error) {
@@ -107,9 +109,11 @@ const getProduct = async () => {
   }
 }
 
-const getCategories = async () => {
+const getCategories = async (search = '') => {
   try {
-    const response = await api.get('/category')
+    const response = await api.get('/category', {
+      params: { nama_category: search }
+    })
     categories.value = response.data.data.data || []
     filteredCategories.value = categories.value
   } catch (error) {
@@ -117,18 +121,22 @@ const getCategories = async () => {
   }
 }
 
+let productTimeout;
 const filterProducts = () => {
   showProductDropdown.value = true
-  filteredProducts.value = ProductSeller.value.filter(p =>
-    p.nama_product.toLowerCase().includes(productSearch.value.toLowerCase())
-  )
+  clearTimeout(productTimeout);
+  productTimeout = setTimeout(() => {
+    getProduct(productSearch.value);
+  }, 300);
 }
 
+let categoryTimeout;
 const filterCategories = () => {
   showCategoryDropdown.value = true
-  filteredCategories.value = categories.value.filter(c =>
-    c.nama_category.toLowerCase().includes(categorySearch.value.toLowerCase())
-  )
+  clearTimeout(categoryTimeout);
+  categoryTimeout = setTimeout(() => {
+    getCategories(categorySearch.value);
+  }, 300);
 }
 
 const selectProduct = (product) => {

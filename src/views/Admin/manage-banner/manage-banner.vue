@@ -20,7 +20,7 @@
             <p class="text-sm font-bold">{{ user.name }}</p>
             <p class="text-xs text-gray-600">{{ user.email }}</p>
           </div>
-          <img :src="user?.foto_profil || 'https://via.placeholder.com/100'" class="w-10 h-10 rounded-full" />
+          <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 rounded-full" />
         </div>
       </div>
 
@@ -62,7 +62,7 @@
           </tbody>
 
           <!-- DATA -->
-          <tbody v-else>
+          <tbody v-else-if="banners.length > 0">
             <tr v-for="banner in banners" :key="banner.id" class="border-t">
               <td class="px-4 py-2 text-center">{{ banner.section }}</td>
 
@@ -82,6 +82,13 @@
                     Hapus
                   </button>
                 </div>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td colspan="3" class="px-4 py-6 text-center text-gray-500">
+                Tidak ada data banner
               </td>
             </tr>
           </tbody>
@@ -283,19 +290,27 @@ const deleteBanner = async (id) => {
 }
 
 /* ================= FETCH ================= */
+// Fix : sebelumnya kalo data di banner kosong bakalan gagal mengambil data (soalnya gagal map karna undefined)
 const getBanners = async (page = 1) => {
   isLoading.value = true;
   try {
     const res = await api.get('/content/all', {
       params: { page }
     });
-    const data = res.data.data;
-    banners.value = Array.isArray(data.data) ? data.data : [];
-    pagination.value.current_page = data.current_page;
-    pagination.value.last_page = data.last_page;
+
+    const result = res.data?.data || {};
+    
+    banners.value = Array.isArray(result.data) ? result.data : [];
+    
+    pagination.value = {
+      current_page: result.current_page || 1,
+      last_page: result.last_page || 1
+    };
   } catch (error) {
     console.error(error);
-    showError('Gagal ambil data');
+    if (error.response?.status !== 404) {
+      showError('Gagal ambil data');
+    }
     banners.value = [];
   } finally {
     isLoading.value = false;

@@ -29,7 +29,7 @@
             <p class="text-xs text-gray-600">{{ user.email }}</p>
           </div>
           <img
-            :src="user?.foto_profil || 'https://via.placeholder.com/100'"
+            :src="user?.foto_profil || 'https://placehold.co/100'"
             class="w-10 h-10 bg-gray-300 rounded-full"
           />
         </div>
@@ -92,7 +92,7 @@
             </template>
 
             <!-- Real Data -->
-            <template v-else>
+            <template v-else-if="users.length > 0">
               <tr v-for="user in users" :key="user.id">
                 <td class="px-6 py-4 text-sm font-medium text-gray-900">
                   {{ user.name }}
@@ -120,13 +120,21 @@
               </tr>
             </template>
 
+            <template v-else>
+              <tr>
+                <td colspan="3" class="px-6 py-8 text-center text-gray-500">
+                  Tidak ada data user
+                </td>
+              </tr>
+            </template>
+
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- PAGINATION -->
-    <div class="flex justify-center mt-6 space-x-2">
+    <div v-if="pagination.last_page > 1" class="flex justify-center mt-6 space-x-2">
       <button
         @click="changePage(pagination.current_page - 1)"
         :disabled="pagination.current_page === 1"
@@ -173,6 +181,8 @@ const user = ref({});
 const isLoading = ref(true);
 const searchQuery = ref('');
 
+let searchTimeout;
+
 const pagination = ref({
   current_page: 1,
   last_page: 1,
@@ -190,17 +200,18 @@ const getProfile = async () => {
 const getUsers = async (page = 1) => {
   try {
     isLoading.value = true;
-    const response = await api.get(`/manage-user?page=${page}`);
+    const response = await api.get('/manage-user', {
+      params: { page, name: searchQuery.value }
+    });
 
-    const responseData = response.data.data;
-
-    if (Array.isArray(responseData.data)) {
-      users.value = responseData.data;
-      pagination.value.current_page = responseData.current_page;
-      pagination.value.last_page = responseData.last_page;
-    }
+    const responseData = response.data?.data || {};
+    
+    users.value = Array.isArray(responseData.data) ? responseData.data : [];
+    pagination.value.current_page = responseData.current_page || 1;
+    pagination.value.last_page = responseData.last_page || 1;
   } catch (error) {
     console.error('Error fetching users:', error);
+    users.value = [];
   } finally {
     isLoading.value = false;
   }
@@ -213,20 +224,11 @@ const changePage = (page) => {
 };
 
 
-const searchUsers = async () => {
-  try {
-    isLoading.value = true;
-    const response = await api.get(`/manage-user?name=${searchQuery.value}`);
-    if (Array.isArray(response.data.data.data)) {
-      users.value = response.data.data.data;
-    } else {
-      console.error("Data pengguna tidak berupa array:", response.data.data.data);
-    }
-  } catch (error) {
-    console.error('Error searching users:', error);
-  } finally {
-    isLoading.value = false;
-  }
+const searchUsers = () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    getUsers(1);
+  }, 300);
 };
 
 const deleteUser = async (id) => {

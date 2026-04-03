@@ -190,9 +190,15 @@ const submitForm = async () => {
 
     router.push('/manageUser') 
   } catch (error) {
-    console.error('Gagal submit form:', error)
-    console.error('Detail error:', error.response?.data || error)
-    showError(error.response?.data?.message || 'Gagal menambahkan user.')
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 }
 

@@ -35,7 +35,7 @@
       <!-- Foto Profil -->
       <div class="text-center">
         <img
-          :src="previewImage || user?.foto_profil || 'https://via.placeholder.com/100'"
+          :src="previewImage || user?.foto_profil || 'https://placehold.co/100'"
           class="w-24 h-24 mx-auto rounded-full object-cover mb-3 border-2 border-yellow-500"
         />
 
@@ -105,6 +105,7 @@ import { ref, onMounted } from 'vue';
 import Navbar from '@/components/navbar/navbar.vue';
 import Skeleton from "@/components/Skeleton.vue"
 import api from '@/plugins/axios';
+import { showError, showSuccess } from '@/utils/alert';
 
 const user = ref(null);
 const form = ref({
@@ -163,11 +164,11 @@ const updateProfile = async () => {
       },
     });
 
-    alert('Profil berhasil diperbarui');
+    showSuccess('Profil berhasil diperbarui');
     getProfile();
   } catch (error) {
     console.error('Gagal update profil:', error);
-    alert('Gagal update profil');
+    showError('Gagal update profil');
   } finally {
     isLoading.value = false;
   }
