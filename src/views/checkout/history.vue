@@ -76,7 +76,7 @@
                 </span>
 
                 <span class="text-sm">
-                  No. Pesanan: {{ shipment.id || generateOrderNumber() }}
+                  Kode Pesanan: {{ shipment.kode_transaksi || "SJK-GAGAL-KODE" }}
                 </span>
 
               </div>

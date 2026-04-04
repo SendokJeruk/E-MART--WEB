@@ -495,13 +495,7 @@ const checkoutCart = async () => {
       onSuccess: async result => {
         try {
           // Jika pembayaran sukses → buat data pengiriman
-          await api.post('/pengiriman', {
-            kode_transaksi: kodeTransaksi.value,
-            status_pengiriman: 'dibuat',
-            kurir: null,
-            plat_nomor: null,
-            estimasi_tiba: null
-          });
+          await api.post(`/pengiriman/${kodeTransaksi.value}`, payload)
           window.location.href = "/transaksi-selesai";
         } catch (err) {
           console.error('Gagal buat shipment:', err);

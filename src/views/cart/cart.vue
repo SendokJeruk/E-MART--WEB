@@ -38,7 +38,7 @@
           />
 
           <img
-            :src="item.product?.foto_cover || 'https://via.placeholder.com/100'"
+            :src="item.product?.foto_cover || 'https://placehold.co/100'"
             alt="Produk"
             class="w-20 h-20 object-cover rounded-lg border border-gray-200 mr-4"
           />

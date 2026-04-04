@@ -115,6 +115,7 @@
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 import { useRouter } from 'vue-router'
+import { showConfirm, showError, showSuccess } from '@/utils/alert'
 
 const router = useRouter()
 const userName = ref('')
@@ -130,17 +131,17 @@ function linkClass(path) {
 }
 
 const logout = async () => {
-  const confirmed = window.confirm("Are you sure you want to log out?")
+  const confirmed = await showConfirm("Anda Yakin Mau Logout ?")
   if (!confirmed) return
 
   try {
     await api.post('/auth/logout')
     localStorage.removeItem("token")
     router.push('/login')
-    alert('Logged out successfully!')
+    showSuccess("Logout Berhasil")
   } catch (error) {
     console.error('Logout failed:', error)
-    alert('Logout failed, please try again.')
+    showError('Gagal Untuk Logout.')
   }
 }
 

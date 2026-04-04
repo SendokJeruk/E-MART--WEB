@@ -118,6 +118,7 @@ import { ref, onMounted } from 'vue';
 import Navbar from '@/components/navbar/navbar.vue';
 import Skeleton from "@/components/Skeleton.vue"
 import api from '@/plugins/axios';
+import { showConfirm } from '@/utils/alert';
 
 const user = ref(null);
 const userRole = ref('');
@@ -152,16 +153,16 @@ const getToko = async () => {
 };
 
 const logout = async () => {
-  const confirmed = window.confirm('Are you sure you want to log out?');
+  const confirmed = await showConfirm("Anda Yakin Mau Logout ?")
   if (!confirmed) return;
 
   try {
     await api.post('/auth/logout');
-    alert('Logged out successfully!');
+    showSuccess("Logout Berhasil");
     window.location.href = '/login';
   } catch (error) {
     console.error('Logout failed:', error);
-    alert('Logout failed, please try again.');
+    showError('Gagal Untuk Logout.');
   }
 };
 

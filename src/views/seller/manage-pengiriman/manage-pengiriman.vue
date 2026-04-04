@@ -10,7 +10,7 @@
 
         <div class="bg-white shadow-md rounded-xl px-4 py-2 flex items-center gap-3 w-64">
           <img
-            :src="user?.foto_profil || 'https://via.placeholder.com/100'"
+            :src="user?.foto_profil || 'https://placehold.co/100'"
             class="w-10 h-10 rounded-full object-cover border"
           />
           <div>
@@ -163,7 +163,7 @@
 import SellerSide from '@/components/navbar/seller-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import api from '@/plugins/axios'
-import { showConfirm, showError } from '@/utils/alert'
+import { showConfirm, showError, showSuccess } from '@/utils/alert'
 import { onMounted, ref } from 'vue'
 
 const user = ref({})
@@ -240,6 +240,7 @@ const updateStatus = async (item) => {
     showSuccess("Status berhasil diperbarui!")
     await getPengiriman(currentPage.value)
   } catch (error) {
+    console.error(error)
     showError("Gagal update status")
     await getPengiriman(currentPage.value)
   }

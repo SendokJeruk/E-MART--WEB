@@ -29,7 +29,7 @@
   import { ref, onMounted } from 'vue'
   import api from '@/plugins/axios'
   import adminside from '@/components/navbar/admin-side.vue'
-import { showSuccess } from '@/utils/alert'
+  import { showSuccess, showError } from '@/utils/alert'
   
   const form = ref({
     nama_category: '',
@@ -50,8 +50,15 @@ import { showSuccess } from '@/utils/alert'
     form.value.nama_category = ''
 
   } catch (error) {
-    console.error('Gagal submit form:', error)
-    showError(error.response?.data?.message || 'Gagal menambahkan category.')
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 } 
   </script>
