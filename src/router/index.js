@@ -316,4 +316,39 @@ const router = createRouter({
     routes
   });
   
+  /*
+  Halaman yang boleh diakses tanpa login
+*/
+const publicPages = [
+  '/dashboard',
+  '/login',
+  '/register'
+]
+
+/*
+  Validasi tambahan untuk route dinamis /produk/:id
+*/
+const isPublicDynamic = (path) => {
+  return path.startsWith('/produk/')
+}
+
+/*
+  Global route guard:
+  - cek apakah halaman public
+  - jika tidak dan tidak ada token, redirect ke login
+*/
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token")
+
+  const isPublic =
+    publicPages.includes(to.path) ||
+    isPublicDynamic(to.path)
+
+  if (!isPublic && !token) {
+    return next('/login')
+  }
+
+  next()
+})
+
   export default router;
