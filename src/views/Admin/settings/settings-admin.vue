@@ -3,26 +3,20 @@
     <div class="p-6 overflow-x-auto">
       <h1 class="text-2xl font-bold mb-4">Settings</h1>
 
-      <!-- Tombol Add Setting -->
-      <!-- <button
-        @click="showModal = true"
-        class="mb-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-      >
-        Add Setting
-      </button> -->
-
-      <!-- Table Settings -->
+      <!-- TABLE SETTINGS -->
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-auto divide-y divide-gray-200">
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Value</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold">Name</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold">Value</th>
+              <th class="px-6 py-3 text-left text-sm font-semibold">Action</th>
             </tr>
           </thead>
+
           <tbody class="divide-y divide-gray-200">
 
+            <!-- Skeleton loading -->
             <template v-if="isLoading">
               <tr v-for="n in 5" :key="n">
                 <td class="px-6 py-4"><Skeleton height="14px" width="70%"/></td>
@@ -34,165 +28,198 @@
               </tr>
             </template>
 
+            <!-- Data -->
             <template v-else>
               <tr v-for="item in settings" :key="item.id">
-                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ item.name }}</td>
 
-                <td class="px-6 py-4 text-sm text-gray-700">
+                <!-- NAME -->
+                <td class="px-6 py-4 text-sm font-medium">
+                  {{ item.name }}
+                </td>
+
+                <!-- VALUE -->
+                <td class="px-6 py-4 text-sm">
                   <input
                     v-if="editing[item.id]"
                     v-model="item.value"
                     type="text"
                     class="border rounded px-2 py-1 w-full"
                   />
+
                   <span v-else>
                     {{ shown[item.id] ? item.value : maskValue(item.value) }}
                   </span>
                 </td>
 
-                <td class="px-6 py-4 text-sm space-x-2">
+                <!-- ACTION -->
+                <td class="px-6 py-4 space-x-2">
+
+                  <!-- MODE EDIT -->
                   <template v-if="editing[item.id]">
                     <button
                       @click="saveEdit(item)"
-                      class="px-3 py-1 text-xs bg-green-500 text-white rounded-md hover:bg-green-600 transition"
+                      class="px-3 py-1 text-xs bg-green-500 text-white rounded"
                     >
                       Save
                     </button>
+
                     <button
                       @click="cancelEdit(item.id)"
-                      class="px-3 py-1 text-xs bg-gray-300 rounded-md hover:bg-gray-400 transition"
+                      class="px-3 py-1 text-xs bg-gray-300 rounded"
                     >
                       Cancel
                     </button>
                   </template>
 
+                  <!-- MODE NORMAL -->
                   <template v-else>
                     <button
                       @click="toggleShow(item.id)"
-                      class="px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded-md transition"
+                      class="px-3 py-1 text-xs bg-gray-200 rounded"
                     >
                       {{ shown[item.id] ? "Hide" : "Show" }}
                     </button>
 
                     <button
                       @click="enableEdit(item.id)"
-                      class="px-3 py-1 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                      class="px-3 py-1 text-xs bg-blue-500 text-white rounded"
                     >
                       Edit
                     </button>
                   </template>
+
                 </td>
               </tr>
             </template>
+
           </tbody>
         </table>
       </div>
     </div>
-
-    <!-- Modal Add Setting
-    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white rounded-lg w-96 p-6 relative">
-        <h2 class="text-lg font-bold mb-4">Add New Setting</h2>
-        <label class="block mb-2">Name</label>
-        <input v-model="newSetting.name" type="text" class="border rounded px-2 py-1 w-full mb-4" />
-
-        <label class="block mb-2">Value</label>
-        <input v-model="newSetting.value" type="text" class="border rounded px-2 py-1 w-full mb-4" />
-
-        <div class="flex justify-end space-x-2">
-          <button @click="showModal = false" class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 transition">Cancel</button>
-          <button @click="addSetting" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition">Add</button>
-        </div>
-      </div>
-    </div> -->
   </adminside>
 </template>
 
 <script setup>
-import adminside from '@/components/navbar/admin-side.vue';
-import Skeleton from '@/components/Skeleton.vue';
-import api from '@/plugins/axios';
-import { ref, onMounted } from 'vue';
+/*
+  Komponen Settings:
+  - Menampilkan daftar setting
+  - Show / hide value
+  - Edit value
+  - Konfirmasi sebelum save
+  - Notifikasi success / error
+*/
 
-const settings = ref([]);
-const shown = ref({});
-const editing = ref({});
-const originalValues = ref({});
-const isLoading = ref(true);
+import adminside from '@/components/navbar/admin-side.vue'
+import Skeleton from '@/components/Skeleton.vue'
+import api from '@/plugins/axios'
+import { showConfirm, showError, showSuccess } from '@/utils/alert'
+import { ref, onMounted } from 'vue'
 
-const showModal = ref(false);
-const newSetting = ref({ name: '', value: '' });
+/*
+  STATE
+*/
+const settings = ref([])
+const shown = ref({})
+const editing = ref({})
+const originalValues = ref({})
+const isLoading = ref(true)
 
+/*
+  Mask value (untuk sembunyikan data sensitif)
+*/
 const maskValue = (val) => {
-  if (!val) return "";
-  return "•".repeat(Math.min(val.length, 8)); 
-};
+  if (!val) return ""
+  return "•".repeat(Math.min(val.length, 8))
+}
 
+/*
+  Toggle show/hide value
+*/
 const toggleShow = (id) => {
-  shown.value[id] = !shown.value[id];
-};
+  shown.value[id] = !shown.value[id]
+}
 
+/*
+  Enable edit mode
+*/
 const enableEdit = (id) => {
-  editing.value[id] = true;
-  originalValues.value[id] = settings.value.find(s => s.id === id).value;
-};
+  editing.value[id] = true
 
+  /* simpan nilai awal untuk cancel */
+  const item = settings.value.find(s => s.id === id)
+  originalValues.value[id] = item.value
+}
+
+/*
+  Cancel edit:
+  - kembalikan nilai lama
+*/
 const cancelEdit = (id) => {
-  const item = settings.value.find(s => s.id === id);
-  item.value = originalValues.value[id];
-  editing.value[id] = false;
-};
+  const item = settings.value.find(s => s.id === id)
+  item.value = originalValues.value[id]
+  editing.value[id] = false
+}
 
+/*
+  Save edit:
+  - pakai confirm
+  - kirim ke backend
+  - tampilkan success / error
+*/
 const saveEdit = async (item) => {
+
+  /* konfirmasi sebelum save */
+  const confirm = await showConfirm('Yakin ingin mengubah setting ini?')
+  if (!confirm) return
+
   try {
-    // payload harus sesuai nama field yang ada di $settings
     const payload = {
-      [item.name]: item.value   // contoh: { MIDTRANS_SERVER_KEY: "xxx" }
-    };
+      [item.name]: item.value
+    }
 
-    await api.post('/setting', payload);
-    editing.value[item.id] = false;
+    await api.post('/setting', payload)
+
+    editing.value[item.id] = false
+
+    /* notifikasi sukses */
+    showSuccess('Setting berhasil diupdate')
+
   } catch (error) {
-    console.error("Error updating setting:", error);
+    console.error("Error updating setting:", error)
+
+    /* notifikasi error */
+    showError('Gagal mengupdate setting')
   }
-};
+}
 
-
-// const addSetting = async () => {
-//   if (!newSetting.value.name || !newSetting.value.value) return;
-
-//   try {
-//     await api.post('/setting', {
-//       name: newSetting.value.name,
-//       value: newSetting.value.value
-//     });
-
-//     await getSettings();
-
-//     showModal.value = false;
-//     newSetting.value = { name: '', value: '' };
-//   } catch (error) {
-//     console.error("Error adding setting:", error);
-//   }
-// };
-
+/*
+  Ambil data setting dari backend
+*/
 const getSettings = async () => {
   try {
-    const response = await api.get('/setting');
-    settings.value = response.data.data;
+    isLoading.value = true
 
-    response.data.data.forEach(item => {
-      shown.value[item.id] = false;
-      editing.value[item.id] = false;
-    });
+    const response = await api.get('/setting')
+    settings.value = response.data.data
+
+    /* inisialisasi state */
+    settings.value.forEach(item => {
+      shown.value[item.id] = false
+      editing.value[item.id] = false
+    })
+
   } catch (error) {
-    console.error('Error fetching settings:', error);
+    console.error('Error fetching settings:', error)
+    showError('Gagal mengambil data setting')
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
+/*
+  Lifecycle
+*/
 onMounted(() => {
-  getSettings();
-});
+  getSettings()
+})
 </script>

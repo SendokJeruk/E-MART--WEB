@@ -64,7 +64,7 @@
           <!-- DATA -->
           <tbody v-else-if="banners.length > 0">
             <tr v-for="banner in banners" :key="banner.id" class="border-t">
-              <td class="px-4 py-2 text-center">{{ banner.section }}</td>
+              <td class="px-4 py-2 text-center inter-font text-sm">{{ banner.section }}</td>
 
               <td class="px-4 py-2 flex justify-center">
                 <img :src="banner.image" class="w-24 h-16 object-cover rounded" />

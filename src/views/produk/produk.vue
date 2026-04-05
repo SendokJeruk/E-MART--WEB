@@ -382,7 +382,7 @@ const getRatings = async (productId) => {
       ratings.value = response.data.data.map((item) => ({
         bintang: item.rating,
         komentar: item.deskripsi,
-        user: item.user_id, // kalau backend sudah return nama user, pakai item.user.nama
+        user: item.user.name, // kalau backend sudah return nama user, pakai item.user.nama
         foto: item.foto_review ? [item.foto_review] : []
       }));
     } else {

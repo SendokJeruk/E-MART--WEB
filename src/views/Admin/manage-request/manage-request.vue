@@ -31,7 +31,7 @@
 
       <!-- Skeleton Cards -->
       <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="n in 6" :key="n" class="bg-white rounded-xl shadow p-5 border space-y-3">
+        <div v-for="n in 6" :key="n" class="bg-white rounded-xl shadow p-5 space-y-3">
           <div class="flex justify-between">
             <Skeleton height="18px" width="70px"/>
             <Skeleton height="12px" width="40px"/>
@@ -50,7 +50,7 @@
         <div
           v-for="(item, index) in requests"
           :key="index"
-          class="bg-white rounded-xl shadow hover:shadow-lg transition p-5 border border-gray-100 flex flex-col justify-between"
+          class="bg-white rounded-xl shadow hover:shadow-lg transition p-5 border-gray-100 flex flex-col justify-between"
         >
           <div>
             <div class="flex items-center justify-between mb-3">

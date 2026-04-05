@@ -25,7 +25,7 @@
 
       <!-- Grid Withdraw -->
       <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div v-for="n in 4" :key="n" class="bg-white shadow rounded-xl p-4 border space-y-3">
+        <div v-for="n in 4" :key="n" class="bg-white shadow rounded-xl p-4 space-y-3">
           <Skeleton height="14px" width="60%"/>
           <Skeleton height="12px" width="80%"/>
           <Skeleton height="18px" width="40%"/>
@@ -38,7 +38,7 @@
         <div
           v-for="withdraw in withdraws"
           :key="withdraw.id"
-          class="bg-white shadow rounded-xl p-4 border flex flex-col justify-between"
+          class="bg-white shadow rounded-xl p-4 flex flex-col justify-between"
         >
           <div>
             <p class="font-bold text-gray-800">{{ withdraw.user.name }}</p>
