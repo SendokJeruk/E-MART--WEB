@@ -494,8 +494,9 @@ const checkoutCart = async () => {
     window.snap.pay(snapToken, {
       onSuccess: async result => {
         try {
-          // Jika pembayaran sukses → buat data pengiriman
-          await api.post(`/pengiriman/${kodeTransaksi.value}`, payload)
+          // Jika pembayaran sukses
+          // await api.post(`/pengiriman/${kodeTransaksi.value}`, payload)
+          // ini dimatiin karna ga buat shipment (udah di backend )
           window.location.href = "/transaksi-selesai";
         } catch (err) {
           console.error('Gagal buat shipment:', err);
