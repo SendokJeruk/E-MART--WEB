@@ -281,6 +281,7 @@ import Navbar from '@/components/navbar/navbar.vue'
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 import Skeleton from '@/components/Skeleton.vue'
+import { showError, showSuccess } from '@/utils/alert'
 
 const shipmentList = ref([])
 const isLoading = ref(true)
@@ -320,11 +321,11 @@ const getShipment = async () => {
 const postConfirmation = async (id) => {
   try {
     await api.post(`/pengiriman/confirm-received/${id}`)
-    alert('Pesanan dikonfirmasi!')
+    showSuccess('Pesanan Berhasil Dikonfirmasi Diterima')
     getShipment()
   } catch (error) {
     const msg = error.response?.data?.message || 'Gagal konfirmasi pesanan'
-    alert(msg)
+    showError("Terjadi Kesalahan")
     console.error('Gagal konfirmasi pesanan:', error)
   }
 }
@@ -363,12 +364,12 @@ const submitRating = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
 
-    alert('Rating berhasil dikirim!')
+    showSuccess("Rating Berhasil Dikirimkan")
     closeModal()
     getShipment()
   } catch (error) {
     console.error('Gagal kirim rating:', error)
-    alert('Gagal kirim rating')
+    showError("Gagal Mengirimkan Rating")
   }
 }
 
