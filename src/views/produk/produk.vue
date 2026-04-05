@@ -53,6 +53,7 @@
             :src="produk.selectedImage"
             alt="Produk"
             class="w-full h-full object-contain"
+            @error="(e) => e.target.src = 'https://placehold.co/800x800?text=Image+Not+Found'"
           />
         </div>
 
@@ -65,6 +66,7 @@
             alt="Cover"
             class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
             @click="changeMainImage(produk.foto_cover)"
+            @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
           />
 
           <img
@@ -74,6 +76,7 @@
             alt="Foto Tambahan"
             class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
             @click="changeMainImage(foto.foto)"
+            @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
           />
         </div>
       </div>

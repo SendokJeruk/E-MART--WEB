@@ -161,6 +161,15 @@
                 Lihat Detail
               </router-link>
 
+              <!-- Unduh Invoice le --> 
+              <button
+                v-if="shipment.status_pengiriman === 'diterima'"
+                @click="downloadInvoice(shipment.kode_transaksi)"
+                class="px-5 py-2 text-sm border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition"
+              >
+                Unduh Invoice
+              </button>
+
               <!-- Konfirmasi -->
               <button
                 v-if="shipment.status_pengiriman === 'tiba'"
@@ -370,6 +379,34 @@ const submitRating = async () => {
   } catch (error) {
     console.error('Gagal kirim rating:', error)
     showError("Gagal Mengirimkan Rating")
+  }
+}
+
+// unduh invoice, ane nambah ini lee
+const downloadInvoice = async (kodeTransaksi) => {
+  if (!kodeTransaksi) {
+    showError("Kode transaksi tidak valid")
+    return
+  }
+  try {
+    const response = await api.get(`/report/invoice/${kodeTransaksi}`, {
+      responseType: 'blob',
+    })
+
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `Invoice-${kodeTransaksi}.pdf`)
+    document.body.appendChild(link)
+    link.click()
+
+    link.parentNode.removeChild(link)
+    window.URL.revokeObjectURL(url)
+
+    showSuccess("Invoice berhasil diunduh")
+  } catch (error) {
+    console.error('Gagal mengunduh invoice:', error)
+    showError("Gagal mengunduh invoice")
   }
 }
 

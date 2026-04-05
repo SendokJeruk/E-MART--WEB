@@ -20,6 +20,7 @@
           <img
             :src="image"
             class="w-full max-w-full h-auto max-h-[200px] sm:max-h-[300px] object-cover"
+            @error="(e) => e.target.src = 'https://placehold.co/1200x400?text=Banner+Not+Found'"
           />
         </div>
       </div>

@@ -6,6 +6,7 @@
           :src="product.foto_cover"
           alt="Product Image"
           class="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+          @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
         />
       </template>
       <template v-else>
