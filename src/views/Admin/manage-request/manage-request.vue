@@ -164,7 +164,7 @@
           <div class="mt-6">
             <label class="font-semibold block mb-2">Catatan Admin</label>
             <textarea
-              v-model="note"
+              v-model="admin_note"
               rows="3"
               class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none"
             ></textarea>
@@ -194,7 +194,7 @@
 import AdminSide from '@/components/navbar/admin-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import api from '@/plugins/axios'
-import { showSuccess } from '@/utils/alert'
+import { showSuccess, showError } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
 const user = ref({})
@@ -223,9 +223,16 @@ const getRequestSeller = async (page = 1) => {
       params: { page }
     });
     const resData = response.data.data;
-    requests.value = Array.isArray(resData.data) ? resData.data : [];
-    pagination.value.current_page = resData.current_page;
-    pagination.value.last_page = resData.last_page;
+
+    if (Array.isArray(resData)) {
+      requests.value = resData;
+      pagination.value.current_page = 1;
+      pagination.value.last_page = 1;
+    } else {
+      requests.value = Array.isArray(resData?.data) ? resData.data : [];
+      pagination.value.current_page = resData?.current_page || 1;
+      pagination.value.last_page = resData?.last_page || 1;
+    }
   } catch (error) {
     console.error('Gagal mengambil request seller:', error);
     requests.value = [];
@@ -247,7 +254,7 @@ const openDetail = (item) => {
 
 const updateStatus = async (id, status) => {
   try {
-    await api.put(`/requestseller/${id}`, { status, note: note.value })
+    await api.put(`/requestseller/${id}`, { status, note: admin_note.value })
     const index = requests.value.findIndex((r) => r.id === id)
     if (index !== -1) {
       requests.value[index].status = status

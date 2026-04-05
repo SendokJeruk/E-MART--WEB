@@ -9,6 +9,7 @@
             v-if="images.length"
             :src="images[currentImage]"
             class="max-w-full max-h-full object-contain rounded-lg"
+            @error="(e) => e.target.src = 'https://placehold.co/800x800/7D0A0A/FFF?text=Space Available'"
           />
         </div>  
       </div>
@@ -101,12 +102,19 @@ const loginUser = async () => {
 const getBannerLogin = async () => {
   try {
     const response = await api.get("/content?section=login")
-    const data = response.data.data || []
-    images.value = data.map(item => item.image)
+    const data = response.data?.data || []
+    const fetchedImages = data.map(item => item.image)
+    
+    if (fetchedImages.length > 0) {
+      images.value = fetchedImages
+    } else {
+      images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']
+    }
 
     console.log("Images:", images.value)
   } catch (error) {
     console.error("Error fetching login banners:", error)
+    images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']
   }
 }
 

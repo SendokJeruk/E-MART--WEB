@@ -447,7 +447,8 @@ const updateSelectedOngkir = (toko) => {
   const kurirPayload = checkout.value.map(t => ({
     toko_id: t.toko_id,
     kurir: t.items[0].selectedKurir,
-    ongkir: t.biayaPengiriman
+    ongkir: t.biayaPengiriman,
+    alamat_id: selectedAlamat.value
   }));
   console.log("Kurir payload terbaru:", kurirPayload);
 };
@@ -480,7 +481,8 @@ const checkoutCart = async () => {
     const payload = { 
       ongkir: totalOngkir.value, 
       total: totalHarga.value,
-      data_ongkir: dataOngkir
+      data_ongkir: dataOngkir,
+      alamat_id: selectedAlamat.value
     };
 
     console.log("Payload checkout dikirim:", payload);

@@ -186,9 +186,20 @@ const loadMore = () => {
 const getBannerDashboard = async () => {
   try {
     const res = await api.get('/content?section=dashboard')
-    imagesA.value = res.data.data.map(item => item.image) || []
+    const fetchedImages = res.data?.data?.map(item => item.image) || []
+    
+    if (fetchedImages.length > 0) {
+      imagesA.value = fetchedImages
+    } else {
+      imagesA.value = [
+        'https://placehold.co/1200x400/7D0A0A/FFF?text=Space+Available'
+      ]
+    }
   } catch (error) {
     console.error('Gagal ambil banner dashboard:', error)
+    imagesA.value = [
+      'https://placehold.co/1200x400/7D0A0A/FFF?text=Space+Available'
+    ]
   } finally{
     isLoading.value = false
   }

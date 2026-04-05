@@ -4,7 +4,8 @@
       <div v-if="isDesktop" class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4">
         <div class="w-11/12 h-[500px] bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
           <img v-if="images.length" :src="images[currentImage]"
-            class="max-w-full max-h-full object-contain rounded-lg" />
+            class="max-w-full max-h-full object-contain rounded-lg"
+            @error="(e) => e.target.src = 'https://placehold.co/800x800/7D0A0A/FFF?text=Space Available'" />
         </div>
       </div>
 
@@ -133,10 +134,17 @@ const checkScreen = () => {
 const getBannerLogin = async () => {
   try {
     const response = await api.get("/content?section=login")
-    const data = response.data.data || []
-    images.value = data.map(item => item.image)
+    const data = response.data?.data || []
+    const fetchedImages = data.map(item => item.image)
+    
+    if (fetchedImages.length > 0) {
+      images.value = fetchedImages
+    } else {
+      images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']
+    }
   } catch (error) {
     console.error(error)
+    images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']
   }
 }
 

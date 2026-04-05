@@ -6,7 +6,62 @@
       Form Pengajuan Jadi Seller
     </h2>
 
-    <form class="space-y-5" @submit.prevent="submitForm">
+    <!-- ane nambahain ini le buat loading sama ganti beberapa isi halaman biar dinamis status -->
+    <!-- Loading State -->
+    <div v-if="isLoading" class="text-center py-10">
+      <p class="text-gray-500">Mengecek status pengajuan...</p>
+    </div>
+
+    <!-- Status Pengajuan Sudah Ada -->
+    <div v-else-if="existingRequest && !isReapplying" class="text-center py-10 space-y-4">
+      <div class="inline-block p-4 rounded-full" 
+           :class="{
+             'bg-yellow-100 text-yellow-600': existingRequest.status === 'pending',
+             'bg-green-100 text-green-600': existingRequest.status === 'accepted' || existingRequest.status === 'approved',
+             'bg-red-100 text-red-600': existingRequest.status === 'rejected'
+           }">
+        <!-- Icon / Status -->
+        <svg v-if="existingRequest.status === 'pending'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <svg v-else-if="existingRequest.status === 'accepted' || existingRequest.status === 'approved'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <svg v-else-if="existingRequest.status === 'rejected'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+
+      <h3 class="text-xl font-bold text-gray-800">
+        Status Pengajuan: <span class="uppercase">{{ existingRequest.status }}</span>
+      </h3>
+      
+      <p v-if="existingRequest.status === 'pending'" class="text-gray-600">
+        Pengajuan Anda sedang direview oleh tim Admin. Mohon tunggu informasi selanjutnya.
+      </p>
+      <p v-else-if="existingRequest.status === 'accepted' || existingRequest.status === 'approved'" class="text-gray-600">
+        Selamat! Pengajuan Anda telah disetujui. Anda sekarang adalah Seller.
+      </p>
+      <p v-else-if="existingRequest.status === 'rejected'" class="text-gray-600">
+        Mohon maaf, pengajuan Anda saat ini ditolak.
+        <br>
+        <span v-if="existingRequest.note" class="font-semibold block mt-2 text-red-500">Alasan: {{ existingRequest.note }}</span>
+      </p>
+
+      <div class="pt-6 flex justify-center gap-4">
+        <router-link to="/profile" class="inline-block px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+          Kembali ke Profil
+        </router-link>
+
+        <!-- Tombol Ajukan Ulang  -->
+        <button v-if="existingRequest.status === 'rejected'" @click="reapply" class="inline-block px-6 py-2 bg-[#7D0A0A] text-white rounded-lg hover:bg-[#BF3131] transition">
+          Perbaiki & Ajukan Ulang
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Pengajuan -->
+    <form v-else class="space-y-5" @submit.prevent="submitForm">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Menjadi Seller</label>
         <textarea v-model="form.note" rows="3" placeholder="Ceritakan Alasan atau motivasi Anda menjadi seller"
@@ -61,9 +116,13 @@
         <p class="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG (max 2MB)</p>
       </div>
 
-      <div class="pt-4">
+      <div class="pt-4 flex gap-4">
+        <button v-if="isReapplying" type="button" @click="isReapplying = false"
+          class="w-1/3 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg shadow hover:bg-gray-300 transition duration-300">
+          Batal
+        </button>
         <button type="submit"
-          class="w-full py-3 bg-[#7D0A0A] text-white font-semibold rounded-lg shadow hover:bg-[#BF3131] transition duration-300">
+          class="flex-1 py-3 bg-[#7D0A0A] text-white font-semibold rounded-lg shadow hover:bg-[#BF3131] transition duration-300">
           Kirim Pengajuan
         </button>
       </div>
@@ -73,10 +132,14 @@
 
 <script setup>
 import Navbar from '@/components/navbar/navbar.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import api from '@/plugins/axios';
 import { showSuccess,showError } from '@/utils/alert';
 import router from '@/router';
+
+const isLoading = ref(true);
+const existingRequest = ref(null);
+const isReapplying = ref(false);
 
 const form = ref({
   note: '',
@@ -88,6 +151,37 @@ const form = ref({
   alamat_ktp: '',
   foto_ktp: null,
 });
+
+const checkExistingRequest = async () => {
+  try {
+    const response = await api.get('/requestseller');
+    const resData = response.data.data;
+
+    if (resData && !Array.isArray(resData) && resData.id) {
+      existingRequest.value = resData;
+    } else if (Array.isArray(resData) && resData.length > 0) {
+      existingRequest.value = resData[0];
+    }
+  } catch (error) {
+    console.error('Belum ada request atau gagal mengambil data:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const reapply = () => {
+  if (existingRequest.value) {
+    form.value.note = existingRequest.value.note || '';
+    form.value.nik = existingRequest.value.nik || '';
+    form.value.nama_lengkap = existingRequest.value.nama_lengkap || '';
+    form.value.tempat_lahir = existingRequest.value.tempat_lahir || '';
+    form.value.tanggal_lahir = existingRequest.value.tanggal_lahir || '';
+    form.value.jenis_kelamin = existingRequest.value.jenis_kelamin || '';
+    form.value.alamat_ktp = existingRequest.value.alamat_ktp || '';
+    form.value.foto_ktp = null; 
+  }
+  isReapplying.value = true;
+};
 
 const submitForm = async () => {
   try {
@@ -122,10 +216,16 @@ const submitForm = async () => {
       foto_ktp: null,
     };
 
-    router.push('/profile');
+    isReapplying.value = false;
+
+    await checkExistingRequest();
   } catch (error) {
     console.error('Gagal submit form:', error)
     showError(error.response?.data?.message || 'Gagal mengirim pengajuan.');
   }
 }
+
+onMounted(() => {
+  checkExistingRequest();
+});
 </script>
