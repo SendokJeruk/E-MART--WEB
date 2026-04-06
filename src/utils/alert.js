@@ -1,5 +1,6 @@
 import Swal from 'sweetalert2'
 
+// Alert buat nunjukin kalo aksinya berhasil, cuma nongol 2 detik terus ilang sendiri
 export function showSuccess(message) {
   Swal.fire({
     icon: 'success',
@@ -10,6 +11,7 @@ export function showSuccess(message) {
   })
 }
 
+// Shortcut biar gak ribet ngetik pesan sukses CRUD berulang-ulang
 export function showCrudSuccess(action) {
   let message = ''
 
@@ -30,6 +32,7 @@ export function showCrudSuccess(action) {
   showSuccess(message)
 }
 
+// Alert buat nunjukin kalo ada yang salah/gagal
 export function showError(message) {
   Swal.fire({
     icon: 'error',
@@ -39,6 +42,7 @@ export function showError(message) {
   })
 }
 
+// Alert konfirmasi, nanya dulu ke user beneran yakin apa kagak
 export async function showConfirm(message) {
   const result = await Swal.fire({
     icon: 'warning',

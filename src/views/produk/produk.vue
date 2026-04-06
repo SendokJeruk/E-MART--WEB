@@ -1,10 +1,11 @@
 <template>
   <Navbar />
 
+  <!-- Tampilan skeleton pas data produknya lagi ditarik, biar user gak liat halaman kosong -->
   <div v-if="isLoading" class="max-w-6xl mx-auto px-4 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-      <!-- Skeleton Gambar -->
+      <!-- skeleton buat bagian gambar produk -->
       <div class="space-y-4">
         <Skeleton width="100%" height="450px" />
 
@@ -13,7 +14,7 @@
         </div>
       </div>
 
-      <!-- Skeleton Detail -->
+      <!-- skeleton buat bagian detail teks ama tombol -->
       <div class="flex flex-col space-y-6">
 
         <div>
@@ -34,7 +35,7 @@
           <Skeleton width="180px" height="20px" class="mb-2" />
           <Skeleton width="100%" height="14px" />
           <Skeleton width="100%" height="14px" />
-          <Skeleton width="80%" height="14px" />
+          <Skeleton width="100%" height="14px" />
         </div>
 
       </div>
@@ -42,13 +43,16 @@
     </div>
   </div>
 
+  <!-- Ini tampilan asli halaman detail produknya -->
   <div class="max-w-6xl mx-auto px-4 py-8" v-else-if="produk">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-      <!-- Gambar Produk -->
+      
+      <!-- Bagian kiri: pajangan foto produk -->
       <div class="space-y-4">
         <div
           class="w-full aspect-square bg-white border rounded-xl shadow-sm flex items-center justify-center overflow-hidden"
         >
+          <!-- Foto utama yang lagi dipilih -->
           <img
             :src="produk.selectedImage"
             alt="Produk"
@@ -57,6 +61,7 @@
           />
         </div>
 
+        <!-- List foto kecil-kecil (thumbnails) biar bisa ganti foto utama -->
         <div
           v-if="produk.foto && produk.foto.length"
           class="flex gap-3 flex-wrap"
@@ -81,12 +86,13 @@
         </div>
       </div>
 
-      <!-- Detail Produk -->
+      <!-- Bagian kanan: info detail produk ama tombol beli -->
       <div class="flex flex-col space-y-6">
         <div>
           <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1">
             {{ produk.nama_product }}
           </h1>
+          <!-- Link buat mampir ke profil tokonya -->
           <router-link
             :to="{
               name: 'toko',
@@ -102,15 +108,16 @@
         </div>
 
         <div class="text-sm text-yellow-700 font-medium">
-          Stok tersedia: {{ produk.stock }}
+          Stok sisa: {{ produk.stock }}
         </div>
 
+        <!-- Tombol-tombol buat transaksi -->
         <div class="flex items-center flex-wrap gap-4">
           <form @submit.prevent="formTransaction">
             <button
               class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
               :disabled="isFetching">
-              <span v-if="isFetching">Loading...</span>
+              <span v-if="isFetching">Lagi proses...</span>
               <span v-else>Beli Sekarang</span>
             </button>
           </form>
@@ -122,6 +129,7 @@
             + Keranjang
           </button>
 
+          <!-- Inputan buat nambah/kurang jumlah barang yang mau dibeli -->
           <div class="flex items-center gap-2 rounded-lg px-3 py-1">
             <button class="text-xl font-bold" @click="decreaseQuantity">
               -
@@ -138,6 +146,7 @@
           </div>
         </div>
 
+        <!-- Deskripsi produk, pake fitur baca selengkapnya biar gak kepanjangan -->
         <div>
           <h2 class="text-lg font-semibold text-[#7D0A0A] mb-2">
             Deskripsi Produk
@@ -166,7 +175,7 @@
           </p>
         </div>
 
-        <!-- Tombol Rating -->
+        <!-- Tombol buat intip ulasan orang lain -->
         <div>
           <button
             class="text-sm text-[#7D0A0A] underline hover:text-red-800"
@@ -179,7 +188,7 @@
     </div>
   </div>
 
-  <!-- Produk Lain -->
+  <!-- Kumpulan produk lain sapa tau user tertarik belanja lagi -->
   <div class="grid grid-cols-2 md:grid-cols-6 gap-4 p-4">
 
     <template v-if="isLoading">
@@ -208,7 +217,7 @@
   </div>
 
 
-  <!-- Modal Rating -->
+  <!-- Pop-up modal buat nampilin list ulasan user -->
   <transition name="fade-scale">
     <div
       v-if="showModal"
@@ -217,7 +226,7 @@
       <div class="bg-white w-full max-w-lg rounded-2xl shadow-lg p-6 relative">
         <h2 class="text-xl font-bold text-[#7D0A0A] mb-4">Rating & Review</h2>
 
-        <!-- Scrollable dengan padding kanan -->
+        <!-- List ulasan yang bisa di-scroll -->
         <div v-if="ratings.length" class="space-y-4 max-h-96 overflow-y-auto pr-3">
           <div
             v-for="(rating, index) in ratings"
@@ -228,7 +237,7 @@
             <p class="text-gray-700 text-sm">{{ rating.komentar }}</p>
             <p class="text-xs text-gray-500">oleh {{ rating.user }}</p>
 
-            <!-- Foto Review -->
+            <!-- Foto bukti dari user yang ngasih ulasan -->
             <div v-if="rating.foto && rating.foto.length" class="grid grid-cols-3 gap-2 mt-2">
               <img
                 v-for="(foto, fIndex) in rating.foto"
@@ -241,9 +250,9 @@
             </div>
           </div>
         </div>
-        <div v-else class="text-gray-500">Belum ada rating.</div>
+        <div v-else class="text-gray-500">Belom ada ulasan nih.</div>
 
-        <!-- Tombol Close -->
+        <!-- Tombol silang buat nutup modal -->
         <button
           class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
           @click="showModal = false"
@@ -254,7 +263,7 @@
     </div>
   </transition>
 
-  <!-- Modal Preview Foto -->
+  <!-- Pop-up pratinjau foto ulasan biar keliatan gede -->
   <transition name="fade-scale">
     <div
       v-if="selectedImage"
@@ -282,29 +291,31 @@ import Skeleton from '@/components/Skeleton.vue';
 const route = useRoute();
 const router = useRouter();
 
+// State buat nyimpen data produk, list produk, ulasan, dll
 const produk = ref(null);
 const products = ref([]);
 const readMore = ref(false);
 const showModal = ref(false);
 const ratings = ref([]);
-const rating = ref([]);
 const selectedImage = ref(null);
 const isLoading = ref(true);
 const isFetching = ref(false);
 
 const kodeTransaksi = ref(route.params.kode || '');
 
+// Kalo user mindah-mindah produk, kita tarik datanya lagi
 watch(
   () => route.params.id,
   async (newId) => {
     if (!newId) return;
-    produk.value = null;      // reset data lama
-    readMore.value = false;   // reset readMore
-    await getProductById();   // fetch produk baru
-    await getRatings(newId);  // fetch rating baru
+    produk.value = null;
+    readMore.value = false;
+    await getProductById();
+    await getRatings(newId);
   }
 );
 
+// Jaga-jaga biar user gak masukin jumlah belanjaan yang aneh-aneh
 watch(
   () => produk.value?.quantity,
   (newVal) => {
@@ -318,8 +329,9 @@ watch(
       produk.value.quantity = 1;
     }
   }
-); //? ANE NAMBAH INI BUAT BIAR DOUBLE SAFETY STOCK
+);
 
+// Fungsi ngerubah nama jadi alamat URL yang rapi
 const toSlug = (text) => {
   return text
     .toLowerCase()
@@ -327,10 +339,12 @@ const toSlug = (text) => {
     .replace(/[^\w-]+/g, ''); 
 }
 
+// Shortcut ambil nama toko
 const getNamaToko = (product) => {
   return product.user?.toko?.nama_toko || 'Nama Seller'
 }
 
+// Tarik data produk-produk yang lagi aktif
 const fetchProducts = async () => {
   try {
     const response = await api.get('/product', { 
@@ -338,6 +352,7 @@ const fetchProducts = async () => {
     });
 
     if (response.data?.data?.data && Array.isArray(response.data.data.data)) {
+      // Acak urutannya biar gak bosen
       products.value = response.data.data.data.sort(() => Math.random() - 0.5);
     }
 
@@ -349,16 +364,19 @@ const fetchProducts = async () => {
   }
 };
 
+// Pindah ke halaman detail produk lain
 const goToProduct = (id) => {
   router.push({ name: 'Produk', params: { id } });
 };
 
+// Fungsi buat nyari info satu produk doang berdasarkan ID di URL
 const getProductById = async () => {
   const id = parseInt(route.params.id);
   let page = 1;
   let found = null;
 
   try {
+    // Cari ampe dapet di tiap halaman pagination API
     while (true) {
       const response = await api.get(`/product?page=${page}`);
       const products = response.data.data.data;
@@ -374,10 +392,11 @@ const getProductById = async () => {
     }
   } catch (error) {
     console.error('Gagal mengambil produk:', error);
-    showError('Produk tidak ditemukan atau gagal diambil');
+    showError('Produk gak ketemu atau server lagi capek nih');
   }
 };
 
+// Tarik semua ulasan user buat produk ini
 const getRatings = async (productId) => {
   try {
     const response = await api.get(`/rating?product_id=${productId}`);
@@ -385,7 +404,7 @@ const getRatings = async (productId) => {
       ratings.value = response.data.data.map((item) => ({
         bintang: item.rating,
         komentar: item.deskripsi,
-        user: item.user.name, // kalau backend sudah return nama user, pakai item.user.nama
+        user: item.user.name,
         foto: item.foto_review ? [item.foto_review] : []
       }));
     } else {
@@ -393,42 +412,43 @@ const getRatings = async (productId) => {
     }
   } catch (error) {
     console.error('Gagal mengambil rating:', error);
-    showError('Gagal mengambil rating produk');
     ratings.value = [];
   }
 };
 
+// Pas user klik foto kecil, ganti foto utamanya
 const changeMainImage = (imageUrl) => {
   if (produk.value) produk.value.selectedImage = imageUrl;
 };
 
+// Format duit ke Rupiah biar cakep
 const formatRupiah = (value) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(value);
 
+// Fungsi buat tombol + ama - quantity
 const increaseQuantity = () => { if (produk.value) produk.value.quantity++; };
 const decreaseQuantity = () => { if (produk.value && produk.value.quantity > 1) produk.value.quantity--; };
 
+// Fungsi buat proses beli langsung (checkout cepat)
 const formTransaction = async () => {
   try {
     isFetching.value = true
     const payload = {
       status: 'pending',
-      tanggal_transaksi: null,
-      kode_transaksi: null,
       total_harga: produk.value.harga * produk.value.quantity,
       produk_id: produk.value.id,
       quantity: produk.value.quantity
     };
 
     if (produk.value.stock < produk.value.quantity) {
-      showError('Stock Produk Tidak Cukup');
+      showError('Stok produknya gak cukup nih');
       return
     }
 
     const response = await api.post('/transaction', payload);
     await formDetailTransaction(response.data.data.id);
 
-    showSuccess('Transaksi berhasil dibuat!');
+    showSuccess('Transaksi udah dibuat, buruan bayar ya!');
     isFetching.value = false
     router.push(`/list-transaksi`);
 
@@ -436,14 +456,15 @@ const formTransaction = async () => {
   } catch (error) {
     console.error('Gagal transaksi:', error);
     if (error.response.data.status == 401) {
-      showError("Session Tidak Ada, Silahkan Login");
+      showError("Sesi kamu abis, login dulu ya");
       router.push(`/login`);
       return
     }
-    showError('Gagal melakukan transaksi');
+    showError('Yah, gagal bikin transaksi nih');
   }
 };
 
+// Fungsi buat nyimpen detil barang ke dalem transaksi baru
 const formDetailTransaction = async (transactionId) => {
   try {
     const payload = { transaction_id: transactionId, product_id: produk.value.id, jumlah: produk.value.quantity };
@@ -453,41 +474,29 @@ const formDetailTransaction = async (transactionId) => {
   }
 };
 
-const addToCart = async (payload) => {
-  try {
-    const response = await api.post('/detailcart', payload);
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      return { success: false, message: error.response.data.message, errors: error.response.data.errors || null };
-    } else {
-      return { success: false, message: 'Terjadi kesalahan pada jaringan atau server.' };
-    }
-  }
-};
-
+// Masukin barang ke keranjang belanja
 const handleAddToCart = async () => {
   if (!produk.value) return;
   const payload = { product_id: produk.value.id, jumlah: produk.value.quantity };
-  const result = await addToCart(payload);
-  if (result.success === false) {
-    if (result.message == "Unauthenticated" ) {
-      showError("Session Tidak Ada, Silahkan Login");
+  try {
+    const response = await api.post('/detailcart', payload);
+    showSuccess('Produk udah masuk ke keranjang kamu!');
+  } catch (error) {
+    if (error.response?.data?.message == "Unauthenticated" ) {
+      showError("Login dulu dong kalo mau belanja");
       router.push(`/login`);
-      return
+    } else {
+      showError("Aduh, gagal masukin ke keranjang nih");
     }
-    showError("Terjadi Kesalahan");
-  } else {
-    showSuccess('Produk berhasil ditambahkan ke keranjang!');
   }
 };
 
-// Modal actions
+// Urusan buka-tutup modal ama pratinjau gambar
 const openModal = () => { showModal.value = true; getRatings(produk.value?.id); };
-const closeModal = () => { showModal.value = false; };
 const openImage = (url) => { selectedImage.value = url; };
 const closeImage = () => { selectedImage.value = null; };
 
+// Pas halaman baru nongol, langsung gas tarik semua datanya
 onMounted( async () => { 
     await getProductById(); 
     await fetchProducts();
@@ -497,6 +506,7 @@ onMounted( async () => {
 </script>
 
 <style>
+/* Efek transisi modal biar makin smooth */
 .fade-scale-enter-active,
 .fade-scale-leave-active {
   transition: all 0.3s ease;
@@ -507,15 +517,12 @@ onMounted( async () => {
   transform: scale(0.9);
 }
 
-/* Custom Scrollbar */
+/* Custom scrollbar biar tampilannya tetep modern */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 9999px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
 }
 </style>

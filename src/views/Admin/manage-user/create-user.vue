@@ -1,11 +1,13 @@
 <template>
   <adminside>
+    <!-- Kasih tau user kalo website ini bukan buat kaum rebahan pake HP -->
     <div v-if="isMobile" class="text-center mt-10">
       <h2 class="text-xl font-semibold text-red-600">
         Website ini tidak bisa diakses dari perangkat mobile.
       </h2>
     </div>
 
+    <!-- Kotak form buat admin nambahin user baru secara manual -->
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
       <h2 class="text-xl font-bold mb-4">Form Tambah User</h2>
       <form @submit.prevent="submitForm">
@@ -53,6 +55,7 @@
           />
         </div>
 
+        <!-- Pilih role-nya, mau jadi buyer, seller, apa admin juga -->
         <div class="mb-4">
           <label for="role_id" class="block mb-1">Role</label>
           <select
@@ -73,10 +76,12 @@
           </select>
         </div>
 
+        <!-- Inputan buat upload foto profil, dibikin ngumpet tapi tetep fungsional -->
         <div class="mb-4">
           <label for="foto_profil" class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer">
             <div class="flex items-center justify-center gap-4">
               <span class="font-medium">Upload Foto Profil</span>
+              <!-- Tunjukin nama filenya kalo udah kepilih -->
               <div v-if="selectedFileName" class="text-sm text-gray-500">
                 {{ selectedFileName }}
               </div>
@@ -128,6 +133,7 @@ import { useRouter } from 'vue-router'
 import { showSuccess,showError } from '@/utils/alert'
 
 const router = useRouter()
+// State form buat nampung inputan user
 const form = ref({
   name: '',
   email: '',
@@ -138,11 +144,10 @@ const form = ref({
 })
 
 const selectedFileName = ref('')
-
 const isMobile = ref(false)
-
 const roleIds = ref([])
 
+// Tarik daftar role yang ada di database biar admin tinggal milih
 const fetchRoles = async () => {
   try {
     const response = await api.get('/role')
@@ -155,6 +160,7 @@ const fetchRoles = async () => {
   }
 }
 
+// Pas user milih file foto, kita simpen filenya ama namanya
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
@@ -166,6 +172,7 @@ const handleFileUpload = (event) => {
   }
 }
 
+// Fungsi utama buat ngirim data user baru ke server pake FormData
 const submitForm = async () => {
   try {
     const formData = new FormData()
@@ -175,6 +182,7 @@ const submitForm = async () => {
     formData.append('no_telp', form.value.no_telp)
     formData.append('role_id', form.value.role_id)
 
+    // Foto cuma dikirim kalo user emang upload ya
     if (form.value.foto_profil) {
       formData.append('foto_profil', form.value.foto_profil)
     }
@@ -188,8 +196,10 @@ const submitForm = async () => {
     showSuccess('User berhasil ditambahkan!')
     console.log('Response:', response.data)
 
+    // Balikin admin ke halaman daftar user
     router.push('/manageUser') 
   } catch (error) {
+    // Kalo error, kita bongkar pesan errornya biar gampang dibaca
     const errors = error.response?.data?.errors;
     let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
 
@@ -202,8 +212,10 @@ const submitForm = async () => {
   }
 }
 
+// Pas halaman kebuka, sikat data role
 onMounted(fetchRoles)
 
+// Sekalian cek apakah yang buka ini pake HP apa kagak
 onMounted(() => {
   const userAgent = navigator.userAgent || navigator.vendor || window.opera
   isMobile.value = /android|iphone|ipad|iPod|mobile/i.test(userAgent)

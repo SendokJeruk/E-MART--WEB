@@ -1,47 +1,56 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
+      <!-- Judul halaman buat nambahin barang dagangan baru -->
       <h2 class="text-xl font-bold mb-4">Form Tambah Produk</h2>
       <form @submit.prevent="submitForm">
+        <!-- Input nama barang yang mau dijual -->
         <div class="mb-4">
           <label for="nama_product" class="block mb-1">Nama Produk</label>
           <input id="nama_product" v-model="form.nama_product" type="text" class="w-full border px-3 py-2 rounded" />
         </div>
 
+        <!-- Kolom buat nulis deskripsi barang sejelas mungkin -->
         <div class="mb-4">
           <label for="deskripsi" class="block mb-1">Deskripsi</label>
           <textarea id="deskripsi" v-model="form.deskripsi" class="w-full border px-3 py-2 rounded"></textarea>
         </div>
 
+        <!-- Input harga barang (pake angka aja) -->
         <div class="mb-4">
           <label for="harga" class="block mb-1">Harga</label>
           <input id="harga" v-model="form.harga" type="text" class="w-full border px-3 py-2 rounded" />
         </div>
 
+        <!-- Stok barang yang tersedia di gudang -->
         <div class="mb-4">
           <label for="stock" class="block mb-1">Stok</label>
           <input id="stock" v-model="form.stock" type="number" class="w-full border px-3 py-2 rounded" />
         </div>
 
+        <!-- Berat barang buat itung-itungan ongkir (dalam gram) -->
         <div class="mb-4">
-          <label for="berat" class="block mb-1">Berat</label>
+          <label for="berat" class="block mb-1">Berat (Gram)</label>
           <input id="berat" v-model="form.berat" type="number" class="w-full border px-3 py-2 rounded" required />
         </div>
 
+        <!-- Status produk: mau langsung dipajang (publish) apa disimpen dulu (draft) -->
         <div class="mb-4">
           <label for="status" class="block mb-1">Status Produk</label>
           <select id="status" v-model="form.status" class="w-full border px-3 py-2 rounded">
             <option value="">Pilih status</option>
-            <option value="draft">Draft</option>
-            <option value="publish">Publish</option>
+            <option value="draft">Draft (Simpen Dulu)</option>
+            <option value="publish">Publish (Tayangkan)</option>
           </select>
         </div>
 
+        <!-- Bagian upload foto cover produk biar menarik pembeli -->
         <div class="mb-4">
           <label for="foto_cover"
             class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer">
             <div class="flex items-center justify-center gap-4">
-              <span class="font-medium">Upload Foto Produk</span>
+              <span class="font-medium">Upload Foto Sampul</span>
+              <!-- Nama file yang dipilih bakal nongol di sini -->
               <div v-if="selectedFileName" class="text-sm text-gray-500">
                 {{ selectedFileName }}
               </div>
@@ -57,7 +66,7 @@
         </div>
 
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Submit
+          Simpan Produk
         </button>
       </form>
     </div>
@@ -73,8 +82,9 @@ import { showError, showSuccess } from '@/utils/alert'
 
 
 const selectedFileName = ref('')
-
 const user = ref({})
+
+// Data form buat produk baru
 const form = ref({
   nama_product: '',
   deskripsi: '',
@@ -86,6 +96,7 @@ const form = ref({
   user_id: '',
 })
 
+// Pas seller milih file foto cover
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
@@ -97,6 +108,7 @@ const handleFileUpload = (event) => {
   }
 }
 
+// Tarik data profil seller buat tau siapa yang punya produk ini
 const getProfile = async () => {
   try {
     const response = await api.get('/profile')
@@ -107,9 +119,11 @@ const getProfile = async () => {
   }
 }
 
+// Fungsi utama buat ngirim data produk baru ke database
 const submitForm = async () => {
+  // Pastiin ID usernya udah dapet dulu
   if (!form.value.user_id) {
-    showError('User belum dikenali, silakan tunggu beberapa saat...');
+    showError('Sabar ya, lagi ngenalin kamu dulu...');
     return;
   }
 
@@ -130,7 +144,8 @@ const submitForm = async () => {
       },
     })
 
-    showSuccess('Produk berhasil ditambahkan!')
+    showSuccess('Asik! Produk kamu udah berhasil ditambahin.')
+    // Kosongin form biar bisa nambah produk baru lagi
     form.value = {
       nama_product: '',
       deskripsi: '',
@@ -142,10 +157,12 @@ const submitForm = async () => {
       user_id: '',
     }
 
+    // Balikin ke halaman daftar produk
     router.push('/manage-produk')
   } catch (error) {
+    // Bongkar alesan gagalnya kalo ada error
     const errors = error.response?.data?.errors;
-    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+    let errorMessage = error.response?.data?.message || 'Yah, gagal nambahin produk nih.';
 
     if (errors) {
       const allErrors = Object.values(errors).flat().join('\n');
@@ -156,6 +173,7 @@ const submitForm = async () => {
   }
 }
 
+// Pas halaman kebuka, sikat data profil
 onMounted(() => {
   getProfile()
 })

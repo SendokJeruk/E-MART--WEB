@@ -47,8 +47,9 @@ import VerifyPage from "@/views/Auth/verify.vue";
 import ResetPass from "@/views/Auth/forget-pass.vue";
 import RequestResetPass from "@/views/Auth/request-forget-pass.vue";
 
+// Daftar semua rute halaman di aplikasi kita
 const routes = [
-    // Dashboard
+    // Bagian Dashboard
     {
         path: '/',
         redirect: '/dashboard' 
@@ -59,7 +60,7 @@ const routes = [
         component: Dashboard
     },
 
-    //Auth
+    // Bagian Autentikasi (Login, Register, dll)
     {
         
         path: '/login',
@@ -88,14 +89,14 @@ const routes = [
         component: ResetPass
     },
 
-    // Admin
+    // Bagian Admin
     {
         path: '/admin',
         name: 'Admin',
         component: Admin
     },
 
-     //Manage User
+     // Urusan Manage User buat Admin
      {
         path: '/manage-user',
         name: 'ManageUser',
@@ -114,7 +115,7 @@ const routes = [
         component: EditUser
      },
 
-     //Kategori Admin
+     // Urusan Kategori Produk buat Admin
      {
         path: '/kategori',
         name: 'kategori',
@@ -131,14 +132,14 @@ const routes = [
         component: EditKategori
     },
 
-    // Detail Produk
+    // Halaman Detail Produk
     {
         path: '/produk/:id',
         name: 'Produk',
         component: Produk
     },
 
-    // Settings
+    // Pengaturan Akun & Profil
     {
         path: '/settings',
         name: 'Settings',
@@ -165,7 +166,7 @@ const routes = [
         component: CreateAlamat
     },
 
-    //Checkout + Cart
+    // Urusan Belanja (Cart & Checkout)
      {
         path: '/checkout/:kode',
         name: 'checkout',
@@ -176,7 +177,8 @@ const routes = [
         name: 'cart',
         component: Cart
     },
-    //Kategori Produk
+
+    // Bagian Seller (Manage Jualan)
     {
         path: '/manage-kategori-produk',
         name: 'managekategoriproduct',
@@ -197,7 +199,6 @@ const routes = [
         name: 'seller',
         component: Seller
     },
-    //Manage Produk
     {
         path: '/manage-produk',
         name: 'product',
@@ -213,7 +214,6 @@ const routes = [
         name: 'editproduk',
         component: EditProduk
     },
-    //Manage Foto Produk
     {
         path: '/manage-foto-product',
         name: 'manageFotoproduct',
@@ -229,7 +229,6 @@ const routes = [
         name: 'createfotoproduct',
         component: CreateFotoProduct
     },
-    //Toko
     {
         path: '/manage-toko',
         name: 'managetoko',
@@ -260,13 +259,15 @@ const routes = [
         name: 'historyTransaksi',
         component: History
     },
-    //Toko
+
+    // Halaman Toko (Tampilan buat Buyer)
     {
         path: '/toko/:nama_toko',
         name: 'toko',
         component: Toko
     },
-    //Pengajuan Seller
+
+    // Fitur Request Jadi Seller & Tracking Order
     {
         path: '/pengajuan-seller',
         name: 'pengajuanSeller',
@@ -292,51 +293,41 @@ const routes = [
         name: 'managePengiriman',
         component: ManagePengiriman
     },
-    //Manage Income
     {
         path: '/manage-income',
         name: 'manageIncome',
         component: ManageIncome
     },
-    //Withdraw
     {
         path: '/withdraw',
         name: 'withdraw',
         component: Withdraw
     },
-    //
     {
         path: '/manage-banner',
         name: 'manageBanner',
         component: ManageBanner
     }
 ]
+
 const router = createRouter({
     history: createWebHistory(),
     routes
   });
   
-  /*
-  Halaman yang boleh diakses tanpa login
-*/
+// Halaman yang bebas dikunjungi tanpa perlu login
 const publicPages = [
   '/dashboard',
   '/login',
   '/register'
 ]
 
-/*
-  Validasi tambahan untuk route dinamis /produk/:id
-*/
+// Fungsi buat ngecek rute produk, soalnya ada ID-nya yang dinamis
 const isPublicDynamic = (path) => {
   return path.startsWith('/produk/')
 }
 
-/*
-  Global route guard:
-  - cek apakah halaman public
-  - jika tidak dan tidak ada token, redirect ke login
-*/
+// Penjaga pintu (Route Guard) biar gak sembarang orang masuk ke halaman privat
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token")
 
@@ -344,6 +335,7 @@ router.beforeEach((to, from, next) => {
     publicPages.includes(to.path) ||
     isPublicDynamic(to.path)
 
+  // Kalo mau masuk halaman privat tapi gak bawa token (belom login), tendang ke login
   if (!isPublic && !token) {
     return next('/login')
   }

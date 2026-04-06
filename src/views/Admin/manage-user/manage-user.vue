@@ -2,11 +2,11 @@
   <adminside>
     <div class="p-6 overflow-x-auto">
 
-      <!-- HEADER -->
+      <!-- Bagian atas halaman daftar user -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage User</h1>
 
-        <!-- Header Skeleton saat loading -->
+        <!-- Skeleton profil admin pas lagi nunggu data -->
         <div
           v-if="isLoading"
           class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
@@ -19,7 +19,7 @@
           </div>
         </div>
 
-        <!-- Header data user -->
+        <!-- Profil admin yang lagi operasional -->
         <div
           v-else
           class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
@@ -36,8 +36,7 @@
         </div>
       </div>
 
-      <!-- SEARCH INPUT -->
-      <!-- Menggunakan debounce agar tidak spam API -->
+      <!-- Inputan buat nyari user berdasarkan nama, biar gak pegel scrollnya -->
       <input
         v-model="searchQuery"
         class="w-full p-2 border border-gray-300 rounded-md text-sm mb-4"
@@ -46,7 +45,7 @@
         @input="handleSearch"
       />
 
-      <!-- BUTTON TAMBAH USER -->
+      <!-- Tombol buat nambah user baru secara manual -->
       <router-link
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5"
         to="/create-user"
@@ -57,7 +56,7 @@
         </span>
       </router-link>
 
-      <!-- TABLE USER -->
+      <!-- Tabel buat nampilin daftar usernya, pake shadow biar ada dimensinya -->
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-auto divide-y divide-gray-200">
           <thead class="bg-gray-200">
@@ -70,7 +69,7 @@
 
           <tbody class="divide-y divide-gray-200">
 
-            <!-- Skeleton saat loading -->
+            <!-- Baris skeleton pas tabelnya lagi narik data dari server -->
             <template v-if="isLoading">
               <tr v-for="n in 6" :key="n">
                 <td class="px-6 py-4"><Skeleton height="14px" width="80%"/></td>
@@ -82,13 +81,14 @@
               </tr>
             </template>
 
-            <!-- Data user -->
+            <!-- Data user asli yang nongol dari database -->
             <template v-else>
               <tr v-for="user in users" :key="user.id">
                 <td class="px-6 py-4 text-sm font-medium inter-font text-gray-900 ">{{ user.name }}</td>
                 <td class="px-6 py-4 text-sm font-medium inter-font text-gray-900">{{ user.email }}</td>
 
                 <td class="px-6 py-4">
+                  <!-- Tombol buat ngehapus user, ati-ati ya pas neken ini -->
                   <button
                     @click="deleteUser(user.id)"
                     class="bg-red-500 text-white px-3 py-1 rounded mr-2"
@@ -96,6 +96,7 @@
                     Hapus
                   </button>
 
+                  <!-- Tombol buat masuk ke halaman edit user -->
                   <router-link
                     :to="`/edit-user/${user.id}`"
                     class="bg-yellow-500 text-white px-3 py-1 rounded"
@@ -111,7 +112,7 @@
       </div>
     </div>
 
-    <!-- PAGINATION -->
+    <!-- Tombol navigasi halaman pagination -->
     <div class="flex justify-center mt-6 space-x-2">
       <button
         @click="changePage(pagination.current_page - 1)"
@@ -121,6 +122,7 @@
         Previous
       </button>
 
+      <!-- Looping angka halamannya -->
       <button
         v-for="page in pagination.last_page"
         :key="page"
@@ -148,41 +150,24 @@
 </template>
 
 <script setup>
-/*
-  Komponen ini menangani:
-  - Menampilkan data user
-  - Search user
-  - Pagination
-  - Delete user
-
-  Prinsip utama:
-  Search dan pagination harus selalu berjalan bersamaan
-*/
-
 import adminside from '@/components/navbar/admin-side.vue'
 import { ref, onMounted } from 'vue'
 import api from "@/plugins/axios"
 import Skeleton from '@/components/Skeleton.vue'
 
-/*
-  State utama
-*/
+// Siapin state buat nampung data list user
 const users = ref([])
-const user = ref({})
+const user = ref({}) // Profil admin sendiri
 const isLoading = ref(true)
 const searchQuery = ref('')
 
-/*
-  State pagination dari backend
-*/
+// Info buat ngatur pagination
 const pagination = ref({
   current_page: 1,
   last_page: 1,
 })
 
-/*
-  Mengambil profil user login
-*/
+// Ambil profil admin yang lagi operasional
 const getProfile = async () => {
   try {
     const response = await api.get('/profile')
@@ -192,12 +177,7 @@ const getProfile = async () => {
   }
 }
 
-/*
-  FUNCTION UTAMA
-  Mengambil data user dengan parameter:
-  - page
-  - searchQuery
-*/
+// Fungsi utama buat tarik data user, gabungin search ama pagination
 const fetchUsers = async (page = 1) => {
   try {
     isLoading.value = true
@@ -205,12 +185,13 @@ const fetchUsers = async (page = 1) => {
     const response = await api.get('/manage-user', {
       params: {
         page: page,
-        name: searchQuery.value
+        name: searchQuery.value // Kirim nama yang lagi dicari
       }
     })
 
     const data = response.data.data
 
+    // Simpen datanya ke state
     users.value = data.data
     pagination.value.current_page = data.current_page
     pagination.value.last_page = data.last_page
@@ -222,47 +203,41 @@ const fetchUsers = async (page = 1) => {
   }
 }
 
-/*
-  Pagination handler
-*/
+// Pas user mindah-mindah halaman pagination
 const changePage = (page) => {
   if (page >= 1 && page <= pagination.value.last_page) {
     fetchUsers(page)
   }
 }
 
-/*
-  Debounce search agar tidak spam API
-*/
+// Trik debounce biar gak spam request API pas admin lagi ngetik di kotak search
 let timeout = null
 
 const handleSearch = () => {
   clearTimeout(timeout)
 
   timeout = setTimeout(() => {
+    // Balikin ke halaman satu kalo abis ngetik pencarian baru
     pagination.value.current_page = 1
     fetchUsers(1)
   }, 500)
 }
 
-/*
-  Delete user dan reload data sesuai page sekarang
-*/
+// Fungsi buat ngebuang user dari database
 const deleteUser = async (id) => {
   const konfirmasi = confirm('Yakin ingin menghapus user ini?')
   if (!konfirmasi) return
 
   try {
     await api.delete(`/manage-user/${id}`)
+    // Refresh datanya di halaman yang lagi aktif
     fetchUsers(pagination.value.current_page)
   } catch (error) {
     console.error('Gagal menghapus user:', error)
   }
 }
 
-/*
-  Lifecycle saat komponen pertama kali dimuat
-*/
+// Pas halaman dibuka, langsung sikat ambil profil ama data usernya
 onMounted(() => {
   fetchUsers(1)
   getProfile()
@@ -270,6 +245,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Styling tabel biar gak rapet-rapet amat */
 table {
   border-collapse: collapse;
 }

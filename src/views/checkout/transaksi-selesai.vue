@@ -1,10 +1,11 @@
 <template>
   <Navbar />
+  <!-- Halaman buat ngerayain kalo pembayarannya udah beres ama sukses -->
   <div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#FFF5F5] to-[#ffeaea] p-6">
     
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-10 text-center">
 
-      <!-- Icon -->
+      <!-- Ikon centang ijo, tanda kalo duitnya udah aman masuk sistem -->
       <div class="flex justify-center">
         <div class="bg-green-100 p-5 rounded-full">
           <div class="bg-green-500 rounded-full p-4">
@@ -20,22 +21,21 @@
         </div>
       </div>
 
-      <!-- Title -->
+      <!-- Pesan selamat buat user -->
       <h1 class="text-2xl font-bold text-gray-800 mt-6">
-        Pembayaran Berhasil
+        Pembayaran Berhasil!
       </h1>
 
-      <!-- Subtitle -->
       <p class="text-gray-500 text-sm mt-2">
-        Transaksi kamu sudah selesai diproses.
+        Asik, transaksi kamu udah beres diproses. Tungguin aja ya paketnya dateng.
       </p>
 
-      <!-- Button -->
+      <!-- Tombol buat balik ke halaman depan biar bisa belanja lagi -->
       <button 
         @click="router.push('/dashboard')" 
         class="mt-8 w-full py-3 bg-[#7D0A0A] text-white rounded-xl font-semibold 
                hover:bg-[#a32727] transition duration-300 shadow-md">
-        Kembali
+        Kembali ke Beranda
       </button>
 
     </div>

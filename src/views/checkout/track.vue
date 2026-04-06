@@ -4,13 +4,13 @@
   <div class="bg-gray-50 min-h-screen py-6">
     <div class="max-w-4xl mx-auto px-4">
 
-      <!-- Header -->
+      <!-- Judul halaman lacak pesanan -->
       <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold text-black">Pesanan</h1>
+        <h1 class="text-2xl font-bold text-black">Lacak Pesanan</h1>
       </div>
 
 
-      <!-- Produk -->
+      <!-- Info singkat produk yang lagi di jalan -->
       <div
         v-if="pengiriman?.detail_shipments?.length"
         class="bg-white rounded-xl shadow p-4 flex items-center gap-4 mb-6"
@@ -36,6 +36,7 @@
           </p>
         </div>
 
+        <!-- Detail nomor resi ama kurir yang ngebawa -->
         <div class="text-right text-sm">
           <p>
             <span class="font-semibold">Nomor Resi :</span>
@@ -52,18 +53,21 @@
 
 
 
-      <!-- Progress Bar -->
+      <!-- Bagian Progress Bar biar tau paket udah sampe mana (visual) -->
       <div v-if="pengiriman" class="mb-6">
 
         <div class="relative">
 
+          <!-- Garis dasar abu-abu -->
           <div class="absolute top-3 left-0 right-0 h-1 bg-gray-300"></div>
 
+          <!-- Garis merah penanda progres, panjangnya otomatis sesuai tahap -->
           <div
             class="absolute top-3 left-0 h-1 bg-red-600 transition-all duration-500"
             :style="{ width: progressWidth }"
           ></div>
 
+          <!-- Titik-titik angka tahapan pengiriman -->
           <div class="flex justify-between relative z-10">
 
             <div
@@ -80,6 +84,7 @@
         </div>
 
 
+        <!-- Teks keterangan buat tiap tahapan pengiriman -->
         <div class="flex justify-between text-xs mt-2 font-medium">
 
           <span :class="stepTextClass(1)">Diproses</span>
@@ -94,7 +99,7 @@
 
 
 
-      <!-- Timeline Tracking -->
+      <!-- Bagian Timeline detil perjalanan paket dari kurir -->
       <div class="bg-white rounded-xl shadow p-4 space-y-4" v-if="manifest.length">
 
         <div
@@ -103,6 +108,7 @@
           class="flex items-start gap-3"
         >
 
+          <!-- Titik merah buat status terbaru, abu-abu buat yang lama -->
           <div
             class="w-3 h-3 rounded-full mt-1"
             :class="index === 0 ? 'bg-red-600' : 'bg-gray-300'"
@@ -110,6 +116,7 @@
 
           <div>
 
+            <!-- Info waktu ama keterangan posisi paket -->
             <p class="text-sm font-medium">
               {{ item.manifest_date }} - {{ item.manifest_time }}
             </p>
@@ -120,6 +127,7 @@
               {{ item.manifest_description }}
             </p>
 
+            <!-- Nama kotanya biar tau paket lagi mampir dimana -->
             <p class="text-xs text-gray-400">
               {{ item.city_name }}
             </p>
@@ -144,6 +152,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
+// State buat nampung data pengiriman ama detil tracking kurir
 const pengiriman = ref(null)
 const shippingData = ref(null)
 
@@ -151,7 +160,7 @@ const idShipment = route.params.id
 
 
 
-// GET DATA
+// Fungsi utama buat tarik data pengiriman dari server kita
 const getShipment = async () => {
 
   try {
@@ -165,7 +174,7 @@ const getShipment = async () => {
 
   } catch (error) {
 
-    console.error("Gagal ambil data pengiriman", error)
+    console.error("Yah, gagal ambil data pengiriman nih", error)
 
   }
 
@@ -173,7 +182,7 @@ const getShipment = async () => {
 
 
 
-// MANIFEST TIMELINE
+// Ngolah data manifest kurir biar yang paling baru nongol paling atas
 const manifest = computed(() => {
 
   const data = shippingData.value?.data?.manifest ?? []
@@ -184,7 +193,7 @@ const manifest = computed(() => {
 
 
 
-// CURRENT STEP DARI TITLE
+// Nentuin sekarang lagi di tahap keberapa buat progress bar
 const currentStep = computed(() => {
 
   const list = shippingData.value?.data?.manifest ?? []
@@ -193,6 +202,7 @@ const currentStep = computed(() => {
 
   const latest = list[list.length - 1].title
 
+  // Cocokin teks status dari kurir ama angka tahapannya
   switch (latest) {
 
     case "Pickup":
@@ -215,7 +225,7 @@ const currentStep = computed(() => {
 
 
 
-// WIDTH PROGRESS
+// Ngitung lebar garis merah progress bar pake persen
 const progressWidth = computed(() => {
 
   return `${((currentStep.value - 1) / 4) * 100}%`
@@ -224,6 +234,7 @@ const progressWidth = computed(() => {
 
 
 
+// Fungsi buat ngatur warna buletan tahapan
 const stepClass = (step) => {
 
   return step <= currentStep.value
@@ -234,6 +245,7 @@ const stepClass = (step) => {
 
 
 
+// Fungsi buat ngatur warna teks keterangan tahapan
 const stepTextClass = (step) => {
 
   return step <= currentStep.value
@@ -244,7 +256,7 @@ const stepTextClass = (step) => {
 
 
 
-// DOWNLOAD INVOICE
+// Fungsi buat download file invoice PDF (kalo user butuh)
 const getInvoice = async (kodeTransaksi) => {
 
   try {
@@ -265,7 +277,7 @@ const getInvoice = async (kodeTransaksi) => {
 
   } catch (error) {
 
-    console.error("Gagal download invoice", error)
+    console.error("Gagal download invoice-nya", error)
 
   }
 
@@ -273,6 +285,7 @@ const getInvoice = async (kodeTransaksi) => {
 
 
 
+// Pas halaman baru dibuka, langsung sikat ambil datanya
 onMounted(() => {
 
   getShipment()

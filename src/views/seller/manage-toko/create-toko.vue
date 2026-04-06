@@ -1,10 +1,11 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <h2 class="text-xl font-bold mb-4">Form Tambah Toko</h2>
+      <!-- Judul halaman buat nambahin toko baru -->
+      <h2 class="text-xl font-bold mb-4">Form Bikin Toko</h2>
       
       <form @submit.prevent="submitForm">
-        <!-- Nama Toko -->
+        <!-- Input nama toko keren kamu -->
         <div class="mb-4">
           <label for="nama_toko" class="block mb-1">Nama Toko</label>
           <input
@@ -12,25 +13,27 @@
             id="nama_toko"
             v-model="form.nama_toko"
             class="w-full border px-3 py-2 rounded"
+            placeholder="Tulis nama toko kamu..."
             required
           />
         </div>
 
-        <!-- Deskripsi -->
+        <!-- Kolom buat nulis deskripsi toko biar pembeli percaya -->
         <div class="mb-4">
-          <label for="deskripsi" class="block mb-1">Deskripsi</label>
+          <label for="deskripsi" class="block mb-1">Deskripsi Toko</label>
           <input
             type="text"
             id="deskripsi"
             v-model="form.deskripsi"
             class="w-full border px-3 py-2 rounded"
+            placeholder="Jualan apa aja nih?"
             required
           />
         </div>
 
-        <!-- No. Telepon -->
+        <!-- Nomor telepon toko yang bisa dihubungin -->
         <div class="mb-4">
-          <label for="no_telp" class="block mb-1">No. Telepon</label>
+          <label for="no_telp" class="block mb-1">No. Telepon Toko</label>
           <input
             type="text"
             id="no_telp"
@@ -40,7 +43,7 @@
           />
         </div>
 
-        <!-- Alamat: Provinsi -->
+        <!-- Urusan alamat toko (Provinsi ampe Kelurahan) -->
         <div class="mb-4">
           <label for="province_name" class="block mb-1">Provinsi</label>
           <select
@@ -57,7 +60,6 @@
           </select>
         </div>
 
-        <!-- Alamat: Kota -->
         <div class="mb-4">
           <label for="city_name" class="block mb-1">Kota / Kabupaten</label>
           <select
@@ -74,7 +76,6 @@
           </select>
         </div>
 
-        <!-- Alamat: Kecamatan -->
         <div class="mb-4">
           <label for="district_name" class="block mb-1">Kecamatan</label>
           <select
@@ -91,7 +92,6 @@
           </select>
         </div>
 
-        <!-- Alamat: Kelurahan -->
         <div class="mb-4">
           <label for="subdistrict_name" class="block mb-1">Kelurahan</label>
           <select
@@ -107,9 +107,9 @@
           </select>
         </div>
 
-        <!-- Alamat: Detail -->
+        <!-- Tulis alamat lengkap toko biar kurir jemputnya gampang -->
         <div class="mb-4">
-          <label for="detail_alamat" class="block mb-1">Detail Alamat (Jalan, RT/RW, dsb)</label>
+          <label for="detail_alamat" class="block mb-1">Alamat Lengkap (Jalan, No Rumah, dsb)</label>
           <textarea
             id="detail_alamat"
             v-model="form.detail_alamat"
@@ -119,15 +119,16 @@
           ></textarea>
         </div>
 
-        <!-- Cari Kode Domestik -->
+        <!-- Info kode domestik buat urusan ongkir RajaOngkir -->
         <div class="mb-4 flex items-center space-x-2">
           <span class="text-sm text-gray-700" v-if="form.kode_domestik">
-            Kode: {{ form.kode_domestik }}
+            Kode Area: {{ form.kode_domestik }}
           </span>
         </div>
 
+        <!-- Kalo nemu banyak saran alamat, suruh seller pilih salah satu -->
         <div v-if="searchResults.length" class="border rounded p-3 max-h-48 overflow-auto mt-3 bg-gray-50">
-          <p class="mb-2 font-semibold">Pilih alamat yang sesuai:</p>
+          <p class="mb-2 font-semibold">Alamat mana nih yang pas?</p>
           <ul>
             <li
               v-for="item in searchResults"
@@ -144,7 +145,7 @@
           type="submit"
           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Submit
+          Bikin Toko Sekarang
         </button>
       </form>
     </div>
@@ -165,10 +166,8 @@ const districts = ref([]);
 const subdistricts = ref([]);
 const searchResults = ref([]);
 const showKodeDomestik = ref(false);
-const errorMessages = ref(null);
-const successMessage = ref(null);
 
-// Form
+// Objek form buat data toko ama alamatnya
 const form = ref({
   user_id: '',
   nama_toko: '',
@@ -184,6 +183,7 @@ const form = ref({
   detail_alamat: ''
 });
 
+// Ngawasin perubahan wilayah buat nyusun label alamat lengkap
 watch(
   () => [
     form.value.subdistrict_name,
@@ -202,37 +202,38 @@ watch(
 
 const user = ref({});
 
+// Ambil profil seller buat tau siapa pemilik tokonya
 const getProfile = async () => {
   try {
     const response = await api.get('/profile');
     user.value = response.data.data;
     form.value.user_id = user.value.id;
   } catch (error) {
-    console.error('Gagal mengambil profil:', error);
+    console.error('Aduh, gagal ambil profil:', error);
   }
 };
 
+// Fungsi buat ngirim data toko baru ke database
 const submitForm = async () => {
   try {
     const response = await api.post('/toko', form.value);
-    showSuccess('Toko berhasil dibuat!');
+    showSuccess('Selamat! Toko kamu udah aktif sekarang.');
+    // Balikin ke halaman manage toko
     router.push('/manage-toko');
   } catch (error) {
     if (error.response) {
-      showError(`Gagal: ${error.response.data.message}`);
-      console.error(error.response.data.errors || error.response.data.error);
+      showError(`Gagal bikin toko: ${error.response.data.message}`);
     } else {
-      console.error(error);
-      showError('Terjadi kesalahan saat mengirim data.');
+      showError('Yah, ada kendala pas mau bikin toko.');
     }
   }
 };
 
-// Ambil data alamat (provinsi, kota, kecamatan, kelurahan)
+// Tarik data wilayah satu-satu (Provinsi -> Kota -> dst)
 const dapat_Alamat = async () => {
   try {
     const response = await fetch('https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/provinces.json');
-    if (!response.ok) throw new Error('Gagal load provinsi');
+    if (!response.ok) throw new Error('Gagal load provinsi-nya');
     provinces.value = await response.json();
   } catch (error) {
     console.error(error);
@@ -244,8 +245,9 @@ const getKota = async () => {
   if (selectedProvince) {
     try {
       const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/regencies/${selectedProvince.id}.json`);
-      if (!response.ok) throw new Error('Gagal load kota');
+      if (!response.ok) throw new Error('Gagal load daftar kota');
       cities.value = await response.json();
+      // Reset sisa wilayah di bawahnya
       districts.value = [];
       subdistricts.value = [];
       form.value.city_name = '';
@@ -262,7 +264,7 @@ const getKecamatan = async () => {
   if (selectedCity) {
     try {
       const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/districts/${selectedCity.id}.json`);
-      if (!response.ok) throw new Error('Gagal load kecamatan');
+      if (!response.ok) throw new Error('Gagal load daftar kecamatan');
       districts.value = await response.json();
       subdistricts.value = [];
       form.value.district_name = '';
@@ -278,10 +280,11 @@ const getKelurahan = async () => {
   if (selectedDistrict) {
     try {
       const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/villages/${selectedDistrict.id}.json`);
-      if (!response.ok) throw new Error('Gagal load kelurahan');
+      if (!response.ok) throw new Error('Gagal load daftar kelurahan');
       subdistricts.value = await response.json();
       form.value.subdistrict_name = '';
 
+      // Kalo kelurahan udah kepilih, cari kode domestiknya otomatis
       watch(
         () => form.value.subdistrict_name,
         (newVal) => {
@@ -295,11 +298,11 @@ const getKelurahan = async () => {
 
     } catch (error) {
       console.error(error);
-      showError(error.message);
     }
   }
 };
 
+// Fungsi buat nyari ID area (kode domestik) lewat RajaOngkir
 const cariKodeDomestik = async () => {
   if (!form.value.label) return;
 
@@ -312,28 +315,30 @@ const cariKodeDomestik = async () => {
       form.value.kode_domestik = '';
       searchResults.value = [];
     } else if (results.length === 1) {
+      // Kalo cuma nemu satu yang pas, langsung comot aja
       form.value.kode_domestik = results[0].id; 
       form.value.zip_code = results[0].zip_code || '';
-      console.log(form.value.zip_code);
       searchResults.value = [];
     } else {
+      // Kalo nemu banyak, kash liat pilihannya
       searchResults.value = results;
       form.value.kode_domestik = '';
     }
   } catch (err) {
-    console.error(err);
+    console.error('Gagal ambil kode area:', err);
     form.value.kode_domestik = '';
     searchResults.value = [];
   }
 };
 
+// Pas seller ngeklik salah satu pilihan alamat dari list
 const pilihAlamat = (item) => {
   form.value.kode_domestik = item.kode_domestik || item.id;
   form.value.label = item.label;
   form.value.zip_code = item.zip_code || '';
 
   searchResults.value = [];
-  showSuccess('Alamat berhasil dipilih');
+  showSuccess('Alamat udah kepilih, mantap!');
 
   showKodeDomestik.value = false;
   setTimeout(() => {
@@ -342,7 +347,7 @@ const pilihAlamat = (item) => {
 };
 
 
-// Load data awal
+// Pas halaman dibuka, langsung sikat ambil profil ama data wilayah
 onMounted(() => {
   getProfile();
   dapat_Alamat();

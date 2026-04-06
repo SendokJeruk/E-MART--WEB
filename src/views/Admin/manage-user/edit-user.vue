@@ -1,9 +1,10 @@
 <template>
   <adminside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <!-- Judul -->
+      <!-- Judul buat edit user -->
       <h2 class="text-xl font-bold mb-4">Form Edit User</h2>
-      <!-- Skeleton Form -->
+      
+      <!-- Penampakan form pas lagi narik data usernya, biar gak kaget kalo kosong -->
       <div v-if="isLoading" class="space-y-4">
         <div>
           <Skeleton height="14px" width="30%" class="mb-2"/>
@@ -35,7 +36,7 @@
         <Skeleton height="40px" width="100px"/>
       </div>
 
-      <!-- Form Asli -->
+      <!-- Ini form aslinya kalo data usernya udah masuk semua -->
       <form v-else @submit.prevent="submitForm">
         <div class="mb-4">
           <label for="name" class="block mb-1">Name</label>
@@ -59,6 +60,7 @@
           />
         </div>
 
+        <!-- Password bisa dikosongin kalo gak mau diganti -->
         <div class="mb-4">
           <label for="password" class="block mb-1">Password</label>
           <input
@@ -81,6 +83,7 @@
           />
         </div>
 
+        <!-- Pilih role barunya si user -->
         <div class="mb-4">
           <label for="role_id" class="block mb-1">Role</label>
 
@@ -102,6 +105,7 @@
           </select>
         </div>
 
+        <!-- Urusan upload foto profil baru -->
         <div class="mb-4">
           <label
             for="foto_profil"
@@ -110,6 +114,7 @@
             <div class="flex items-center justify-center gap-4">
               <span class="font-medium">Upload Foto Profil</span>
 
+              <!-- Kalo ada file baru kepilih, tunjukin namanya -->
               <div v-if="selectedFileName" class="text-sm text-gray-500">
                 {{ selectedFileName }}
               </div>
@@ -152,7 +157,7 @@
   </adminside>
 </template>
   
-  <script setup>
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
@@ -163,6 +168,7 @@ import { showError, showSuccess } from '@/utils/alert'
 const route = useRoute()
 const router = useRouter()
 
+// Siapin state form buat data user
 const form = ref({
   name: '',
   email: '',
@@ -173,11 +179,10 @@ const form = ref({
 })
 
 const isLoading = ref(true)
-
 const selectedFileName = ref(null);
-
 const roleIds = ref([])
 
+// Tarik semua daftar role yang tersedia
 const fetchRoles = async () => {
   try {
     const response = await api.get('/role')
@@ -190,6 +195,7 @@ const fetchRoles = async () => {
   }
 }
 
+// Pas user milih foto profil baru
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -198,10 +204,13 @@ const handleFileUpload = (event) => {
   }
 };
 
+// Tarik data si user yang mau diedit berdasarkan ID di URL
 const fetchUser = async () => {
   try {
+    // Ambil datanya lewat api manage-user pake query param ID
     const response = await api.get(`/manage-user?id=${route.params.id}`);
     const user = response.data.data.data[0];
+    // Masukin datanya ke form biar nongol di inputan
     form.value.name = user.name;
     form.value.email = user.email;
     form.value.password = user.password;
@@ -211,14 +220,16 @@ const fetchUser = async () => {
     console.error('Gagal mengambil data user:', error);
     showError('Gagal mengambil data user.');
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 };
 
+// Fungsi buat ngirim updatean data user ke server
 const submitForm = async () => {
   try {
     const formData = new FormData();
 
+    // Masukin data-datanya ke FormData, cek dulu sapa tau ada yang kosong
     if (form.value.name) formData.append('name', form.value.name);
     if (form.value.email) formData.append('email', form.value.email);
     if (form.value.password) formData.append('password', form.value.password);
@@ -226,6 +237,7 @@ const submitForm = async () => {
     if (form.value.role_id) formData.append('role_id', form.value.role_id);
     if (form.value.foto_profil) formData.append('foto_profil', form.value.foto_profil);
 
+    // Paksa pake PUT biar backend tau ini update
     formData.append('_method', 'PUT');
 
     await api.post(`/manage-user/${route.params.id}`, formData, {
@@ -235,8 +247,10 @@ const submitForm = async () => {
     });
 
     showSuccess('User berhasil diperbarui!');
+    // Balikin ke daftar user kalo udah beres
     router.push('/manageuser');
   } catch (error) {
+    // Kalo gagal, kita bongkar alesan gagalnya
     const errors = error.response?.data?.errors;
     let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
 
@@ -249,6 +263,7 @@ const submitForm = async () => {
   }
 };
 
+// Pas halaman dibuka, tarik data user ama role barengan
 onMounted(() => {
   fetchRoles()
   fetchUser()

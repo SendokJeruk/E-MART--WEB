@@ -1,4 +1,5 @@
 <template>
+    <!-- Tombol ijo buat navigasi, pas dihover bakal jadi transparan border ijo -->
     <a
       @click.prevent="navigate"
       href="#"
@@ -11,6 +12,7 @@
   <script setup>
   import { useRouter } from 'vue-router'
   
+  // Perlu label (teks tombol) ama to (tujuan mau kemana)
   const props = defineProps({
     label: String,    
     to: String       
@@ -18,6 +20,7 @@
   
   const router = useRouter()
   
+  // Pas diklik, langsung cus ke halaman tujuan
   const navigate = () => {
     router.push(props.to)
   }

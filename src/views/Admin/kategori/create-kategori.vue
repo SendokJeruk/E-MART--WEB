@@ -2,6 +2,7 @@
     <adminside>
       <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
         <h2 class="text-xl font-bold mb-4">Form Tambah Kategori</h2>
+        <!-- Form buat bikin kategori baru, dicegah biar gak reload pas disubmit -->
         <form @submit.prevent="submitForm">
           <div class="mb-4">
             <label for="nama_category" class="block mb-1">Nama Kategori</label>
@@ -31,10 +32,12 @@
   import adminside from '@/components/navbar/admin-side.vue'
   import { showSuccess, showError } from '@/utils/alert'
   
+  // Data formnya disimpen di sini
   const form = ref({
     nama_category: '',
   })
   
+  // Fungsi buat ngirim data kategori baru ke server
   const submitForm = async () => {
   try {
     const formData = new FormData()
@@ -46,10 +49,12 @@
       },
     })
 
+    // Kalo sukses, kasih tau user terus kosongin lagi inputannya
     showSuccess('category berhasil ditambahkan!')
     form.value.nama_category = ''
 
   } catch (error) {
+    // Kalo ada yang salah, kita kumpulin pesan errornya buat ditampilin
     const errors = error.response?.data?.errors;
     let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
 

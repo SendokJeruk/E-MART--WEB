@@ -1,16 +1,16 @@
 <template>
-  <!-- Navbar dengan search input -->
+  <!-- Navbar atas, sekalian nerima data kalo user lagi nyari barang -->
   <Navbar @search="doSearch" />
 
-  <!-- Carousel/Slider gambar -->
+  <!-- Slider banner iklan di bagian paling atas -->
   <div class="p-4">
     <carousel :images="imagesA" />
   </div>
 
-  <!-- Kategori produk -->
+  <!-- Barisan tombol filter kategori yang bisa digeser-geser -->
   <div class="flex space-x-2 overflow-x-auto p-4">
     
-    <!-- Semua kategori -->
+    <!-- Tombol buat nampilin semua barang tanpa pilih-pilih kategori -->
     <button
       @click="clearCategory"
       :class="[
@@ -23,7 +23,7 @@
       Semua Kategori
     </button>
 
-    <!-- Loop kategori -->
+    <!-- Looping tombol tiap kategori yang ada -->
     <button
       v-for="cat in categories"
       :key="cat.id"
@@ -40,43 +40,43 @@
 
   </div>
 
-  <!-- Daftar Produk -->
+  <!-- Area utama buat majang semua kartu produk (grid) -->
   <div class="grid grid-cols-2 md:grid-cols-6 gap-4 p-4">
 
-    <!-- Skeleton -->
+    <!-- Skeleton loading kotak-kotak pas datanya lagi dijemput -->
     <template v-if="isLoading && products.length === 0">
       <div v-for="n in 12" :key="n">
         <Skeleton height="180px"/>
-        <Skeleton width="70%" height="18px"/>
-        <Skeleton width="40%" height="18px"/>
+        <Skeleton class="mt-2" width="70%" height="18px"/>
+        <Skeleton class="mt-1" width="40%" height="18px"/>
       </div>
     </template>
 
-    <!-- Produk -->
+    <!-- Pajang barang dagangannya kalo datanya udah siap -->
     <template v-else>
       <div v-for="product in products" :key="product.id">
         <product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
       </div>
     </template>
 
-    <!-- Tidak ada produk -->
+    <!-- Kalo ternyata barang yang dicari gak ada di planet ini -->
     <div 
       v-if="!isLoading && products.length === 0"
       class="col-span-full text-gray-500 py-10 text-center"
     >
-      Produk tidak ditemukan
+      Yah, produknya gak ketemu nih. Coba cari yang lain ya!
     </div>
 
   </div>
 
-  <!-- Tombol Load More untuk pagination -->
+  <!-- Tombol buat muat barang lebih banyak lagi di bawah (Load More) -->
   <div v-if="currentPage < lastPage" class="flex justify-center my-6">
     <button
       @click="loadMore"
       class="bg-[#7D0A0A] text-white px-6 py-2 rounded hover:bg-[#BF3131] transition"
       :disabled="isLoading"
     >
-      {{ isLoading ? 'Memuat...' : 'Tampilkan Lebih Banyak' }}
+      {{ isLoading ? 'Lagi muat...' : 'Tampilin Lebih Banyak' }}
     </button>
   </div>
 </template>
@@ -92,34 +92,35 @@ import Carousel from '@/components/card/carousel.vue'
 
 const router = useRouter()
 
-// State produk & pagination
-const products = ref([])       // Menyimpan data produk
-const currentPage = ref(1)     // Halaman saat ini
-const lastPage = ref(null)     // Halaman terakhir dari API
-const isLoading = ref(false)   // Loading state
-const searchQuery = ref("")    // Query pencarian produk
+// State buat urusan data produk ama navigasi halaman
+const products = ref([])
+const currentPage = ref(1)
+const lastPage = ref(null)
+const isLoading = ref(false)
+const searchQuery = ref("")
 const isNotFound = ref(false)
 
-// state categories
+// State buat urusan filter-filteran kategori
 const categories = ref([])
 const selectedCategories = ref([])
 
-// State user
-const isLoggedIn = ref(false)  // Status login
-const userName = ref('')       // Nama user
-const userRole = ref('')       // Role user
+// State buat nyatet siapa yang lagi operasional
+const isLoggedIn = ref(false)
+const userName = ref('')
+const userRole = ref('')
 
-// Gambar carousel
+// State buat nampung gambar banner iklan
 const imagesA = ref([])
 
+// Fungsi pas user abis ngetik di kotak cari di navbar
 const doSearch = (data) => {
   products.value = data.products
   searchQuery.value = data.query
-  currentPage.value = 1
+  currentPage.value = 1 // Reset ke halaman awal kalo nyari barang baru
   isNotFound.value = data.notFound
 }
 
-// Fungsi cek role user & redirect jika admin
+// Cek profil user, kalo admin ya tendang ke halaman admin
 const checkRoleAndRedirect = async () => {
   try {
     const response = await api.get('/profile')
@@ -128,34 +129,35 @@ const checkRoleAndRedirect = async () => {
     userRole.value = role
 
     if (role === 'admin') {
-      router.push('/admin') // Redirect admin ke halaman admin
+      router.push('/admin')
     }
   } catch {
     isLoggedIn.value = false
   }
 }
 
-// Fetch produk dari API
+// Fungsi utama buat tarik daftar produk dari server
 const fetchProducts = async (page = 1) => {
   try {
     isLoading.value = true
 
     const response = await api.get("/product", {
       params: { 
-        status: 'publish',
+        status: 'publish', // Cuma ambil barang yang udah tayang
         page: page,
         nama_product: searchQuery.value,
-        categories: selectedCategories.value.join(',') // 🔥 ini dia
+        categories: selectedCategories.value.join(',') // Filter kategori kalo ada yang dipilih
       }
     })
 
     if (response.data?.data?.data && Array.isArray(response.data.data.data)) {
-      // Acak produk sebelum ditampilkan
+      // Acak urutan barangnya dikit biar gak bosen liatnya
       const shuffled = response.data.data.data.sort(() => Math.random() - 0.5)
 
       if (page === 1) {
         products.value = shuffled
       } else {
+        // Kalo load more, tambahin datanya di ekor list
         products.value.push(...shuffled)
       }
 
@@ -165,24 +167,25 @@ const fetchProducts = async (page = 1) => {
       products.value = []
     }
   } catch (error) {
-    console.error("Gagal mengambil produk:", error)
+    console.error("Gagal ambil produk dari planet lain:", error)
   } finally {
     isLoading.value = false
   }
 }
 
-// Ambil nama toko dari object product
+// Shortcut buat dapet nama toko dari data barang
 const getNamaToko = (product) => {
-  return product.user?.toko?.nama_toko || 'Nama Seller'
+  return product.user?.toko?.nama_toko || 'Toko Misterius'
 }
 
-// Fungsi load more untuk pagination
+// Pas user pengen liat barang lebih banyak lagi di bawah
 const loadMore = () => {
   if (currentPage.value < lastPage.value && !isLoading.value) {
     fetchProducts(currentPage.value + 1)
   }
 }
 
+// Tarik data banner iklan khusus buat dashboard
 const getBannerDashboard = async () => {
   try {
     const res = await api.get('/content?section=dashboard')
@@ -191,12 +194,13 @@ const getBannerDashboard = async () => {
     if (fetchedImages.length > 0) {
       imagesA.value = fetchedImages
     } else {
+      // Kalo gak ada banner, pake placeholder aja biar gak bolong
       imagesA.value = [
         'https://placehold.co/1200x400/7D0A0A/FFF?text=Space+Available'
       ]
     }
   } catch (error) {
-    console.error('Gagal ambil banner dashboard:', error)
+    console.error('Yah, gagal ambil banner dashboard-nya:', error)
     imagesA.value = [
       'https://placehold.co/1200x400/7D0A0A/FFF?text=Space+Available'
     ]
@@ -205,35 +209,38 @@ const getBannerDashboard = async () => {
   }
 }
 
+// Tarik semua daftar kategori barang yang tersedia
 const getCategories = async () => {
   try {
     const res = await api.get('/category')
     categories.value = res.data.data.data || []
   } catch (error) {
-    console.error('Gagal ambil kategori:', error)
+    console.error('Gagal ambil kategori barang nih:', error)
   }
 }
 
+// Fungsi buat milih atau ngebatalin pilihan kategori barang
 const toggleCategory = async (id) => {
   const index = selectedCategories.value.indexOf(id)
 
   if (index === -1) {
-    selectedCategories.value.push(id) 
+    selectedCategories.value.push(id) // Belom ada? Tambahin
   } else {
-    selectedCategories.value.splice(index, 1)
+    selectedCategories.value.splice(index, 1) // Udah ada? Copot
   }
 
   currentPage.value = 1
-  await fetchProducts(1)
+  await fetchProducts(1) // Tarik ulang barangnya sesuai saringan kategori
 }
 
+// Fungsi buat reset semua saringan kategori barang
 const clearCategory = async () => {
   selectedCategories.value = []
   currentPage.value = 1
   await fetchProducts(1)
 }
 
-// Lifecycle hook
+// Pas halaman dashboard baru nongol di layar
 onMounted(async () => {
   await checkRoleAndRedirect()
   await fetchProducts(currentPage.value)
@@ -243,7 +250,7 @@ onMounted(async () => {
 </script>
 
 <style>
-/* Styling scroll horizontal kategori */
+/* Custom styling buat scroll horizontal kategorinya biar gak kaku */
 ::-webkit-scrollbar {
   height: 6px;
 }

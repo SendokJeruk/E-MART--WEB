@@ -2,11 +2,12 @@
   <Navbar />
 
   <div class="bg-gray-50 min-h-screen pb-10">
+    <!-- Judul buat liat-liat belanjaan lama kita -->
     <h1 class="text-2xl font-bold navbar-font mb-6 text-black m-4">| History</h1>
 
     <div class="px-4 py-4 max-w-5xl mx-auto">
 
-      <!-- ================= LOADING ================= -->
+      <!-- Tampilan skeleton pas datanya lagi ditarik dari database -->
       <template v-if="isLoading">
         <div class="space-y-6">
           <div
@@ -43,12 +44,12 @@
 
             </div>
 
-            <!-- total -->
+            <!-- total skeleton -->
             <div class="flex justify-end">
               <Skeleton width="120px" height="18px"/>
             </div>
 
-            <!-- button -->
+            <!-- tombol skeleton -->
             <div class="flex justify-end">
               <Skeleton width="120px" height="36px"/>
             </div>
@@ -57,7 +58,7 @@
         </div>
       </template>
 
-      <!-- ================= DATA HISTORY ================= -->
+      <!-- Daftar barang-barang yang udah pernah dibeli (History) -->
       <template v-else-if="shipmentList.length">
         <div class="space-y-6 max-h-[700px] overflow-y-auto pr-2">
            
@@ -67,7 +68,7 @@
             class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200"
           >
 
-            <!-- Header -->
+            <!-- Bagian atas kartu history: tgl beli, kode pesanan, ama statusnya -->
             <div class="bg-gray-50 px-6 py-4 flex justify-between items-center border-b">
               <div class="flex items-center gap-6">
 
@@ -81,6 +82,7 @@
 
               </div>
 
+              <!-- Warna status dibikin beda-beda biar enak diliat -->
               <span
                 :class="{
                   'text-green-600 font-medium': shipment.status_pengiriman === 'diterima',
@@ -96,7 +98,7 @@
 
             </div>
 
-            <!-- Detail Produk -->
+            <!-- List barang-barang di dalam satu pesanan itu -->
             <div class="divide-y divide-gray-100">
 
               <div
@@ -136,7 +138,7 @@
               </div>
             </div>
 
-            <!-- Total -->
+            <!-- Bagian rincian total belanjaan satu pesanan -->
             <div class="px-6 py-4 bg-gray-50 border-t flex justify-end">
 
               <div class="flex items-center gap-2 text-sm">
@@ -152,7 +154,7 @@
               </div>
             </div>
 
-            <!-- Action -->
+            <!-- Tombol-tombol aksi sesuai status barangnya -->
             <div class="px-6 py-4 flex justify-end gap-3 border-t">
               <router-link
                 :to="`/track-order/${shipment.id}`"
@@ -161,7 +163,7 @@
                 Lihat Detail
               </router-link>
 
-              <!-- Unduh Invoice le --> 
+              <!-- Tombol download invoice kalo barang udah nyampe --> 
               <button
                 v-if="shipment.status_pengiriman === 'diterima'"
                 @click="downloadInvoice(shipment.kode_transaksi)"
@@ -170,7 +172,7 @@
                 Unduh Invoice
               </button>
 
-              <!-- Konfirmasi -->
+              <!-- Konfirmasi kalo barang udah di tangan tapi statusnya belom update -->
               <button
                 v-if="shipment.status_pengiriman === 'tiba'"
                 @click="postConfirmation(shipment.id)"
@@ -179,7 +181,7 @@
                 Konfirmasi Pesanan
               </button>
 
-              <!-- Rating -->
+              <!-- Tombol buat ngasih bintang ama ulasan -->
               <button
                 v-else-if="shipment.status_pengiriman === 'diterima' && !hasRating(shipment)"
                 @click="openRatingModal(shipment)"
@@ -188,7 +190,7 @@
                 Beri Rating
               </button>
 
-              <!-- Sudah rating -->
+              <!-- Kalo udah dikasih ulasan, kasih liat bintangnya -->
               <div
                 v-else-if="shipment.status_pengiriman === 'diterima' && hasRating(shipment)"
                 class="flex items-center gap-1 px-5 py-2 text-sm border border-yellow-400 rounded-md text-yellow-500"
@@ -210,15 +212,15 @@
 
 
 
-      <!-- ================= EMPTY ================= -->
+      <!-- Kalo user belom pernah belanja sama sekali -->
       <template v-else>
         <div class="text-center py-20 text-gray-400">
-          Belum ada history transaksi
+          Belum ada history transaksi nih. Yuk belanja!
         </div>
       </template>
     </div>
 
-    <!-- ================= MODAL RATING ================= -->
+    <!-- Modal buat ngisi rating ama upload foto bukti barangnya oke -->
     <div
       v-if="showModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -231,7 +233,7 @@
         </h2>
 
         <form @submit.prevent="submitRating">
-          <!-- Bintang -->
+          <!-- Pilih jumlah bintangnya (1 ampe 5) -->
           <div class="flex gap-2 mb-4">
             <span
               v-for="n in 5"
@@ -244,14 +246,15 @@
             </span>
           </div>
 
-          <!-- Deskripsi -->
+          <!-- Tulis uneg-uneg atau pujian buat barangnya -->
           <textarea
             v-model="form.deskripsi"
-            placeholder="Tulis ulasan..."
+            placeholder="Tulis ulasan kamu di sini..."
             class="w-full border rounded-md p-2 mb-4 text-sm"
+            required
           ></textarea>
 
-          <!-- Upload -->
+          <!-- Inputan buat upload foto barang aslinya -->
           <input
             type="file"
             @change="handleFileUpload"
@@ -261,7 +264,7 @@
             hover:file:bg-orange-600"
           />
 
-          <!-- Buttons -->
+          <!-- Tombol buat batalin atau kirim ulasannya -->
           <div class="flex justify-end gap-3">
             <button
               type="button"
@@ -292,12 +295,14 @@ import api from '@/plugins/axios'
 import Skeleton from '@/components/Skeleton.vue'
 import { showError, showSuccess } from '@/utils/alert'
 
+// List data history belanjaan
 const shipmentList = ref([])
 const isLoading = ref(true)
 
-// modal
+// Urusan modal rating
 const showModal = ref(false)
 const selectedShipment = ref(null)
+// Data form buat dikirim ke server rating
 const form = ref({
   detail_transaction_id: null,
   product_id: null,
@@ -306,14 +311,15 @@ const form = ref({
   foto_review: null
 })
 
-// format
+// Fungsi bantu buat ngerapiin tampilan angka duit
 const formatPrice = (price) => Number(price).toLocaleString('id-ID')
+// Fungsi bantu buat ngerapiin format tanggal
 const formatDate = (dateString) =>
   dateString
     ? new Date(dateString).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
     : '-'
-const generateOrderNumber = () => 'INV' + Math.floor(10000000 + Math.random() * 90000000)
 
+// Ambil semua data pengiriman (history) milik si buyer
 const getShipment = async () => {
   try {
     const response = await api.get('/pengiriman/buyer')
@@ -326,42 +332,43 @@ const getShipment = async () => {
   }
 }
 
-// konfirmasi pesanan
+// Fungsi buat buyer ngonfirmasi kalo barangnya beneran udah nyampe
 const postConfirmation = async (id) => {
   try {
     await api.post(`/pengiriman/confirm-received/${id}`)
-    showSuccess('Pesanan Berhasil Dikonfirmasi Diterima')
-    getShipment()
+    showSuccess('Pesanan udah kamu terima ya, mantap!')
+    getShipment() // Tarik ulang biar statusnya ganti
   } catch (error) {
-    const msg = error.response?.data?.message || 'Gagal konfirmasi pesanan'
-    showError("Terjadi Kesalahan")
+    showError("Aduh, gagal konfirmasi nih. Coba lagi ya.")
     console.error('Gagal konfirmasi pesanan:', error)
   }
 }
 
+// Persiapin data barang yang mau dikasih ulasan
 const openRatingModal = (shipment) => {
   const firstDetail = shipment.detail_shipments[0]
   selectedShipment.value = shipment
-  form.value.detail_transaction_id = firstDetail?.detail_transaction?.id   // id dari detail_transaction
-  form.value.product_id = firstDetail?.detail_transaction?.product?.id     // id produk
+  form.value.detail_transaction_id = firstDetail?.detail_transaction?.id
+  form.value.product_id = firstDetail?.detail_transaction?.product?.id
   showModal.value = true
 }
 
+// Reset form ama tutup modal rating
 const closeModal = () => {
   showModal.value = false
   form.value = { product_id: null, rating: 0, deskripsi: '', foto_review: null }
 }
 
-// file upload
+// Nyimpen file foto ulasan yang kepilih
 const handleFileUpload = (e) => {
   form.value.foto_review = e.target.files[0]
 }
 
-// kirim rating
+// Ngirim ulasan bintang ama teks ke server
 const submitRating = async () => {
   try {
     const fd = new FormData()
-    fd.append('detail_transaction_id', form.value.detail_transaction_id) // nama sesuai backend
+    fd.append('detail_transaction_id', form.value.detail_transaction_id)
     fd.append('product_id', form.value.product_id)
     fd.append('rating', form.value.rating)
     fd.append('deskripsi', form.value.deskripsi)
@@ -373,26 +380,27 @@ const submitRating = async () => {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
 
-    showSuccess("Rating Berhasil Dikirimkan")
+    showSuccess("Rating kamu udah masuk, makasih ya!")
     closeModal()
-    getShipment()
+    getShipment() // Update data biar tombol rating ilang
   } catch (error) {
     console.error('Gagal kirim rating:', error)
-    showError("Gagal Mengirimkan Rating")
+    showError("Gagal ngirim ulasan nih.")
   }
 }
 
-// unduh invoice, ane nambah ini lee
+// Fungsi buat nyolong file invoice PDF dari server
 const downloadInvoice = async (kodeTransaksi) => {
   if (!kodeTransaksi) {
-    showError("Kode transaksi tidak valid")
+    showError("Kode transaksinya gak ada nih")
     return
   }
   try {
     const response = await api.get(`/report/invoice/${kodeTransaksi}`, {
-      responseType: 'blob',
+      responseType: 'blob', // Penting nih biar dapetnya file mentah
     })
 
+    // Bikin link download buatan biar filenya bisa di-save user
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url
@@ -400,27 +408,30 @@ const downloadInvoice = async (kodeTransaksi) => {
     document.body.appendChild(link)
     link.click()
 
+    // Bersih-bersih sisa link tadi
     link.parentNode.removeChild(link)
     window.URL.revokeObjectURL(url)
 
-    showSuccess("Invoice berhasil diunduh")
+    showSuccess("Invoice udah kedownload ya")
   } catch (error) {
-    console.error('Gagal mengunduh invoice:', error)
-    showError("Gagal mengunduh invoice")
+    console.error('Gagal download invoice:', error)
+    showError("Gagal ngambil invoice-nya")
   }
 }
 
-// ✅ helper cek rating
+// Fungsi bantu buat ngecek apakah barang ini udah pernah diulas user apa belom
 const hasRating = (shipment) => {
   const firstDetail = shipment.detail_shipments[0]
   return firstDetail?.detail_transaction?.rating !== undefined && firstDetail?.detail_transaction?.rating !== null
 }
 
+// Ambil nilai bintang yang udah pernah dikasih
 const getRatingValue = (shipment) => {
   const firstDetail = shipment.detail_shipments[0]
   return firstDetail?.detail_transaction?.rating?.rating || 0
 }
 
+// Pas halaman kebuka, langsung tarik semua data historynya
 onMounted(() => {
   getShipment()
 })

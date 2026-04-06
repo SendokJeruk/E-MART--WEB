@@ -1,6 +1,7 @@
 <template>
   <sellerside>
     <div class="p-6 overflow-x-auto">
+      <!-- Header buat nampilin profil seller ama judul halaman -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage Kategori Produk</h1>
 
@@ -13,6 +14,7 @@
         </div>
       </div>
 
+      <!-- Tombol buat nambahin kategori ke barang dagangan -->
       <router-link
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
         to="/create-kategori-produk"
@@ -23,6 +25,7 @@
         </span>
       </router-link>
 
+      <!-- Tabel daftar barang dagangan beserta kategorinya -->
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-fixed divide-y divide-gray-200">
           <thead class="bg-gray-200">
@@ -32,10 +35,12 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
+            <!-- Data barang yang udah dikelompokin biar gak dobel -->
             <tr v-for="produk in groupedProducts" :key="produk.id">
               <td class="px-4 py-2 text-sm text-gray-900">{{ produk.nama }}</td>
               <td class="px-4 py-2 text-sm text-gray-900">
                 <div class="flex gap-2 flex-wrap">
+                  <!-- Label kategori barang, ada tombol X buat ngehapus -->
                   <span 
                     v-for="kategori in produk.categories" 
                     :key="kategori.id"
@@ -54,8 +59,9 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Navigasi halaman biar gak pusing bacanya kalo kebanyakan -->
         <div class="flex justify-center mt-4 space-x-2 mb-4">
-          <!-- Previous -->
           <button
             @click="changePage(currentPage - 1)"
             :disabled="currentPage === 1"
@@ -64,7 +70,7 @@
             Previous
           </button>
 
-          <!-- Page Numbers -->
+          <!-- List angka halamannya -->
           <button
             v-for="page in lastPage"
             :key="page"
@@ -74,7 +80,6 @@
             {{ page }}
           </button>
 
-          <!-- Next -->
           <button
             @click="changePage(currentPage + 1)"
             :disabled="currentPage === lastPage"
@@ -95,13 +100,13 @@ import api from "@/plugins/axios";
 import { showError, showSuccess } from '@/utils/alert';
 
 const user = ref({});
+// State buat nampung data relasi barang ama kategori
 const categoryProducts = ref([]);
 
-// Pagination
 const currentPage = ref(1);
 const lastPage = ref(1);
 
-// ambil profile
+// Ambil profil seller yang lagi tugas
 const getProfile = async () => {
   try {
     const response = await api.get('/profile');
@@ -111,7 +116,7 @@ const getProfile = async () => {
   }
 };
 
-// ambil data pivot dengan pagination
+// Fungsi tarik data relasi kategori-produk pake pagination
 const getCategoryProduct = async (page = 1) => {
   try {
     const response = await api.get(`/category-product?page=${page}`);
@@ -119,11 +124,11 @@ const getCategoryProduct = async (page = 1) => {
     currentPage.value = response.data.data.current_page;
     lastPage.value = response.data.data.last_page;
   } catch (error) {
-    console.error('Error fetching category product:', error);
+    console.error('Gagal ambil data kategori produk:', error);
   }
 };
 
-// transform → group by product
+// Ngumpulin kategori-kategori berdasarkan produknya biar rapi di tabel
 const groupedProducts = computed(() => {
   const map = {};
   categoryProducts.value.forEach(item => {
@@ -138,32 +143,35 @@ const groupedProducts = computed(() => {
     map[p.id].categories.push({
       id: item.category.id,
       nama: item.category.nama_category,
-      pivotId: item.id
+      pivotId: item.id // ID unik relasi buat keperluan hapus
     });
   });
   return Object.values(map);
 });
 
+// Fungsi buat ngebatalin kategori tertentu dari suatu produk
 const deleteCategoryProduct = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus kategori ini dari produk ini?');
+  const konfirmasi = confirm('Yakin mau hapus kategori ini dari barangnya?');
   if (!konfirmasi) return;
 
   try {
     await api.delete(`/category-product/${id}`);
-    await getCategoryProduct(currentPage.value); // refresh page yang sama
-    showSuccess('Kategori berhasil dihapus.');
+    // Tarik ulang datanya biar tampilan list-nya update
+    await getCategoryProduct(currentPage.value); 
+    showSuccess('Kategori udah berhasil dicopot.');
   } catch (error) {
-    console.error('Gagal menghapus kategori dari produk:', error);
-    showError(error.response?.data?.message || 'Terjadi kesalahan.');
+    console.error('Gagal hapus relasi-nya:', error);
+    showError(error.response?.data?.message || 'Yah, ada masalah pas mau ngehapus.');
   }
 };
 
-// ganti page
+// Pas seller mau pindah ke halaman lain
 const changePage = async (page) => {
   if (page < 1 || page > lastPage.value) return;
   await getCategoryProduct(page);
 };
 
+// Pas halaman dibuka, langsung gas ambil profil ama datanya
 onMounted(async () => {
   await getProfile();
   await getCategoryProduct();

@@ -1,11 +1,13 @@
 <template>
   <div class="flex h-screen">
+    <!-- Overlay buat nutup sidebar pas lagi di mobile -->
     <div
       v-if="isSidebarOpen"
       @click="toggleSidebar"
       class="fixed inset-0 z-30 bg-transparent lg:hidden transition-opacity duration-300 ease-in-out"
     ></div>
 
+    <!-- Sidebar samping, warnanya merah gelap biar keliatan tegas -->
     <div
       :class="[ 
         'fixed z-40 lg:static flex h-full flex-col justify-between border-e border-gray-100 transition-transform duration-300 ease-in-out', 
@@ -16,6 +18,7 @@
     >
       <div class="px-4 py-6">
         <ul class="mt-6 space-y-1">
+          <!-- Menu-menu navigasi buat admin, dari home sampe manage banner -->
           <li>
             <router-link
               to="/admin"
@@ -63,7 +66,7 @@
               class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
             >
               Manage Setting Admin
-            </router-link>
+            </label>
           </li>
 
           <li>
@@ -86,6 +89,7 @@
             </router-link>
           </li>
 
+          <!-- Tombol buat keluar, nanya dulu biar gak salah pencet -->
           <button
             @click="logout"
             class="w-full text-left rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#A61D1D]"
@@ -97,7 +101,9 @@
       </div>
     </div>
 
+    <!-- Bagian konten utama di sebelah kanan sidebar -->
     <div class="flex-1 p-4 lg:p-8 bg-gray-100 w-full overflow-auto">
+      <!-- Tombol menu buat nampilin sidebar pas di layar kecil -->
       <button
         @click="toggleSidebar"
         class="lg:hidden mb-4 inline-flex items-center rounded-md bg-[#7D0A0A] px-4 py-2 text-white hover:bg-[#A61D1D]"
@@ -105,6 +111,7 @@
         ☰ Menu
       </button>
 
+      <!-- Tempat nampilin view-view admin -->
       <router-view />
       <slot/>
     </div>
@@ -123,6 +130,7 @@ const email = ref('')
 const userRole = ref('')
 const isSidebarOpen = ref(false)
 
+// Fungsi buat nentuin gaya link menu, biar keliatan mana yang lagi aktif
 function linkClass(path) {
   return [
     'text-white',
@@ -130,6 +138,7 @@ function linkClass(path) {
   ]
 }
 
+// Proses logout, hapus token terus tendang ke halaman login
 const logout = async () => {
   const confirmed = await showConfirm("Anda Yakin Mau Logout ?")
   if (!confirmed) return
@@ -145,6 +154,7 @@ const logout = async () => {
   }
 }
 
+// Pas halaman kebuka, cek profil dulu, pastiin emang admin yang masuk
 onMounted(async () => {
   try {
     const response = await api.get('/profile')
@@ -152,14 +162,17 @@ onMounted(async () => {
     email.value = response.data.data.email
     userRole.value = response.data.data.nama_role
 
+    // Kalo bukan admin, balikin ke dashboard user biasa
     if (userRole.value === 'seller' || userRole.value === 'buyer') {
       router.push('/dashboard')
     }
   } catch (error) {
+    // Kalo gagal ambil profil (mungkin token basi), suruh login lagi
     router.push('/login')
   }
 })
 
+// Buka tutup sidebar buat tampilan mobile
 function toggleSidebar() {
   isSidebarOpen.value = !isSidebarOpen.value
 }

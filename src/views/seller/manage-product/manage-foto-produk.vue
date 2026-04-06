@@ -2,9 +2,11 @@
   <sellerside>
     <div class="p-6 overflow-x-auto">
         
+        <!-- Header buat halaman kelola banyak foto barang -->
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-3xl font-bold">Manage Foto Produk</h1>
 
+          <!-- Info si bos seller di pojok -->
           <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
             <div class="flex-1">
               <p class="text-sm font-bold">{{ user.name }}</p>
@@ -14,6 +16,7 @@
           </div>
         </div>
 
+        <!-- Tombol buat nambah foto baru buat barang kamu -->
         <router-link
           class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
           to="/create-foto-product"
@@ -25,10 +28,11 @@
           <span
             class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white"
           >
-            Tambah Foto Produk
+            Tambah Foto Baru
           </span>
         </router-link>
 
+        <!-- Shortcut balik ke halaman daftar barang -->
         <router-link
           class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
           to="/manage-produk"
@@ -40,17 +44,18 @@
           <span
             class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white"
           >
-            Manage Product
+            Daftar Produk
           </span>
         </router-link>
 
+        <!-- Tabel list barang ama kumpulan foto-fotonya -->
         <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-fixed divide-y divide-gray-200">
             <thead class="bg-gray-200">
             <tr>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Nama</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Foto</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Action</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Nama Produk</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Koleksi Foto</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Aksi</th>
 
             </tr>
             </thead>
@@ -58,6 +63,7 @@
             <tr v-for="produk in ProductSeller" :key="produk.id">
                 <td class="px-4 py-2 text-sm text-gray-900">{{ produk.nama_product }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-[200px]">
+                <!-- Area buat geser-geser liat foto kalo fotonya banyak -->
                 <div v-if="Array.isArray(produk.foto) && produk.foto.length > 0" class="overflow-x-auto">
                     <div class="flex w-max">
                         <div 
@@ -66,6 +72,7 @@
                             class="text-center flex-shrink-0 relative"
                             :class="openMenuIndex === `${produk.id}-${index}` ? 'mr-20' : 'mr-2'" 
                             >
+                            <!-- Foto kecilnya, bisa diklik buat nongolin menu edit/hapus -->
                             <img 
                                 :src="item.foto" 
                                 alt="foto produk" 
@@ -73,6 +80,7 @@
                                 @click="toggleMenu(produk.id, index)"
                             />
 
+                            <!-- Menu melayang buat edit atau hapus fotonya -->
                             <div 
                                 v-if="openMenuIndex === `${produk.id}-${index}`" 
                                 class="absolute top-1/2 left-full transform -translate-y-1/2 ml-2 bg-white border shadow-md rounded p-2 space-y-2 z-20"
@@ -89,12 +97,13 @@
                     </div>
                 </div>
                 <div v-else>
-                    <p class="text-sm text-gray-500">Tidak ada foto</p>
+                    <p class="text-sm text-gray-500">Gak ada fotonya nih</p>
                 </div>
             </td>
             </tr>
             </tbody>
             </table>
+              <!-- Navigasi halaman biar list-nya gak kepanjangan -->
               <div class="flex justify-center mt-4 space-x-2 mb-4">
                 <button
                   @click="changePage(currentPage - 1)"
@@ -139,25 +148,29 @@ const openMenuIndex = ref(null);
 const currentPage = ref(1);
 const lastPage = ref(1);
 
+// Fungsi buat buka-tutup menu kecil pas foto diklik
 const toggleMenu = (produkId, fotoIndex) => {
   const id = `${produkId}-${fotoIndex}`;
   openMenuIndex.value = openMenuIndex.value === id ? null : id;
 };
 
+// Fungsi buat ngebuang foto barang dari database
 const deleteFoto = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus Foto Ini?');
+  const konfirmasi = confirm('Yakin mau hapus foto ini? Gak bisa balik lho.');
   if (!konfirmasi) return;
 
   try {
     await api.delete(`/foto/${id}`);
-    showSuccess('Foto berhasil dihapus.');
+    showSuccess('Beres! Foto udah dihapus.');
+    // Tarik ulang data produk biar fotonya ilang dari list
     await getProduct(currentPage.value);
   } catch (error) {
-    console.error('Gagal Menghapus Foto:', error);
-    showError('Gagal menghapus foto.');
+    console.error('Gagal hapus fotonya:', error);
+    showError('Yah, gagal hapus fotonya nih.');
   }
 };
 
+// Ambil profil si bos seller
 const getProfile = async () => {
   try {
     const response = await api.get('/profile');
@@ -167,6 +180,7 @@ const getProfile = async () => {
   }
 };
 
+// Fungsi utama buat tarik data produk punya seller beserta foto-fotonya
 const getProduct = async (page = 1) => {
   try {
     const response = await api.get(`/product/myproducts?page=${page}`);
@@ -175,15 +189,17 @@ const getProduct = async (page = 1) => {
     currentPage.value = response.data.data.current_page;
     lastPage.value = response.data.data.last_page;
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('Gagal ambil data barang:', error);
   }
 };
 
+// Pas seller mindah-mindah halaman data
 const changePage = async (page) => {
   if (page < 1 || page > lastPage.value) return;
   await getProduct(page);
 };
 
+// Pas halaman kebuka, langsung sikat tarik profil ama produknya
 onMounted(async () => {
   await getProfile();
   await getProduct();
@@ -191,5 +207,4 @@ onMounted(async () => {
 </script>
 
 <style>
-
 </style>

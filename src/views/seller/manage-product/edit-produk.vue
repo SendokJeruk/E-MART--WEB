@@ -1,9 +1,9 @@
 <template>
   <Sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded overflow-x-hidden">
-      <!-- LOADING -->
+      <!-- Penampakan form pas lagi nunggu data produk lama ditarik -->
       <template v-if="isLoading">
-        <h2 class="text-xl font-bold mb-4">Form Tambah Produk</h2>
+        <h2 class="text-xl font-bold mb-4">Form Update Produk</h2>
         <div class="space-y-4">
           <div>
             <Skeleton width="120px" height="14px" class="mb-2"/>
@@ -40,7 +40,7 @@
         </div>
       </template>
 
-      <!-- FORM -->
+      <!-- Form asli buat ngubah detail barang dagangan kamu -->
       <template v-else>
         <h2 class="text-xl font-bold mb-4">Form Update Produk</h2>
         <form @submit.prevent="submitForm">
@@ -63,7 +63,7 @@
           </div>
 
           <div class="mb-4">
-            <label class="block mb-1">Harga</label>
+            <label class="block mb-1">Harga (Angka aja)</label>
             <input
               v-model="form.harga"
               type="text"
@@ -72,7 +72,7 @@
           </div>
 
           <div class="mb-4">
-            <label class="block mb-1">Stok</label>
+            <label class="block mb-1">Stok Barang</label>
             <input
               v-model="form.stock"
               type="number"
@@ -81,7 +81,7 @@
           </div>
 
           <div class="mb-4">
-            <label class="block mb-1">Berat</label>
+            <label class="block mb-1">Berat (Gram)</label>
             <input
               v-model="form.berat"
               type="number"
@@ -90,17 +90,18 @@
           </div>
 
           <div class="mb-4">
-            <label class="block mb-1">Status Produk</label>
+            <label class="block mb-1">Status Pajang</label>
             <select
               v-model="form.status"
               class="w-full border px-3 py-2 rounded"
             >
               <option value="">Pilih status</option>
-              <option value="draft">Draft</option>
-              <option value="publish">Publish</option>
+              <option value="draft">Draft (Simpen)</option>
+              <option value="publish">Publish (Jual)</option>
             </select>
           </div>
 
+          <!-- Input milih foto sampul baru kalo mau diganti -->
           <div class="mb-4">
             <label
               for="foto_cover"
@@ -108,8 +109,9 @@
             >
               <div class="flex items-center justify-center gap-4">
 
-                <span class="font-medium">Upload Foto Produk</span>
+                <span class="font-medium">Ganti Foto Sampul</span>
 
+                <!-- Nama file baru yang kepilih -->
                 <div v-if="selectedFileName" class="text-sm text-gray-500 truncate w-full max-w-xs">
                   {{ selectedFileName }}
                 </div>
@@ -128,7 +130,7 @@
             type="submit"
             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Update
+            Update Produk
           </button>
 
         </form>
@@ -148,6 +150,7 @@ import { showError, showSuccess } from '@/utils/alert'
 const route = useRoute()
 const router = useRouter()
 
+// State form buat nampung data barang yang lagi diedit
 const form = ref({
   nama_product: '',
   deskripsi: '',
@@ -161,6 +164,7 @@ const form = ref({
 const isLoading = ref(true)
 const selectedFileName = ref(null);
 
+// Pas seller milih file foto baru
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -169,25 +173,28 @@ const handleFileUpload = (event) => {
   }
 };
 
+// Fungsi tarik data barang lama berdasarkan ID dari URL
 const fetchProduct = async () => {
   try {
     const response = await api.get(`/product?id=${route.params.id}`);
     const product = response.data.data.data[0];
+    // Masukin data lamanya ke form biar seller gak ngetik ulang
     form.value.nama_product = product.nama_product;
     form.value.deskripsi = product.deskripsi;
     form.value.harga = product.harga;
     form.value.stock = product.stock;
     form.value.berat = product.berat;
     form.value.status = product.status_produk;
-    selectedFileName.value = product.foto_cover || 'Tidak ada file';
+    selectedFileName.value = product.foto_cover || 'Gak ada foto';
   } catch (error) {
-    console.error('Gagal mengambil data produk:', error);
-    showError('Gagal mengambil data produk.');
+    console.error('Gagal ambil info barang:', error);
+    showError('Yah, gagal narik data barangnya nih.');
   } finally {
     isLoading.value = false;
   }
 };
 
+// Fungsi utama buat ngirim update-an barang ke server
 const submitForm = async () => {
   try {
     const formData = new FormData();
@@ -198,22 +205,28 @@ const submitForm = async () => {
     formData.append('stock', form.value.stock);
     formData.append('berat', form.value.berat);
     formData.append('status_produk', form.value.status);
-    if (form.value.foto_cover) {
+    
+    // Foto cuma dikirim kalo seller emang milih file baru
+    if (form.value.foto_cover instanceof File) {
       formData.append('foto_cover', form.value.foto_cover);  
     }
 
+    // Pake trik _method=PUT karena kirim file lewat FormData
+    formData.append('_method', 'PUT');
 
-    await api.put(`/product/${route.params.id}`, formData, {
+    await api.post(`/product/${route.params.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
 
-    showSuccess('Produk berhasil diperbarui!');
+    showSuccess('Sip! Barang kamu udah diupdate.');
+    // Balikin ke halaman kelola barang
     router.push('/manage-produk');  
   } catch (error) {
+    // Kalo error, kasih tau apa yang salah
     const errors = error.response?.data?.errors;
-    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+    let errorMessage = error.response?.data?.message || 'Gagal update barangnya.';
 
     if (errors) {
       const allErrors = Object.values(errors).flat().join('\n');
@@ -224,6 +237,7 @@ const submitForm = async () => {
   }
 };
 
+// Pas halaman kebuka, langsung sikat tarik datanya
 onMounted(() => {
   fetchProduct()  
 })

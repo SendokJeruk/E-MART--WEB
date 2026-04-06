@@ -2,11 +2,11 @@
   <adminside>
     <div>
 
-      <!-- Header -->
+      <!-- Judul halaman utama buat Admin -->
       <div class="flex justify-between items-start mb-6">
         <h1 class="text-2xl font-bold">Dashboard Admin</h1>
 
-        <!-- Skeleton Profile -->
+        <!-- Ini penampakan profil pas lagi loading, pake skeleton biar cakep -->
         <div
           v-if="isLoading"
           class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
@@ -19,7 +19,7 @@
           </div>
         </div>
 
-        <!-- Real Profile -->
+        <!-- Ini profil asli adminnya kalo udah nongol -->
         <div
           v-else
           class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
@@ -37,10 +37,10 @@
       </div>
 
 
-      <!-- Statistik Cards -->
+      <!-- Kumpulan kartu statistik (User, Produk, dll) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-        <!-- Skeleton Cards -->
+        <!-- Kalo belom ada datanya, kasih skeleton dulu 3 biji -->
         <template v-if="isLoading">
 
           <div
@@ -54,7 +54,7 @@
 
         </template>
 
-        <!-- Real Cards -->
+        <!-- Kartu statistik asli -->
         <template v-else>
 
           <div class="bg-white rounded-2xl shadow p-6 text-center">
@@ -82,15 +82,15 @@
 
       </div>
 
-      <!-- Chart -->
+      <!-- Bagian grafik performa seller biar keliatan siapa yang jago jualan -->
       <div class="bg-white rounded-2xl shadow p-6">
 
-        <!-- Skeleton Chart -->
+        <!-- Skeleton pas grafiknya lagi diolah -->
         <div v-if="isLoading">
           <Skeleton height="350px"/>
         </div>
 
-        <!-- Real Chart -->
+        <!-- Ini grafiknya pake ApexCharts -->
         <apexchart
           v-else
           type="bar"
@@ -113,20 +113,16 @@ import { useRouter } from 'vue-router'
 import ApexCharts from "vue3-apexcharts"
 import Skeleton from '@/components/Skeleton.vue'
 
-// =====================================================
-// REGISTER COMPONENT
-// =====================================================
+// Masukin apexchart biar bisa dipake di template
 const components = { apexchart: ApexCharts }
 
-// =====================================================
-// REACTIVE STATE
-// =====================================================
+// Setting variabel-variabel reaktif kita
 const router = useRouter()
 const user = ref({})
 const isLoading = ref(true)
 const totalUsers = ref(0)
 const totalProducts = ref(0)
-const series = ref([]) // Chart series
+const series = ref([]) // Data buat grafiknya
 const chartOptions = ref({
   chart: { type: 'bar', height: 350 },
   plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 5 } },
@@ -138,9 +134,7 @@ const chartOptions = ref({
   tooltip: { y: { formatter: val => val } }
 })
 
-// =====================================================
-// FUNCTIONS
-// =====================================================
+// Fungsi buat nyolong data profil
 const getProfile = async () => {
   try {
     const response = await api.get('/profile')
@@ -150,6 +144,7 @@ const getProfile = async () => {
   }
 }
 
+// Fungsi buat ngitung ada berapa user di database
 const getUsers = async () => {
   try {
     const response = await api.get('/manage-user')
@@ -161,6 +156,7 @@ const getUsers = async () => {
   }
 }
 
+// Fungsi buat ngitung total produk yang tayang
 const getProducts = async () => {
   try {
     const response = await api.get('/product')
@@ -172,6 +168,7 @@ const getProducts = async () => {
   }
 }
 
+// Cek role dulu, kalo bukan admin ya jangan boleh masuk sini
 const checkRoleAndRedirect = async () => {
   try {
     const response = await api.get('/profile')
@@ -184,6 +181,7 @@ const checkRoleAndRedirect = async () => {
   }
 }
 
+// Ambil data top seller buat dipajang di grafik
 const getTopSeller = async () => {
   try {
     const response = await api.get('/sellerinfo/topseller')
@@ -192,10 +190,10 @@ const getTopSeller = async () => {
 
     if (data.length === 0) return
 
-    // Mapping nama seller ke X-axis
+    // Pasang nama seller di sumbu X
     chartOptions.value.xaxis.categories = data.map(item => item.seller)
 
-    // Mapping income & penjualan_total ke series chart
+    // Masukin angka income ama total jualan ke grafik
     series.value = [
       { name: 'Income', data: data.map(item => item.income) },
       { name: 'Penjualan Total', data: data.map(item => item.penjualan_total) }
@@ -205,9 +203,7 @@ const getTopSeller = async () => {
   }
 }
 
-// =====================================================
-// ON MOUNTED
-// =====================================================
+// Pas halaman baru dibuka, langsung gas ambil semua data
 onMounted(async () => {
   try{
     isLoading.value = true

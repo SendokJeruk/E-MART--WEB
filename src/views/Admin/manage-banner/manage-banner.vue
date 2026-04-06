@@ -2,11 +2,11 @@
   <AdminSide>
     <div class="p-6">
 
-      <!-- HEADER -->
+      <!-- Bagian Header halaman banner -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage Banner</h1>
 
-        <!-- PROFILE -->
+        <!-- Penampakan profil pas lagi loading, pake skeleton biar tetep rapi -->
         <div v-if="isProfileLoading" class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <Skeleton type="circle" size="40px" />
           <div class="flex-1 space-y-2">
@@ -15,6 +15,7 @@
           </div>
         </div>
 
+        <!-- Profil admin aslinya kalo udah nongol datanya -->
         <div v-else class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
             <p class="text-sm font-bold">{{ user.name }}</p>
@@ -24,7 +25,7 @@
         </div>
       </div>
 
-      <!-- BUTTON -->
+      <!-- Tombol buat nambahin banner baru, ada efek hover-nya -->
       <button @click="openCreate"
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-6">
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
@@ -33,7 +34,7 @@
         </span>
       </button>
 
-      <!-- TABLE -->
+      <!-- Tabel buat nampilin daftar banner yang udah diupload -->
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-fixed">
 
@@ -45,7 +46,7 @@
             </tr>
           </thead>
 
-          <!-- LOADING -->
+          <!-- Tampilan skeleton tabel pas datanya lagi ditarik -->
           <tbody v-if="isLoading">
             <tr v-for="n in 5" :key="n" class="border-t">
               <td class="px-4 py-3">
@@ -61,7 +62,7 @@
             </tr>
           </tbody>
 
-          <!-- DATA -->
+          <!-- Daftar banner aslinya dari server -->
           <tbody v-else-if="banners.length > 0">
             <tr v-for="banner in banners" :key="banner.id" class="border-t">
               <td class="px-4 py-2 text-center inter-font text-sm">{{ banner.section }}</td>
@@ -85,6 +86,7 @@
               </td>
             </tr>
           </tbody>
+          <!-- Kalo ternyata kosong melompong datanya -->
           <tbody v-else>
             <tr>
               <td colspan="3" class="px-4 py-6 text-center text-gray-500">
@@ -96,6 +98,7 @@
         </table>
       </div>
 
+      <!-- Pagination biar gak kepanjangan tabelnya -->
       <div
         v-if="pagination.last_page > 1"
         class="flex justify-center mt-6 space-x-2"
@@ -131,7 +134,7 @@
         </button>
       </div>
 
-      <!-- MODAL -->
+      <!-- Modal pop-up buat nambah atau ngedit banner -->
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div class="bg-white w-[400px] rounded-lg shadow-lg p-6">
 
@@ -139,7 +142,7 @@
             {{ isEdit ? 'Edit Banner' : 'Tambah Banner' }}
           </h2>
 
-          <!-- SECTION -->
+          <!-- Pilih penempatan banner-nya (mau di login apa dashboard) -->
           <div class="mb-4">
             <label class="block text-sm mb-1">Section</label>
               <select 
@@ -152,18 +155,18 @@
               </select>          
           </div>
 
-          <!-- FILE -->
+          <!-- Inputan buat milih file gambarnya -->
           <div class="mb-4">
             <label class="block text-sm mb-1">Upload Gambar</label>
             <input type="file" @change="handleFile" class="w-full border px-3 py-2 rounded" />
           </div>
 
-          <!-- PREVIEW -->
+          <!-- Pratinjau gambarnya biar user tau bener apa kagak filenya -->
           <div v-if="form.preview" class="mb-4">
             <img :src="form.preview" class="w-full h-40 object-cover rounded" />
           </div>
 
-          <!-- ACTION -->
+          <!-- Aksi buat batalin atau simpen perubahannya -->
           <div class="flex justify-end gap-2">
             <button @click="closeModal" class="px-4 py-2 border rounded">Batal</button>
 
@@ -186,6 +189,7 @@ import api from '@/plugins/axios'
 import { showSuccess, showError, showConfirm } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
+// State buat nyimpen data banner ama profil
 const banners = ref([])
 const user = ref({})
 
@@ -196,17 +200,19 @@ const pagination = ref({
   last_page: 1,
 });
 
+// Urusan modal
 const showModal = ref(false)
 const isEdit = ref(false)
 const selectedId = ref(null)
 
+// Data form buat banner
 const form = ref({
   section: '',
   file: null,
   preview: ''
 })
 
-/* ================= FILE ================= */
+// Pas user milih file gambar, kita bikin preview-nya
 const handleFile = (e) => {
   const file = e.target.files[0]
   if (!file) return
@@ -215,7 +221,7 @@ const handleFile = (e) => {
   form.value.preview = URL.createObjectURL(file)
 }
 
-/* ================= CREATE ================= */
+// Fungsi buat ngirim banner baru ke server
 const submitForm = async () => {
   if (!form.value.section || !form.value.file) {
     return showError('Semua field harus diisi!')
@@ -232,6 +238,7 @@ const submitForm = async () => {
       }
     })
 
+    // Masukin data baru ke urutan paling atas daftar
     banners.value.unshift(res.data.data)
 
     showSuccess('Banner berhasil ditambahkan!')
@@ -241,7 +248,7 @@ const submitForm = async () => {
   }
 }
 
-/* ================= EDIT ================= */
+// Buka modal edit ama pasang data yang mau diedit
 const openEdit = (banner) => {
   isEdit.value = true
   selectedId.value = banner.id
@@ -253,6 +260,7 @@ const openEdit = (banner) => {
   showModal.value = true
 }
 
+// Fungsi buat update banner yang udah ada
 const updateBanner = async () => {
   try {
     const formData = new FormData()
@@ -262,8 +270,10 @@ const updateBanner = async () => {
       formData.append('image', form.value.file)
     }
 
+    // Pake trik _method=PUT karena mau kirim file lewat FormData
     const res = await api.post(`/content/${selectedId.value}?_method=PUT`, formData)
 
+    // Update data di list banners biar langsung ganti tampilannya
     const index = banners.value.findIndex(b => b.id === selectedId.value)
     banners.value[index] = res.data.data
 
@@ -274,7 +284,7 @@ const updateBanner = async () => {
   }
 }
 
-/* ================= DELETE ================= */
+// Fungsi buat ngebuang banner dari server
 const deleteBanner = async (id) => {
   const confirm = await showConfirm('Yakin hapus banner?')
   if (!confirm) return
@@ -289,8 +299,7 @@ const deleteBanner = async (id) => {
   }
 }
 
-/* ================= FETCH ================= */
-// Fix : sebelumnya kalo data di banner kosong bakalan gagal mengambil data (soalnya gagal map karna undefined)
+// Tarik semua daftar banner dari server pake pagination
 const getBanners = async (page = 1) => {
   isLoading.value = true;
   try {
@@ -317,12 +326,14 @@ const getBanners = async (page = 1) => {
   }
 };
 
+// Pas user mindah-mindah halaman pagination
 const changePage = async (page) => {
   if (page < 1 || page > pagination.value.last_page) return;
 
   await getBanners(page);
 };
 
+// Ambil profil admin
 const getProfile = async () => {
   try {
     const res = await api.get('/profile')
@@ -332,7 +343,7 @@ const getProfile = async () => {
   }
 }
 
-/* ================= MODAL ================= */
+// Reset form ama buka modal buat nambah banner
 const openCreate = () => {
   isEdit.value = false
   selectedId.value = null
@@ -340,11 +351,12 @@ const openCreate = () => {
   showModal.value = true
 }
 
+// Tutup modal
 const closeModal = () => {
   showModal.value = false
 }
 
-/* ================= INIT ================= */
+// Pas halaman dibuka, langsung sikat datanya
 onMounted(() => {
   getBanners()
   getProfile()

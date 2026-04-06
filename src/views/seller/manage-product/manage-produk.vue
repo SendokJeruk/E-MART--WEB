@@ -3,10 +3,11 @@
 
     <div class="p-6 overflow-x-auto">
 
-      <!-- HEADER -->
+      <!-- Header halaman daftar barang dagangan -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage Produk</h1>
 
+        <!-- Profil singkat si bos seller -->
         <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
             <p class="text-sm font-bold">{{ user.name }}</p>
@@ -19,13 +20,13 @@
         </div>
       </div>
 
-      <!-- SEARCH BAR -->
+      <!-- Kotak buat nyari barang dagangan kamu sendiri -->
       <div class="mb-4 flex items-center gap-3">
         <input
           type="text"
           v-model="searchQuery"
           @keyup.enter="searchProduct"
-          placeholder="Cari produk..."
+          placeholder="Cari produk kamu di sini..."
           class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7D0A0A]"
         />
         <button
@@ -36,14 +37,14 @@
         </button>
       </div>
 
-      <!-- BUTTON -->
+      <!-- Tombol-tombol shortcut buat nambah barang ama kelola foto -->
       <router-link
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5 ml-2"
         to="/create-produk"
       >
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
         <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
-          Tambah Produk
+          Tambah Produk Baru
         </span>
       </router-link>
 
@@ -53,12 +54,12 @@
       >
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
         <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
-          Manage Foto
+          Kelola Foto Produk
         </span>
       </router-link>
 
 
-      <!-- ================= LOADING ================= -->
+      <!-- Tampilan skeleton pas datanya lagi dijemput dari database -->
       <template v-if="isLoading">
         <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
           <table class="min-w-full table-fixed">
@@ -109,7 +110,7 @@
         </div>
       </template>
 
-      <!-- ================= DATA ================= -->
+      <!-- Daftar barang dagangan asli punya si seller -->
       <template v-else-if="product.length">
         <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
           <table class="min-w-full table-fixed divide-y divide-gray-200">
@@ -148,7 +149,7 @@
                 </td>
 
                 <td class="px-4 py-2">
-
+                  <!-- Tombol hapus produk, ati-ati ya pas neken -->
                   <button
                     @click="deleteProduct(produk.id)"
                     class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded mb-2 ml-3"
@@ -157,6 +158,7 @@
                   </button>
 
                   <div>
+                    <!-- Tombol edit info produk -->
                     <router-link
                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded mb-2 ml-3"
                       :to="`/edit-produk/${produk.id}`"
@@ -168,6 +170,8 @@
               </tr>
             </tbody>
           </table>
+
+          <!-- Navigasi halaman biar gak kepanjangan tabelnya -->
           <div v-if="product.length" class="flex justify-center mt-4 space-x-2 mb-4">
             <button
               @click="changePage(currentPage - 1)"
@@ -197,10 +201,10 @@
         </div>
       </template>
 
-      <!-- ================= EMPTY ================= -->
+      <!-- Kalo seller ternyata belom jualan apa-apa -->
       <template v-else>
         <div class="text-center py-20 text-gray-400">
-          Belum ada produk
+          Belom ada produk nih. Ayo mulai jualan!
         </div>
       </template>
     </div>
@@ -221,21 +225,25 @@ const currentPage = ref(1);
 const lastPage = ref(1);
 const searchQuery = ref(''); 
 
+// Fungsi buat ngebuang produk dari etalase
 const deleteProduct = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus Produk ini?');
+  const konfirmasi = confirm('Yakin beneran mau hapus barang ini?');
   if (!konfirmasi) return;
 
   try {
     await api.delete(`/product/${id}`);
+    // Saring list biar produknya ilang dari pandangan
     product.value = product.value.filter(p => p.id !== id);
-    showSuccess('Produk berhasil dihapus.');
+    showSuccess('Beres! Produk udah dihapus.');
+    // Tarik ulang listnya biar pasti
     await getProduct();
   } catch (error) {
-    console.error('Gagal menghapus produk:', error);
-    showError(error.response?.data?.message || 'Terjadi kesalahan saat menghapus produk.');
+    console.error('Gagal hapus produk:', error);
+    showError(error.response?.data?.message || 'Yah, gagal hapus barangnya nih.');
   }
 };
 
+// Ambil profil si juragan seller
 const getProfile = async () => {
   try {
     const response = await api.get('/profile');
@@ -245,6 +253,7 @@ const getProfile = async () => {
   }
 };
 
+// Tarik daftar produk punya seller ini pake pagination
 const getProduct = async (page = 1) => {
   try {
     const response = await api.get('/product/myproducts', {
@@ -257,16 +266,16 @@ const getProduct = async (page = 1) => {
       lastPage.value = response.data.data.last_page;
     } else {
       product.value = [];
-      console.warn("Tidak ada produk:", response.data.message || "No Data");
     }
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('Gagal ambil data barang kamu:', error);
     product.value = [];
   } finally {
     isLoading.value = false;
   }
 };
 
+// Fungsi cari produk di etalase sendiri
 const searchProduct = async (page = 1) => {
   isLoading.value = true;
   try {
@@ -280,19 +289,20 @@ const searchProduct = async (page = 1) => {
       lastPage.value = response.data.data.last_page;
     } else {
       product.value = [];
-      console.warn("Tidak ada produk:", response.data.message || "No Data");
     }
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('Gagal nyari barang kamu:', error);
     product.value = [];
   } finally {
     isLoading.value = false;
   }
 };
 
+// Pas user mindah-mindah halaman list barang
 const changePage = async (page) => {
   if (page < 1 || page > lastPage.value) return;
 
+  // Kalo lagi nyari, ya carinya di halaman selanjutnya
   if (searchQuery.value) {
     await searchProduct(page); 
   } else {
@@ -300,6 +310,7 @@ const changePage = async (page) => {
   }
 };
 
+// Pas halaman dibuka, tarik profil ama daftar barangnya
 onMounted(async () => {
   await getProfile();
   await getProduct();
@@ -307,6 +318,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Styling tabel biar gak rapet-rapet banget */
 table {
   border-collapse: collapse;
 }

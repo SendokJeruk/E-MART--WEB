@@ -1,11 +1,11 @@
 <template>
   <AdminSide>
     <div class="p-6">
-      <!-- Header -->
+      <!-- Header halaman buat manage pengajuan user yang pengen jualan -->
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-[#7D0A0A]">Manage Pengajuan Seller</h1>
 
-        <!-- Profile -->
+        <!-- Skeleton profil pas datanya belom nongol -->
         <div v-if="isLoading" class="bg-white shadow-md rounded-xl px-4 py-2 flex items-center gap-3 w-64 border border-gray-200">
           <Skeleton type="circle" size="48px"/>
           <div class="flex-1 space-y-2">
@@ -14,6 +14,7 @@
           </div>
         </div>
 
+        <!-- Profil admin aslinya -->
         <div
           v-else
           class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
@@ -29,7 +30,7 @@
         </div>
       </div>
 
-      <!-- Skeleton Cards -->
+      <!-- Kumpulan kotak skeleton buat nungguin daftar pengajuan -->
       <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="n in 6" :key="n" class="bg-white rounded-xl shadow p-5 space-y-3">
           <div class="flex justify-between">
@@ -45,7 +46,7 @@
         </div>
       </div>
 
-      <!-- Data Cards -->
+      <!-- Daftar pengajuan seller dalam bentuk kartu-kartu cakep -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="(item, index) in requests"
@@ -53,6 +54,7 @@
           class="bg-white rounded-xl shadow hover:shadow-lg transition p-5 border-gray-100 flex flex-col justify-between"
         >
           <div>
+            <!-- Label status ama ID pengajuan -->
             <div class="flex items-center justify-between mb-3">
               <span
                 :class="[
@@ -69,12 +71,14 @@
               <span class="text-xs text-gray-400">#{{ item.id }}</span>
             </div>
 
+            <!-- Nama lengkap ama NIK yang daftar jualan -->
             <h2 class="text-lg font-semibold text-gray-800 mb-1">
               {{ item.nama_lengkap }}
             </h2>
             <p class="text-sm text-gray-500">NIK: {{ item.nik }}</p>
           </div>
 
+          <!-- Tombol buat ngecek detail atau hapus datanya -->
           <div class="mt-6 flex justify-between items-center">
             <button
               @click="openDetail(item)"
@@ -91,6 +95,7 @@
         </div>
       </div>
 
+      <!-- Navigasi halaman pagination -->
       <div
         v-if="pagination.last_page > 1"
         class="flex justify-center mt-6 space-x-2"
@@ -126,16 +131,17 @@
         </button>
       </div>
 
-      <!-- Empty -->
+      <!-- Kalo lagi sepi pengajuan -->
       <div v-if="!isLoading && requests.length === 0" class="text-center text-gray-500 mt-10">
         Tidak ada pengajuan seller
       </div>
     </div>
 
-    <!-- Modal Detail (tidak perlu skeleton karena muncul setelah klik) -->
+    <!-- Modal buat ngeliat detail data diri calon seller -->
     <transition name="modal-fade">
       <div v-if="selectedItem" class="fixed inset-0 flex items-center justify-center z-50 bg-black/30 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-2/3 lg:w-1/2 p-8 relative">
+          <!-- Tombol tutup modal -->
           <button
             @click="selectedItem = null"
             class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition"
@@ -145,6 +151,7 @@
             Detail Pengajuan Seller
           </h2>
 
+          <!-- Data diri lengkap dari database -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
             <p><span class="font-semibold">Status:</span> {{ selectedItem.status }}</p>
             <p><span class="font-semibold">Note:</span> {{ selectedItem.note }}</p>
@@ -156,11 +163,13 @@
             <p><span class="font-semibold">Alamat KTP:</span> {{ selectedItem.alamat_ktp }}</p>
           </div>
 
+          <!-- Pajang foto KTP-nya buat divalidasi -->
           <div class="mt-6">
             <span class="font-semibold">Foto KTP:</span><br/>
             <img :src="selectedItem.foto_ktp" class="w-56 h-36 object-cover rounded-lg border mt-3 shadow"/>
           </div>
 
+          <!-- Kolom buat admin nulis alesan approve/reject -->
           <div class="mt-6">
             <label class="font-semibold block mb-2">Catatan Admin</label>
             <textarea
@@ -170,6 +179,7 @@
             ></textarea>
           </div>
 
+          <!-- Tombol penentu nasib calon seller -->
           <div class="mt-8 flex justify-end gap-4">
             <button
               @click="updateStatus(selectedItem.id, 'rejected')"
@@ -197,16 +207,19 @@ import api from '@/plugins/axios'
 import { showSuccess, showError } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
+// Inisialisasi variabel state
 const user = ref({})
 const requests = ref([])
 const selectedItem = ref(null)
-const note = ref('')
+const note = ref('') // Catatan bawaan user
+const admin_note = ref('') // Catatan baru dari admin
 const isLoading = ref(true)
 const pagination = ref({
   current_page: 1,
   last_page: 1,
 });
 
+// Ambil profil admin yang lagi operasional
 const getProfile = async () => {
   try {
     const response = await api.get('/profile')
@@ -216,6 +229,7 @@ const getProfile = async () => {
   }
 }
 
+// Ambil daftar pengajuan seller pake pagination
 const getRequestSeller = async (page = 1) => {
   isLoading.value = true;
   try {
@@ -224,6 +238,7 @@ const getRequestSeller = async (page = 1) => {
     });
     const resData = response.data.data;
 
+    // Kadang backend ngasih datanya langsung array, kadang object pagination
     if (Array.isArray(resData)) {
       requests.value = resData;
       pagination.value.current_page = 1;
@@ -241,27 +256,34 @@ const getRequestSeller = async (page = 1) => {
   }
 };
 
+// Pas mindah-mindah halaman pagination
 const changePage = async (page) => {
   if (page < 1 || page > pagination.value.last_page) return;
 
   await getRequestSeller(page);
 };
 
+// Pas tombol detail diklik, pasang data calon seller ke modal
 const openDetail = (item) => {
   selectedItem.value = item
   note.value = item.note || ''
+  admin_note.value = '' // Kosongin catatan admin pas ganti orang
 }
 
+// Fungsi buat ngupdate nasib calon seller (approve/reject)
 const updateStatus = async (id, status) => {
   try {
+    // Kirim status baru ama catatan adminnya
     await api.put(`/requestseller/${id}`, { status, note: admin_note.value })
+    // Cari urutan data di list terus update biar tampilannya sinkron
     const index = requests.value.findIndex((r) => r.id === id)
     if (index !== -1) {
       requests.value[index].status = status
-      requests.value[index].note = note.value
+      requests.value[index].note = admin_note.value
     }
+    // Update juga data yang lagi diliat di modal
     selectedItem.value.status = status
-    selectedItem.value.note = note.value
+    selectedItem.value.note = admin_note.value
     showSuccess(`Pengajuan berhasil diubah menjadi ${status}`)
   } catch (error) {
     console.error('Gagal update status:', error)
@@ -269,6 +291,7 @@ const updateStatus = async (id, status) => {
   }
 }
 
+// Pas halaman dibuka, langsung gas ambil profil ama daftar pengajuannya
 onMounted(() => {
   getProfile()
   getRequestSeller(1)
@@ -276,7 +299,7 @@ onMounted(() => {
 </script>
 
 <style>
-/* Animasi modal fade + scale */
+/* Animasi biar modalnya munculnya asik */
 .modal-fade-enter-active,
 .modal-fade-leave-active {
   transition: all 0.3s ease;

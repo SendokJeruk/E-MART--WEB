@@ -2,7 +2,7 @@
   <SellerSide>
     <div class="p-6">
 
-      <!-- HEADER -->
+      <!-- Header buat pamer profil ama judul halaman pengiriman -->
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800">
           Manage Pengiriman
@@ -20,7 +20,7 @@
         </div>
       </div>
 
-      <!-- TABLE -->
+      <!-- Tabel daftar pengiriman yang harus diurus seller -->
       <div class="bg-white shadow-xl rounded-xl overflow-hidden border">
 
         <table class="min-w-full text-sm">
@@ -36,7 +36,7 @@
             </tr>
           </thead>
 
-          <!-- SKELETON -->
+          <!-- Skeleton tabel pas datanya lagi dijemput dari server -->
           <tbody v-if="isLoading">
             <tr v-for="i in 5" :key="i">
               <td class="px-4 py-3"><Skeleton height="16px" width="60px"/></td>
@@ -49,7 +49,7 @@
             </tr>
           </tbody>
 
-          <!-- DATA -->
+          <!-- Daftar pengiriman asli dari database -->
           <tbody v-else class="divide-y">
             <tr
               v-for="item in pengiriman"
@@ -69,17 +69,17 @@
                 {{ item.plat_nomor || '-' }}
               </td>
 
-              <!-- INPUT RESI -->
+              <!-- Kolom buat input nomor resi dari kurir -->
               <td class="px-4 py-3">
                 <input
                   v-model="item.kode_resi"
                   type="text"
-                  placeholder="Masukkan resi"
+                  placeholder="Isi resi di sini..."
                   class="border rounded px-2 py-1 text-sm w-32"
                 />
               </td>
 
-              <!-- STATUS -->
+              <!-- Dropdown buat gonta-ganti status pengiriman paket -->
               <td class="px-4 py-3">
                 <select
                   v-model="item.status_pengiriman"
@@ -87,6 +87,7 @@
                   class="border rounded-lg px-3 py-1 text-sm"
                   :disabled="isFinalStatus(item.status_pengiriman)"
                 >
+                  <!-- Suguhan status cuma yang logis aja (berurutan) -->
                   <option
                     v-for="status in getAvailableStatuses(item.status_pengiriman)"
                     :key="status"
@@ -102,6 +103,7 @@
               </td>
 
               <td class="px-4 py-3">
+                <!-- Tombol hapus, cuma muncul kalo barang belom diterima/batal -->
                 <button
                   @click="deletePengiriman(item.id)"
                   class="px-3 py-1 rounded-lg text-sm font-medium"
@@ -116,9 +118,10 @@
 
             </tr>
 
+            <!-- Kalo seller lagi gak ada barang yang perlu dikirim -->
             <tr v-if="pengiriman.length === 0">
               <td colspan="7" class="text-center py-10 text-gray-500">
-                Belum ada data pengiriman
+                Belom ada data pengiriman nih.
               </td>
             </tr>
 
@@ -127,7 +130,7 @@
 
       </div>
 
-      <!-- PAGINATION -->
+      <!-- Navigasi halaman biar gak pusing liat datanya -->
       <div class="flex justify-center mt-4 space-x-2 mb-4">
         <button
           @click="changePage(currentPage - 1)"
@@ -170,10 +173,11 @@ const user = ref({})
 const pengiriman = ref([])
 const isLoading = ref(true)
 
-// Pagination
+// Info buat ngatur pagination
 const currentPage = ref(1)
 const lastPage = ref(1)
 
+// Urutan tahapan kirim barang yang bener
 const statusOrder = [
   "dibuat",
   "dijadwalkan",
@@ -184,16 +188,19 @@ const statusOrder = [
   "batal"
 ]
 
+// Fungsi buat nyaring status apa aja yang boleh dipilih selanjutnya
 const getAvailableStatuses = (current) => {
   const index = statusOrder.indexOf(current)
+  // Cuma kasih pilihan status sekarang ama status satu tingkat di depannya
   return statusOrder.slice(index, index + 2)
 }
 
+// Cek apakah statusnya udah mentok (diterima atau batal)
 const isFinalStatus = (status) => {
   return status === "diterima" || status === "batal"
 }
 
-// Ambil profile
+// Ambil profil si bos seller
 const getProfile = async () => {
   try {
     const response = await api.get('/profile')
@@ -203,7 +210,7 @@ const getProfile = async () => {
   }
 }
 
-// Ambil data pengiriman dengan pagination
+// Tarik data pengiriman pake fitur pagination
 const getPengiriman = async (page = 1) => {
   isLoading.value = true
   try {
@@ -218,11 +225,12 @@ const getPengiriman = async (page = 1) => {
   }
 }
 
-// Update status
+// Fungsi buat ngapdet status perjalanan paket
 const updateStatus = async (item) => {
+  // Aturan main: jangan ganti status ke "dijadwalkan" kalo resinya masih kosong
   if (item.status_pengiriman === "dijadwalkan" && !item.kode_resi) {
-    showError("Masukkan kode resi terlebih dahulu!")
-    await getPengiriman(currentPage.value)
+    showError("Isi dulu dong nomor resinya!")
+    await getPengiriman(currentPage.value) // Balikin tampilannya
     return
   }
 
@@ -237,33 +245,35 @@ const updateStatus = async (item) => {
       bukti_pengiriman: item.bukti_pengiriman ?? null
     })
 
-    showSuccess("Status berhasil diperbarui!")
+    showSuccess("Status pengiriman udah diupdate ya!")
     await getPengiriman(currentPage.value)
   } catch (error) {
     console.error(error)
-    showError("Gagal update status")
+    showError("Yah, gagal update statusnya nih.")
     await getPengiriman(currentPage.value)
   }
 }
 
-// Hapus pengiriman
+// Fungsi buat ngebuang data pengiriman dari list
 const deletePengiriman = async (id) => {
-  if (!confirm('Yakin ingin menghapus pengiriman ini?')) return
+  if (!confirm('Yakin mau hapus data pengiriman ini?')) return
 
   try {
     await api.delete(`/pengiriman/${id}`)
+    // Langsung saring dari list biar gak perlu request API lagi
     pengiriman.value = pengiriman.value.filter(p => p.id !== id)
   } catch (error) {
     console.log(error)
   }
 }
 
-// Ganti halaman
+// Pas user mindah-mindah halaman data
 const changePage = async (page) => {
   if (page < 1 || page > lastPage.value) return
   await getPengiriman(page)
 }
 
+// Pas halaman dibuka, sikat ambil semua datanya
 onMounted(() => {
   getProfile()
   getPengiriman()

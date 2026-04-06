@@ -1,7 +1,7 @@
 <template>
   <header class="bg-[#BF3131] shadow-md">
 
-    <!-- Skeleton Navbar saat loading -->
+    <!-- Kalo lagi loading, tampilin kotak-kotak kosong dulu biar user tau lagi proses -->
     <div v-if="isLoading" class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 py-4">
       <div class="flex items-center gap-4">
         <Skeleton width="120px" height="40px"/>
@@ -13,25 +13,25 @@
       </div>
     </div>
 
-    <!-- Navbar utama -->
+    <!-- Ini tampilan navbar aslinya -->
     <div v-else class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
       <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-4 py-4">
 
-        <!-- Logo mengarah ke dashboard -->
+        <!-- Logo E-MART, kalo diklik balik ke dashboard -->
         <router-link to="/dashboard">
           <img src="@/assets/img/LOGO E-MART APP.png"
                alt="Logo"
                class="h-10 sm:h-14 w-auto object-contain" />
         </router-link>
 
-        <!-- Foto profil, default jika tidak ada -->
+        <!-- Foto profil user, kalo gak ada ya pake placeholder aja -->
         <img
           :src="user?.foto_profil || 'https://placehold.co/100'"
           alt="Foto Profil"
           class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border"
         />
 
-        <!-- Search bar -->
+        <!-- Kolom pencarian produk, tekan enter buat nyari -->
         <div class="flex-grow w-full md:mx-8">
           <input
             v-model="search"
@@ -42,13 +42,13 @@
           />
         </div>
 
-        <!-- Icon hanya muncul jika user login -->
+        <!-- Ikon keranjang ama setting, cuma nongol kalo udah login -->
         <div v-if="isLoggedIn" class="flex items-center gap-3">
           <router-link to="/cart" class="material-symbols-outlined text-white text-2xl">shopping_cart</router-link>
           <router-link to="/settings" class="material-symbols-outlined text-white text-2xl">settings</router-link>
         </div>
 
-        <!-- Tombol login/register atau logout -->
+        <!-- Tombol login/register kalo belom masuk, atau tombol logout kalo udah masuk -->
         <div class="flex items-center gap-2">
           <div v-if="!isLoggedIn" class="flex gap-2">
             <buttonred label="Login" to="/login" />
@@ -71,13 +71,6 @@
 </template>
 
 <script setup>
-/*
-  Navbar menggunakan:
-  - localStorage token sebagai sumber login utama
-  - API /profile untuk mengambil data user
-  - computed digunakan agar status login selalu sinkron
-*/
-
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from "@/plugins/axios"
@@ -91,16 +84,12 @@ const user = ref(null)
 const router = useRouter()
 const emit = defineEmits(['search'])
 
-/*
-  Status login berdasarkan token
-*/
+// Ngecek status login dari token di localStorage
 const isLoggedIn = computed(() => {
   return !!localStorage.getItem("token")
 })
 
-/*
-  Mengambil data profil jika token tersedia
-*/
+// Ambil data profil kalo tokennya ada
 const getProfile = async () => {
   if (!localStorage.getItem("token")) return
 
@@ -115,9 +104,7 @@ const getProfile = async () => {
   }
 }
 
-/*
-  Fungsi pencarian produk
-*/
+// Fungsi buat nyari produk berdasarkan nama
 const searchBar = async () => {
   if (!search.value) return
 
@@ -131,6 +118,7 @@ const searchBar = async () => {
 
     const result = response?.data?.data?.data || []
 
+    // Kasih tau parent kalo ada hasil pencarian
     emit('search', {
       products: result,
       query: search.value,
@@ -142,12 +130,7 @@ const searchBar = async () => {
   }
 }
 
-/*
-  Logout:
-  - hapus token
-  - reset user
-  - redirect ke login
-*/
+// Fungsi logout buat buang token ama nendang balik ke login
 const logout = async () => {
   const confirmed = window.confirm("Are you sure you want to log out?")
   if (!confirmed) return
@@ -162,6 +145,7 @@ const logout = async () => {
   }
 }
 
+// Pas komponen nempel, langsung sikat ambil profil
 onMounted(() => {
   getProfile()
 })

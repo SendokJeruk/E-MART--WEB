@@ -1,9 +1,11 @@
 <template>
   <sellerside>
     <div class="p-6 overflow-x-auto">
+      <!-- Header halaman buat liat info toko kamu -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage Toko</h1>
 
+        <!-- Profil singkat seller di pojok atas -->
         <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
             <p class="text-sm font-bold">{{ user.name }}</p>
@@ -13,6 +15,7 @@
         </div>
       </div>
 
+      <!-- Tombol buat bikin toko baru kalo emang belom punya -->
       <router-link
         v-if="!isLoading && tokoseller.length === 0"
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
@@ -20,10 +23,11 @@
       >
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
         <span class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white">
-          Tambah Toko
+          Bikin Toko Sekarang
         </span>
       </router-link>
 
+      <!-- Tabel buat daftar toko (biasanya sih cuma sebiji doang) -->
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-fixed divide-y divide-gray-200">
           <thead class="bg-gray-200">
@@ -35,7 +39,7 @@
             </tr>
           </thead>
 
-          <!-- SKELETON -->
+          <!-- Skeleton tabel pas datanya lagi dijemput -->
           <tbody v-if="isLoading" class="divide-y divide-gray-200">
             <tr v-for="n in 4" :key="n">
               <td class="px-4 py-3">
@@ -54,19 +58,21 @@
             </tr>
           </tbody>
 
-          <!-- DATA -->
+          <!-- Data toko asli milik si seller -->
           <tbody v-else class="divide-y divide-gray-200">
             <tr v-for="item in tokoseller" :key="item.id">
               <td class="px-4 py-2 text-sm text-gray-900">{{ item.nama_toko }}</td>
               <td class="px-4 py-2 text-sm text-gray-900">{{ item.deskripsi }}</td>
               <td class="px-4 py-2 text-sm text-gray-900">{{ item.no_telp }}</td>
               <td class="px-4 py-2 text-sm text-gray-900">
+                <!-- Tombol buat ngebuang toko dari database -->
                 <button
                   @click="deleteToko(item.id)"
                   class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded mb-2 ml-3"
                 >
                   Hapus
                 </button>
+                <!-- Tombol buat ngedit profil toko -->
                 <router-link
                   :to="`/edit-toko/${item.id}`"
                   class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded mb-2 ml-3"
@@ -95,6 +101,7 @@ import { showSuccess,showError } from '@/utils/alert';
   const tokoseller = ref([]);
   const isLoading = ref(true);
   
+  // Ambil profil seller yang lagi login
   const getProfile = async () => {
   try {
     const response = await api.get('/profile');
@@ -104,33 +111,37 @@ import { showSuccess,showError } from '@/utils/alert';
   }
 };
 
+// Tarik data toko milik si seller ini (pake trik filter user_id)
 const getToko = async () => {
     try {
         const response = await api.get('/toko?self');
         const alltoko = response.data.data.data;
         tokoseller.value = alltoko.filter(t => t.user_id === user.value.id);
     } catch (error) {
-    console.error('Error fetching toko:', error);
+    console.error('Yah, gagal ambil data toko kamu nih:', error);
   } finally {
     isLoading.value = false;
   }
 }
 
+// Fungsi buat ngehapus toko kamu dari muka bumi
 const deleteToko = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus Toko ini?');
+  const konfirmasi = confirm('Yakin beneran mau hapus toko kamu? Ati-ati ya!');
   if (!konfirmasi) return;
 
   try {
     await api.delete(`/toko/${id}`);
+    // Langsung saring list biar gak perlu refresh halaman
     tokoseller.value = tokoseller.value.filter(toko => toko.id !== id);
-    showSuccess('toko berhasil dihapus.');
+    showSuccess('Toko udah berhasil dihapus, sip!');
     await getToko();
   } catch (error) {
-    console.error('Gagal menghapus toko:', error);
-    showError(error.response?.data?.message || 'Terjadi kesalahan saat menghapus toko.');
+    console.error('Gagal hapus toko:', error);
+    showError(error.response?.data?.message || 'Yah, ada masalah pas mau ngehapus toko.');
   }
 };
 
+// Pas halaman dibuka, tarik profil dulu baru sikat tarik data tokonya
 onMounted(async () => {
     await getProfile();
     await getToko();

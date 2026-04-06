@@ -1,11 +1,11 @@
 <template>
   <AdminSide>
     <div class="p-6">
-      <!-- Header -->
+      <!-- Bagian atas halaman income, buat pamer profil admin -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">Manage Income</h1>
 
-        <!-- Profile -->
+        <!-- Skeleton pas lagi loading narik profil -->
         <div v-if="isLoading" class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <Skeleton type="circle" size="40px"/>
           <div class="flex-1 space-y-2">
@@ -14,6 +14,7 @@
           </div>
         </div>
 
+        <!-- Profil admin asli -->
         <div v-else class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
             <p class="text-sm font-bold">{{ user.name }}</p>
@@ -23,8 +24,9 @@
         </div>
       </div>
 
-      <!-- Grid Withdraw -->
+      <!-- Kotak-kotak daftar permintaan withdraw dari seller -->
       <div v-if="isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Skeleton kotak withdraw -->
         <div v-for="n in 4" :key="n" class="bg-white shadow rounded-xl p-4 space-y-3">
           <Skeleton height="14px" width="60%"/>
           <Skeleton height="12px" width="80%"/>
@@ -34,6 +36,7 @@
         </div>
       </div>
 
+      <!-- Tampilan asli kartu withdraw -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
           v-for="withdraw in withdraws"
@@ -47,6 +50,7 @@
               Rp {{ withdraw.jumlah.toLocaleString() }}
             </p>
 
+            <!-- Label status withdraw (pending, ok, atau ditolak) -->
             <span
               class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold"
               :class="{
@@ -59,6 +63,7 @@
             </span>
           </div>
 
+          <!-- Tombol buat liat detailnya -->
           <button
             class="mt-4 w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
             @click="openDetail(withdraw)"
@@ -68,6 +73,7 @@
         </div>
       </div>
 
+      <!-- Navigasi halaman biar gak numpuk -->
       <div
         v-if="pagination.last_page > 1"
         class="flex justify-center mt-6 space-x-2"
@@ -103,20 +109,22 @@
         </button>
       </div>
 
-      <!-- Empty -->
+      <!-- Kalo ternyata belom ada yang withdraw -->
       <div v-if="!isLoading && withdraws.length === 0" class="p-6 text-center text-gray-500">
         Tidak ada data withdraw
       </div>
 
-      <!-- Modal -->
+      <!-- Modal Detail Withdraw pas diklik "Lihat Detail" -->
       <transition name="fade">
         <div v-if="selectedWithdraw" class="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50">
           <transition name="scale">
             <div v-if="selectedWithdraw" class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
+              <!-- Tombol silang buat nutup modal -->
               <button class="absolute top-3 right-3 text-gray-500 hover:text-gray-700" @click="selectedWithdraw = null">✖</button>
 
               <h2 class="text-xl font-bold mb-4">Detail Withdraw</h2>
 
+              <!-- Informasi lengkap seller yang mau narik duit -->
               <div class="space-y-2 text-sm text-gray-700">
                 <p><span class="font-semibold">Seller:</span> {{ selectedWithdraw.user.name }}</p>
                 <p><span class="font-semibold">Email:</span> {{ selectedWithdraw.user.email }}</p>
@@ -140,6 +148,7 @@
                 </p>
               </div>
 
+              <!-- Tombol eksekusi: approve atau reject -->
               <div class="flex gap-3 mt-6">
                 <button
                   class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
@@ -171,6 +180,7 @@ import Skeleton from '@/components/Skeleton.vue';
 import api from '@/plugins/axios';
 import { onMounted, ref } from 'vue';
 
+// Siapin state-state reaktif
 const user = ref({});
 const withdraws = ref([]);
 const selectedWithdraw = ref(null);
@@ -181,6 +191,7 @@ const pagination = ref({
   last_page: 1,
 });
 
+// Tarik profil admin yang lagi tugas
 const getProfile = async () => {
   try {
     const response = await api.get('/profile');
@@ -190,6 +201,7 @@ const getProfile = async () => {
   }
 };
 
+// Ambil semua daftar withdraw dari database pake pagination
 const getWithdraw = async (page = 1) => {
   isLoading.value = true;
   try {
@@ -199,6 +211,7 @@ const getWithdraw = async (page = 1) => {
 
     const resData = response.data.data;
 
+    // Pastiin datanya array biar gak error pas diloop
     withdraws.value = Array.isArray(resData.data) ? resData.data : [];
 
     pagination.value.current_page = resData.current_page;
@@ -212,20 +225,23 @@ const getWithdraw = async (page = 1) => {
   }
 };
 
+// Pas ganti-ganti halaman pagination
 const changePage = async (page) => {
   if (page < 1 || page > pagination.value.last_page) return;
 
   await getWithdraw(page);
 };
 
+// Fungsi buat nge-update status withdraw (setuju/tolak)
 const updateStatus = async (id, status) => {
   loading.value = true;
   try {
-    // Samakan status dengan backend
+    // Sesuaikan statusnya ama yang dimau backend (approved jadi accepted)
     const backendStatus = status === 'approved' ? 'accepted' : 'rejected';
     await api.post(`/withdraw/handle/${id}`, { status: backendStatus });
+    // Tarik ulang datanya biar update tampilannya
     await getWithdraw();
-    selectedWithdraw.value = null; // tutup modal
+    selectedWithdraw.value = null; // Tutup modalnya kalo udah beres
   } catch (error) {
     console.error('Gagal update status:', error.response?.data || error);
   } finally {
@@ -233,10 +249,12 @@ const updateStatus = async (id, status) => {
   }
 };
 
+// Pas tombol "Lihat Detail" diklik
 const openDetail = (withdraw) => {
   selectedWithdraw.value = withdraw;
 };
 
+// Pas halaman kebuka pertama kali, langsung sikat datanya
 onMounted(async () => {
   await getProfile();
   await getWithdraw(1);
@@ -244,7 +262,7 @@ onMounted(async () => {
 </script>
 
 <style>
-/* Animasi fade */
+/* Efek transisi modal biar makin smooth */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -254,7 +272,6 @@ onMounted(async () => {
   opacity: 0;
 }
 
-/* Animasi scale */
 .scale-enter-active,
 .scale-leave-active {
   transition: all 0.3s ease;

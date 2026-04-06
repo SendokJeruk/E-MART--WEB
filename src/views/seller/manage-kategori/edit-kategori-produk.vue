@@ -1,18 +1,21 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-6 bg-white shadow rounded">
+      <!-- Judul halaman edit relasi kategori barang -->
       <h2 class="text-xl font-bold mb-4">Form Edit Kategori Produk</h2>
 
       <form @submit.prevent="submitForm">
-        <!-- Dropdown Produk -->
+        <!-- Input milih produk dagangan punya seller -->
         <div class="mb-4 relative">
           <label class="block mb-1 font-medium">Pilih Produk</label>
+          <!-- Tombol dropdown palsu buat pamer nama produk yang dipilih -->
           <div
             class="border px-3 py-2 rounded cursor-pointer bg-white"
             @click="toggleDropdown('product')"
           >
-            {{ selectedProductName || 'Cari & pilih produk...' }}
+            {{ selectedProductName || 'Cari & pilih produk kamu...' }}
           </div>
+          <!-- Area daftar produk yang nongol pas diklik -->
           <div
             v-if="openDropdown === 'product'"
             class="absolute z-10 w-full bg-white border rounded mt-1 shadow"
@@ -20,7 +23,7 @@
             <input
               type="text"
               v-model="searchProduct"
-              placeholder="Cari produk..."
+              placeholder="Ketik buat nyari..."
               class="w-full px-3 py-2 border-b focus:outline-none"
             />
             <ul class="max-h-40 overflow-y-auto">
@@ -33,20 +36,20 @@
                 {{ p.nama_product }}
               </li>
               <li v-if="filteredProducts.length === 0" class="px-3 py-2 text-gray-500">
-                Tidak ada produk
+                Gak ada produknya nih
               </li>
             </ul>
           </div>
         </div>
 
-        <!-- Dropdown Kategori -->
+        <!-- Input milih kategori buat dipasang ke barang tadi -->
         <div class="mb-4 relative">
           <label class="block mb-1 font-medium">Pilih Kategori</label>
           <div
             class="border px-3 py-2 rounded cursor-pointer bg-white"
             @click="toggleDropdown('category')"
           >
-            {{ selectedCategoryName || 'Cari & pilih kategori...' }}
+            {{ selectedCategoryName || 'Cari & pilih kategori baru...' }}
           </div>
           <div
             v-if="openDropdown === 'category'"
@@ -55,7 +58,7 @@
             <input
               type="text"
               v-model="searchCategory"
-              placeholder="Cari kategori..."
+              placeholder="Cari kategorinya..."
               class="w-full px-3 py-2 border-b focus:outline-none"
             />
             <ul class="max-h-40 overflow-y-auto">
@@ -68,18 +71,18 @@
                 {{ c.nama_category }}
               </li>
               <li v-if="filteredCategories.length === 0" class="px-3 py-2 text-gray-500">
-                Tidak ada kategori
+                Kategori-nya gak nemu
               </li>
             </ul>
           </div>
         </div>
 
-        <!-- Button -->
+        <!-- Tombol buat update perubahan datanya -->
         <button
           type="submit"
           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
         >
-          Update
+          Update Sekarang
         </button>
       </form>
     </div>
@@ -93,7 +96,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted, watch } from 'vue'
 import { showError, showSuccess } from '@/utils/alert'
 
-// State
+// Siapin state buat nampung data list ama pilihan seller
 const ProductSeller = ref([])
 const categories = ref([])
 const form = ref({
@@ -104,18 +107,19 @@ const form = ref({
 const router = useRouter()
 const route = useRoute()
 
-// Dropdown state
+// Urusan status buka-tutup dropdown ama kata kunci cari
 const openDropdown = ref(null)
 const searchProduct = ref('')
 const searchCategory = ref('')
 const selectedProductName = ref('')
 const selectedCategoryName = ref('')
 
-// Toggle dropdown
+// Fungsi buat gonta-ganti dropdown mana yang mau dipantau
 const toggleDropdown = (type) => {
   openDropdown.value = openDropdown.value === type ? null : type
 }
 
+// Pas seller milih barang dagangannya
 const selectProduct = (product) => {
   form.value.product_id = product.id
   selectedProductName.value = product.nama_product
@@ -124,7 +128,7 @@ const selectProduct = (product) => {
 }
 
 
-// Select category
+// Pas seller milih kategorinya
 const selectCategory = (category) => {
   form.value.category_id = category.id
   selectedCategoryName.value = category.nama_category
@@ -132,11 +136,11 @@ const selectCategory = (category) => {
   searchCategory.value = ''
 }
 
-// Filtered list
+// List buat nampung hasil saringan pencarian
 const filteredProducts = ref([])
 const filteredCategories = ref([])
 
-// Ambil data produk seller
+// Fungsi tarik daftar produk milik si seller ini doang
 const getProducts = async (search = '') => {
   try {
     const res = await api.get('/product/myproducts', {
@@ -145,18 +149,18 @@ const getProducts = async (search = '') => {
     ProductSeller.value = res.data.data.data || []
     filteredProducts.value = ProductSeller.value
   } catch (err) {
-    console.error('Gagal ambil produk:', err)
+    console.error('Gagal ambil produk kamu nih:', err)
   }
 }
 
-// Ambil data kategori
+// Fungsi tarik semua daftar kategori yang ada
 const getCategories = async (search = '') => {
   try {
     const res = await api.get('/category', {
       params: { nama_category: search }
     })
 
-    // cek apakah res.data.data array atau object
+    // Cek respon datanya biar gak error pas dibaca
     let cats = []
     if (Array.isArray(res.data.data)) {
       cats = res.data.data
@@ -166,12 +170,13 @@ const getCategories = async (search = '') => {
     categories.value = cats
     filteredCategories.value = cats
   } catch (err) {
-    console.error('Gagal ambil kategori:', err)
+    console.error('Gagal ambil daftar kategori:', err)
     categories.value = []
     filteredCategories.value = []
   }
 }
 
+// Pantau kotak pencarian produk, pake timer biar gak boros request (debounce)
 let productTimeout
 watch(searchProduct, (newVal) => {
   clearTimeout(productTimeout)
@@ -180,6 +185,7 @@ watch(searchProduct, (newVal) => {
   }, 300)
 })
 
+// Pantau kotak pencarian kategori
 let categoryTimeout
 watch(searchCategory, (newVal) => {
   clearTimeout(categoryTimeout)
@@ -189,9 +195,11 @@ watch(searchCategory, (newVal) => {
 })
 
 
+// Fungsi utama buat ngirim data update ke server
 const submitForm = async () => {
+  // Pastiin dua-duanya udah kepilih biar gak ditolak server
   if (!form.value.product_id || !form.value.category_id) {
-    showError('Harap pilih produk dan kategori terlebih dahulu!')
+    showError('Pilih produk ama kategorinya dulu ya!')
     return
   }
   try {
@@ -199,14 +207,15 @@ const submitForm = async () => {
       product_id: form.value.product_id,
       category_id: form.value.category_id
     })
-    showSuccess('Kategori produk berhasil diperbarui!')
+    showSuccess('Relasi kategori produk udah diupdate, sip!')
   } catch (err) {
-    console.error('Gagal update kategori produk:', err)
-    showError(err.response?.data?.message || 'Gagal update kategori produk')
+    console.error('Gagal update relasi-nya:', err)
+    showError(err.response?.data?.message || 'Yah, gagal update nih.')
   }
 }
 
 
+// Pas halaman dibuka, langsung sikat ambil datanya
 onMounted(() => {
   getProducts()
   getCategories()

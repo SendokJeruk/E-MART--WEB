@@ -1,11 +1,13 @@
 <template>
   <div class="flex h-screen">
+    <!-- Overlay transparan pas sidebar mobile kebuka -->
     <div
       v-if="isSidebarOpen"
       @click="toggleSidebar"
       class="fixed inset-0 z-30 bg-transparent lg:hidden transition-opacity duration-300 ease-in-out"
     ></div>
 
+    <!-- Sidebar seller, isinya menu-menu buat jualan -->
     <div
       :class="[ 
         'fixed z-40 lg:static flex h-full flex-col justify-between border-e border-gray-100 transition-transform duration-300 ease-in-out', 
@@ -17,6 +19,7 @@
       <div class="px-4 py-6 h-full flex flex-col justify-center">
         <ul class="space-y-1">
 
+          <!-- Menu navigasi seller, ada yang dimatiin kalo belom punya toko -->
           <li>
             <router-link
               to="/seller"
@@ -94,7 +97,9 @@
       </div>
     </div>
 
+    <!-- Konten di sebelah sidebar -->
     <div class="flex-1 p-4 lg:p-8 bg-gray-100 w-full overflow-auto">
+      <!-- Tombol menu hamburger buat mobile -->
       <button
         @click="toggleSidebar"
         class="lg:hidden mb-4 inline-flex items-center rounded-md bg-[#7D0A0A] px-4 py-2 text-white hover:bg-[#A61D1D] navbar-font"
@@ -102,6 +107,7 @@
         ☰ Menu
       </button>
 
+      <!-- View-view seller bakal nongol di sini -->
       <router-view />
       <slot/>
     </div>
@@ -119,6 +125,7 @@ const hasToko = ref(false)
 const isSidebarOpen = ref(false)
 const router = useRouter()
 
+// Fungsi buat ngatur warna menu yang lagi aktif atau lagi dikunci
 function linkClass(path) {
   return [
     'text-white',
@@ -127,12 +134,14 @@ function linkClass(path) {
   ]
 }
 
+// Cek profil user buat nentuin boleh masuk sini apa gak
 const getProfile = async () => {
   try {
     const res = await api.get('/profile')
     user.value = res.data.data
     const role = user.value.nama_role
 
+    // Tendang balik kalo ternyata admin atau buyer nyasar kesini
     if (role === 'admin') {
       router.push('/admin')
       return
@@ -149,13 +158,16 @@ const getProfile = async () => {
   }
 }
 
+// Cek apakah seller ini udah bikin toko apa belom
 const getToko = async () => {
   try {
     const res = await api.get('/toko')
     const alltoko = res.data.data.data
+    // Filter toko yang punya user ini doang
     tokoseller.value = alltoko.filter(t => t.user_id === user.value.id)
     hasToko.value = tokoseller.value.length > 0
 
+    // Kalo belom punya toko, paksa bikin dulu
     if (!hasToko.value && router.currentRoute.value.path !== '/create-toko') {
       router.push('/create-toko')
     }
@@ -166,6 +178,7 @@ onMounted(() => {
   getProfile()
 })
 
+// Fungsi saklar sidebar mobile
 function toggleSidebar() {
   isSidebarOpen.value = !isSidebarOpen.value
 }

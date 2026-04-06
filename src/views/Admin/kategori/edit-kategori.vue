@@ -2,6 +2,7 @@
     <adminside>
       <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
         <h2 class="text-xl font-bold mb-4">Form Edit Kategori</h2>
+        <!-- Form buat ngubah kategori yang udah ada -->
         <form @submit.prevent="submitForm">
           <div class="mb-4">
             <label for="nama_category" class="block mb-1">Nama Kategori</label>
@@ -35,14 +36,17 @@ import { showSuccess } from '@/utils/alert'
 const route = useRoute()
 const router = useRouter()
 
+// Tempat nampung nama kategori pas lagi diedit
 const form = ref({
   nama_category: '',
 })
 
+// Fungsi buat ngirim updatean kategori ke server
 const submitForm = async () => {
   try {
     const formData = new FormData()
     formData.append('nama_category', form.value.nama_category)
+    // Laravel minta '_method' PUT kalo ngirim data lewat FormData
     formData.append('_method', 'PUT')  
     
     const response = await api.post(`/category/${route.params.id}`, formData, {
@@ -52,6 +56,7 @@ const submitForm = async () => {
     })
 
     showSuccess('Kategori berhasil diperbarui!')
+    // Kalo udah kelar, balikin admin ke daftar kategori
     router.push('/kategori') 
   } catch (error) {
     console.error('Gagal submit form:', error)

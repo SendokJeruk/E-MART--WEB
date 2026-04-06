@@ -3,7 +3,7 @@
     <div class="p-6 overflow-x-auto">
       <h1 class="text-2xl font-bold mb-4">Settings</h1>
 
-      <!-- TABLE SETTINGS -->
+      <!-- Tabel buat nampilin semua settingan aplikasi kita -->
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-auto divide-y divide-gray-200">
           <thead class="bg-gray-200">
@@ -16,7 +16,7 @@
 
           <tbody class="divide-y divide-gray-200">
 
-            <!-- Skeleton loading -->
+            <!-- Skeleton tabel pas lagi loading narik settingan -->
             <template v-if="isLoading">
               <tr v-for="n in 5" :key="n">
                 <td class="px-6 py-4"><Skeleton height="14px" width="70%"/></td>
@@ -28,17 +28,18 @@
               </tr>
             </template>
 
-            <!-- Data -->
+            <!-- Ini data settingan aslinya -->
             <template v-else>
               <tr v-for="item in settings" :key="item.id">
 
-                <!-- NAME -->
+                <!-- Nama settingannya (key) -->
                 <td class="px-6 py-4 text-sm font-medium">
                   {{ item.name }}
                 </td>
 
-                <!-- VALUE -->
+                <!-- Nilai settingannya, bisa disembunyiin atau diedit -->
                 <td class="px-6 py-4 text-sm">
+                  <!-- Kalo lagi mode edit, nongol inputan -->
                   <input
                     v-if="editing[item.id]"
                     v-model="item.value"
@@ -46,15 +47,16 @@
                     class="border rounded px-2 py-1 w-full"
                   />
 
+                  <!-- Kalo lagi biasa, nongol teks-nya (atau disensor titik-titik) -->
                   <span v-else>
                     {{ shown[item.id] ? item.value : maskValue(item.value) }}
                   </span>
                 </td>
 
-                <!-- ACTION -->
+                <!-- Tombol-tombol aksi -->
                 <td class="px-6 py-4 space-x-2">
 
-                  <!-- MODE EDIT -->
+                  <!-- Tombol pas lagi dalam mode Edit -->
                   <template v-if="editing[item.id]">
                     <button
                       @click="saveEdit(item)"
@@ -71,7 +73,7 @@
                     </button>
                   </template>
 
-                  <!-- MODE NORMAL -->
+                  <!-- Tombol pas lagi dalam mode Lihat (Normal) -->
                   <template v-else>
                     <button
                       @click="toggleShow(item.id)"
@@ -100,101 +102,73 @@
 </template>
 
 <script setup>
-/*
-  Komponen Settings:
-  - Menampilkan daftar setting
-  - Show / hide value
-  - Edit value
-  - Konfirmasi sebelum save
-  - Notifikasi success / error
-*/
-
 import adminside from '@/components/navbar/admin-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import api from '@/plugins/axios'
 import { showConfirm, showError, showSuccess } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
-/*
-  STATE
-*/
+// Siapin state buat nampung settingan ama status tampilannya
 const settings = ref([])
-const shown = ref({})
-const editing = ref({})
-const originalValues = ref({})
+const shown = ref({}) // Buat nyatet settingan mana yang lagi di-unmask
+const editing = ref({}) // Buat nyatet settingan mana yang lagi diedit
+const originalValues = ref({}) // Buat backup kalo admin batal edit
 const isLoading = ref(true)
 
-/*
-  Mask value (untuk sembunyikan data sensitif)
-*/
+// Fungsi buat nyensor data sensitif pake titik-titik biar aman
 const maskValue = (val) => {
   if (!val) return ""
   return "•".repeat(Math.min(val.length, 8))
 }
 
-/*
-  Toggle show/hide value
-*/
+// Saklar buat buka tutup sensor teks
 const toggleShow = (id) => {
   shown.value[id] = !shown.value[id]
 }
 
-/*
-  Enable edit mode
-*/
+// Fungsi buat nyalain mode edit buat baris tertentu
 const enableEdit = (id) => {
   editing.value[id] = true
 
-  /* simpan nilai awal untuk cancel */
+  /* Simpen dulu nilai aslinya, sapa tau admin khilaf terus mau cancel */
   const item = settings.value.find(s => s.id === id)
   originalValues.value[id] = item.value
 }
 
-/*
-  Cancel edit:
-  - kembalikan nilai lama
-*/
+// Fungsi buat batalin edit ama balikin ke nilai awal
 const cancelEdit = (id) => {
   const item = settings.value.find(s => s.id === id)
   item.value = originalValues.value[id]
   editing.value[id] = false
 }
 
-/*
-  Save edit:
-  - pakai confirm
-  - kirim ke backend
-  - tampilkan success / error
-*/
+// Fungsi buat nyimpen perubahan settingan ke database
 const saveEdit = async (item) => {
 
-  /* konfirmasi sebelum save */
+  /* Nanya dulu beneran yakin mau diubah apa kagak */
   const confirm = await showConfirm('Yakin ingin mengubah setting ini?')
   if (!confirm) return
 
   try {
+    // Bikin payload pake nama settingannya sebagai key
     const payload = {
       [item.name]: item.value
     }
 
     await api.post('/setting', payload)
 
+    // Matiin mode editnya
     editing.value[item.id] = false
 
-    /* notifikasi sukses */
     showSuccess('Setting berhasil diupdate')
 
   } catch (error) {
     console.error("Error updating setting:", error)
-
-    /* notifikasi error */
     showError('Gagal mengupdate setting')
   }
 }
 
-/*
-  Ambil data setting dari backend
-*/
+// Tarik semua data settingan dari server
 const getSettings = async () => {
   try {
     isLoading.value = true
@@ -202,7 +176,7 @@ const getSettings = async () => {
     const response = await api.get('/setting')
     settings.value = response.data.data
 
-    /* inisialisasi state */
+    /* Inisialisasi status sensor ama mode edit buat semua baris */
     settings.value.forEach(item => {
       shown.value[item.id] = false
       editing.value[item.id] = false
@@ -216,9 +190,7 @@ const getSettings = async () => {
   }
 }
 
-/*
-  Lifecycle
-*/
+// Pas halaman dibuka, langsung sikat datanya
 onMounted(() => {
   getSettings()
 })

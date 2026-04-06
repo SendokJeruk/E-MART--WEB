@@ -3,19 +3,19 @@
 
   <div class="p-4 space-y-4 bg-[#FFF5F5] min-h-screen">
 
-    <!-- Judul -->
+    <!-- Judul halaman checkout -->
     <h1 class="text-xl font-bold navbar-font mb-4">| Checkout</h1>
 
-    <!-- ================= LOADING ================= -->
+    <!-- Tampilan loading skeleton biar user tau sistem lagi mikir itung-itungan ongkir -->
     <template v-if="isLoading">
 
-      <!-- skeleton alamat -->
+      <!-- skeleton buat area milih alamat -->
       <div class="bg-white rounded-lg shadow p-4 space-y-3">
         <Skeleton width="150px" height="18px"/>
         <Skeleton width="100%" height="40px"/>
       </div>
 
-      <!-- skeleton toko -->
+      <!-- skeleton buat area daftar barang tiap toko -->
       <div
         v-for="n in 2"
         :key="n"
@@ -43,7 +43,7 @@
 
       </div>
 
-      <!-- skeleton rincian -->
+      <!-- skeleton buat rincian totalan duit -->
       <div class="bg-white rounded-lg shadow p-4 space-y-2">
         <Skeleton width="150px" height="18px"/>
         <Skeleton width="100%" height="14px"/>
@@ -51,16 +51,16 @@
         <Skeleton width="100%" height="14px"/>
       </div>
 
-      <!-- skeleton button -->
+      <!-- skeleton buat tombol bayar -->
       <Skeleton width="100%" height="45px"/>
 
     </template>
 
 
-    <!-- ================= CHECKOUT DATA ================= -->
+    <!-- Tampilan asli pas semua data udah siap diolah -->
     <template v-else-if="checkout.length">
 
-      <!-- Pilihan Alamat -->
+      <!-- Bagian buat milih alamat pengiriman yang mau dipake -->
       <div class="bg-white rounded-lg shadow p-4">
         <h3 class="font-semibold mb-3">Alamat Pengiriman</h3>
 
@@ -79,12 +79,13 @@
             {{ alamat.label }}
           </option>
 
+          <!-- Pilihan kalo user mau nambah alamat baru pas lagi checkout -->
           <option value="create">+ Tambah Alamat Baru</option>
         </select>
       </div>
 
 
-      <!-- Checkout per toko -->
+      <!-- List barang belanjaan, dipisah per toko biar ongkirnya gak nyampur -->
       <div class="space-y-5">
 
         <div
@@ -98,7 +99,7 @@
           </h2>
 
 
-          <!-- Produk -->
+          <!-- Daftar barang-barang dari satu toko ini -->
           <div
             v-for="item in toko.items"
             :key="item.product_id"
@@ -112,7 +113,7 @@
 
             <div class="flex-1">
               <h3 class="text-base font-semibold text-gray-800">
-                {{ item.nama_product || 'Produk tidak ditemukan' }}
+                {{ item.nama_product || 'Produk gak jelas' }}
               </h3>
 
               <p class="text-sm font-bold text-red-600 mt-1">
@@ -123,6 +124,7 @@
             <div class="flex flex-col items-end gap-2">
               <span class="text-sm">x{{ item.jumlah }}</span>
 
+              <!-- Tombol silang buat ngebatalin barang tertentu kalo gak jadi beli -->
               <button
                 @click="deleteProductscheckout(item.detail_transaction_id, toko.toko_id)"
                 class="text-red-500 text-xs"
@@ -134,7 +136,7 @@
           </div>
 
 
-          <!-- Kurir -->
+          <!-- Bagian buat milih mau pake kurir apa -->
           <div>
             <h3 class="font-semibold mb-2 text-sm">Pilih Kurir</h3>
 
@@ -143,7 +145,7 @@
               @change="postRajaOngkir(toko)"
               class="border rounded p-2 w-full text-sm"
             >
-              <option disabled value="">-- Pilih Kurir --</option>
+              <option disabled value="">-- Mau kirim pake apa? --</option>
 
               <option
                 v-for="kurir in kurirList"
@@ -156,7 +158,7 @@
           </div>
 
 
-          <!-- Service -->
+          <!-- Bagian buat milih paket layanan kurirnya (Reguler, YES, dll) -->
           <div
             v-if="toko.items[0].ongkirList?.length"
             class="mt-2"
@@ -173,7 +175,7 @@
             >
 
               <option disabled value="">
-                -- Pilih Layanan --
+                -- Pilih jenis paketnya --
               </option>
 
               <option
@@ -183,7 +185,7 @@
               >
                 {{ ongkir.service }}
                 - Rp {{ formatRupiah(ongkir.cost) }}
-                ({{ ongkir.etd }})
+                ({{ ongkir.etd }} hari)
               </option>
 
             </select>
@@ -193,7 +195,7 @@
         </div>
 
 
-        <!-- Rincian Pembayaran -->
+        <!-- Kotak rincian totalan duit yang harus dikeluarin -->
         <div class="bg-white rounded-lg shadow p-4">
 
           <h3 class="font-semibold mb-3">
@@ -202,6 +204,7 @@
 
           <div class="text-sm space-y-1">
 
+            <!-- List harga tiap barang -->
             <div
               v-for="toko in checkout"
               :key="toko.toko_id"
@@ -224,6 +227,7 @@
             </div>
 
 
+            <!-- Info biaya tambahan: ongkir ama admin -->
             <div class="flex justify-between text-gray-500">
               <span>Total Ongkir</span>
               <span>Rp {{ formatRupiah(totalOngkir) }}</span>
@@ -236,8 +240,9 @@
 
             <hr class="my-2">
 
+            <!-- Angka keramat: total belanjaan akhir -->
             <div class="flex justify-between font-bold">
-              <span>Total</span>
+              <span>Total Akhir</span>
 
               <span class="text-[#7D0A0A]">
                 Rp {{ formatRupiah(totalHarga) }}
@@ -249,7 +254,7 @@
         </div>
 
 
-        <!-- Button -->
+        <!-- Tombol buat lanjut ke proses bayar pake Midtrans -->
         <div class="bg-white rounded-lg shadow p-4">
 
           <button
@@ -268,11 +273,11 @@
     </template>
 
 
-    <!-- ================= EMPTY ================= -->
+    <!-- Tampilan kalo data checkout-nya tiba-tiba ilang atau kosong -->
     <template v-else>
 
       <div class="text-center py-20 text-gray-400">
-        Checkout masih kosong...
+        Checkout masih kosong nih...
       </div>
 
     </template>
