@@ -168,7 +168,16 @@ const updateProfile = async () => {
     getProfile();
   } catch (error) {
     console.error('Gagal update profil:', error);
-    showError('Gagal update profil');
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
+    
   } finally {
     isLoading.value = false;
   }

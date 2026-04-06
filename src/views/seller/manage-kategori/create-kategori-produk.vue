@@ -82,10 +82,10 @@ const router = useRouter()
 const ProductSeller = ref([])
 const categories = ref([])
 
-// Form params: pakai nama_product & nama_category
+// Form params: pakai product_id & category_id
 const form = ref({
-  product: '',
-  category: ''
+  product_id: '',
+  category_id: ''
 })
 
 // Search & filtered lists
@@ -124,6 +124,7 @@ const getCategories = async (search = '') => {
 let productTimeout;
 const filterProducts = () => {
   showProductDropdown.value = true
+  form.value.product_id = ''
   clearTimeout(productTimeout);
   productTimeout = setTimeout(() => {
     getProduct(productSearch.value);
@@ -133,6 +134,7 @@ const filterProducts = () => {
 let categoryTimeout;
 const filterCategories = () => {
   showCategoryDropdown.value = true
+  form.value.category_id = ''
   clearTimeout(categoryTimeout);
   categoryTimeout = setTimeout(() => {
     getCategories(categorySearch.value);
@@ -140,13 +142,13 @@ const filterCategories = () => {
 }
 
 const selectProduct = (product) => {
-  form.value.product = product.nama_product
+  form.value.product_id = product.id
   productSearch.value = product.nama_product
   showProductDropdown.value = false
 }
 
 const selectCategory = (category) => {
-  form.value.category = category.nama_category
+  form.value.category_id = category.id
   categorySearch.value = category.nama_category
   showCategoryDropdown.value = false
 }
@@ -157,13 +159,20 @@ const submitForm = async () => {
     console.log('Data dikirim:', form.value)
     const response = await api.post('/category-product', form.value)
     showSuccess('Category Produk Berhasil Ditambahkan!')
-    form.value = { product: '', category: '' }
+    form.value = { product_id: '', category_id: '' }
     productSearch.value = ''
     categorySearch.value = ''
     router.push('/manage-kategori-produk')
   } catch (error) {
-    console.error(error.response?.data)
-    showError(error.response?.data?.message || 'Gagal menambahkan produk')
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 }
 

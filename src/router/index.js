@@ -320,10 +320,13 @@ const router = createRouter({
   Halaman yang boleh diakses tanpa login
 */
 const publicPages = [
-  '/dashboard',
-  '/login',
-  '/register'
-]
+    '/dashboard',
+    '/login',
+    '/register',
+    '/verify',
+    '/forget-password',
+    '/reset-password'
+  ]
 
 /*
   Validasi tambahan untuk route dinamis /produk/:id

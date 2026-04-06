@@ -138,7 +138,7 @@ import adminside from '@/components/navbar/admin-side.vue'
 import { ref, onMounted } from 'vue'
 import api from "@/plugins/axios"
 import Skeleton from '@/components/Skeleton.vue'
-import { showSuccess } from '@/utils/alert'
+import { showConfirm, showSuccess } from '@/utils/alert'
 
 /* STATE */
 const categories = ref([])
@@ -218,7 +218,7 @@ const handleSearch = () => {
   Delete kategori
 */
 const deleteCategory = async (id) => {
-  if (!confirm('Yakin ingin menghapus kategori ini?')) return
+  if (!await showConfirm('Yakin ingin menghapus kategori ini?')) return
 
   try {
     await api.delete(`/category/${id}`)

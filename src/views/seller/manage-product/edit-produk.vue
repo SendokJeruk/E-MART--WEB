@@ -202,8 +202,9 @@ const submitForm = async () => {
       formData.append('foto_cover', form.value.foto_cover);  
     }
 
+    formData.append('_method', 'PUT');
 
-    await api.put(`/product/${route.params.id}`, formData, {
+    await api.post(`/product/${route.params.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

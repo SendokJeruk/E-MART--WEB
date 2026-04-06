@@ -83,6 +83,7 @@ import { useRouter } from 'vue-router'
 import api from "@/plugins/axios"
 import buttonred from "@/components/button/buttonred.vue"
 import Skeleton from "@/components/Skeleton.vue"
+import { showConfirm, showError } from '@/utils/alert'
 
 const search = ref('')
 const isLoading = ref(false)
@@ -149,7 +150,7 @@ const searchBar = async () => {
   - redirect ke login
 */
 const logout = async () => {
-  const confirmed = window.confirm("Are you sure you want to log out?")
+  const confirmed = await showConfirm("Anda yakin mau logout ? ")
   if (!confirmed) return
 
   try {
@@ -158,7 +159,7 @@ const logout = async () => {
     user.value = null
     router.push('/login')
   } catch (error) {
-    alert('Logout failed, please try again.')
+    showError('Logout failed, please try again.')
   }
 }
 
