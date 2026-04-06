@@ -201,6 +201,7 @@ const user = ref({})
 const requests = ref([])
 const selectedItem = ref(null)
 const note = ref('')
+const admin_note = ref('')
 const isLoading = ref(true)
 const pagination = ref({
   current_page: 1,

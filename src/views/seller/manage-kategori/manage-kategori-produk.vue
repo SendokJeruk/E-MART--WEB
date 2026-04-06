@@ -92,14 +92,14 @@
 import sellerside from '@/components/navbar/seller-side.vue';
 import { ref, onMounted, computed } from 'vue';
 import api from "@/plugins/axios";
-import { showError, showSuccess } from '@/utils/alert';
+import { showError, showSuccess, showConfirm } from '@/utils/alert';
 
 const user = ref({});
-const categoryProducts = ref([]);
+const allCategoryProducts = ref([]);
 
 // Pagination
 const currentPage = ref(1);
-const lastPage = ref(1);
+const itemsPerPage = 10;
 
 // ambil profile
 const getProfile = async () => {
@@ -111,22 +111,33 @@ const getProfile = async () => {
   }
 };
 
-// ambil data pivot dengan pagination
-const getCategoryProduct = async (page = 1) => {
+// ambil seluruh data pivot untuk digroup di frontend
+const getCategoryProduct = async () => {
   try {
-    const response = await api.get(`/category-product?page=${page}`);
-    categoryProducts.value = response.data.data.data; 
-    currentPage.value = response.data.data.current_page;
-    lastPage.value = response.data.data.last_page;
+    let page = 1;
+    let totalPages = 1;
+    let allData = [];
+    
+    do {
+      const response = await api.get(`/category-product?page=${page}`);
+      allData = allData.concat(response.data.data.data);
+      totalPages = response.data.data.last_page || 1;
+      page++;
+    } while (page <= totalPages);
+    
+    allCategoryProducts.value = allData;
   } catch (error) {
     console.error('Error fetching category product:', error);
   }
 };
 
-// transform → group by product
-const groupedProducts = computed(() => {
+// transform → group by product (seluruh data)
+const groupedProductsAll = computed(() => {
   const map = {};
-  categoryProducts.value.forEach(item => {
+  allCategoryProducts.value.forEach(item => {
+    // Pastikan item.product ada
+    if (!item.product) return;
+    
     const p = item.product;
     if (!map[p.id]) {
       map[p.id] = {
@@ -136,21 +147,37 @@ const groupedProducts = computed(() => {
       };
     }
     map[p.id].categories.push({
-      id: item.category.id,
-      nama: item.category.nama_category,
+      id: item.category?.id,
+      nama: item.category?.nama_category,
       pivotId: item.id
     });
   });
   return Object.values(map);
 });
 
+// Hitung last page berdasarkan data yang sudah di-group
+const lastPage = computed(() => {
+  return Math.ceil(groupedProductsAll.value.length / itemsPerPage) || 1;
+});
+
+// Data untuk page saat ini
+const groupedProducts = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return groupedProductsAll.value.slice(start, start + itemsPerPage);
+});
+
 const deleteCategoryProduct = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus kategori ini dari produk ini?');
+  const konfirmasi = await showConfirm('Yakin ingin menghapus kategori ini dari produk ini?');
   if (!konfirmasi) return;
 
   try {
     await api.delete(`/category-product/${id}`);
-    await getCategoryProduct(currentPage.value); // refresh page yang sama
+    await getCategoryProduct(); // refresh seluruh data
+    
+    // Sesuaikan currentPage jika data kosong di halaman terakhir
+    if (currentPage.value > lastPage.value) {
+      currentPage.value = lastPage.value;
+    }
     showSuccess('Kategori berhasil dihapus.');
   } catch (error) {
     console.error('Gagal menghapus kategori dari produk:', error);
@@ -159,9 +186,9 @@ const deleteCategoryProduct = async (id) => {
 };
 
 // ganti page
-const changePage = async (page) => {
+const changePage = (page) => {
   if (page < 1 || page > lastPage.value) return;
-  await getCategoryProduct(page);
+  currentPage.value = page;
 };
 
 onMounted(async () => {

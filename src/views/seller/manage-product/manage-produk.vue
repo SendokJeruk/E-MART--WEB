@@ -212,7 +212,7 @@ import sellerside from '@/components/navbar/seller-side.vue';
 import { ref, onMounted } from 'vue';
 import api from "@/plugins/axios";
 import Skeleton from '@/components/Skeleton.vue';
-import { showSuccess, showError } from '@/utils/alert';
+import { showSuccess, showError, showConfirm } from '@/utils/alert';
 
 const product = ref([]);
 const user = ref({});
@@ -222,7 +222,7 @@ const lastPage = ref(1);
 const searchQuery = ref(''); 
 
 const deleteProduct = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus Produk ini?');
+  const konfirmasi = await showConfirm('Yakin ingin menghapus Produk ini?');
   if (!konfirmasi) return;
 
   try {
