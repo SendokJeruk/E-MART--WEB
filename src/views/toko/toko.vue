@@ -14,19 +14,8 @@
       <!-- Informasi Toko -->
       <div class="flex-1">
         <h1 class="text-2xl font-bold text-[#7D0A0A]">{{ toko.nama_toko }}</h1>
-        <p class="text-sm text-gray-600">{{ toko.follower_count || '0' }} Followers</p>
         <p class="text-yellow-600 font-semibold">⭐ {{ toko.rating || '0.0' }}</p>
-      </div>
-
-      <!-- Tombol aksi Follow & Chat -->
-      <div class="flex gap-2">
-        <button class="border border-[#7D0A0A] text-[#7D0A0A] px-4 py-1 rounded-lg">
-          + Follow
-        </button>
-        <button class="bg-[#7D0A0A] text-white px-4 py-1 rounded-lg">
-          Chat
-        </button>
-      </div>
+      </div>      
     </div>
 
     <!-- Tab Navigasi Toko -->
@@ -34,8 +23,6 @@
       <button class="pb-2 border-b-2 border-[#7D0A0A] text-[#7D0A0A] font-semibold">
         Toko
       </button>
-      <button class="pb-2 text-gray-600 hover:text-[#7D0A0A]">Produk</button>
-      <button class="pb-2 text-gray-600 hover:text-[#7D0A0A]">Kategori</button>
     </div>
 
     <!-- Banner Toko -->
@@ -55,7 +42,8 @@
       <div
         v-for="product in products"
         :key="product.id"
-        class="border rounded-lg p-2 text-center text-sm"
+        @click="goToProduct(product.id)"
+        class="border rounded-lg p-2 text-center text-sm cursor-pointer hover:shadow-md hover:scale-[1.02] transition"
       >
         <!-- Gambar produk -->
         <div class="bg-gray-100 h-28 flex items-center justify-center">
@@ -91,12 +79,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute,useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import Navbar from '@/components/navbar/navbar.vue'
 
 // Route untuk ambil parameter nama_toko dari URL
 const route = useRoute()
+const router = useRouter()
 
 // State
 const toko = ref(null)         // Data toko saat ini
@@ -137,6 +126,10 @@ const getTokoByName = async () => {
 const formatRupiah = (value) =>
   new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(value)
 
+
+const goToProduct = (id) => {
+  router.push(`/produk/${id}`)
+}
 onMounted(() => {
   getTokoByName()
 })
