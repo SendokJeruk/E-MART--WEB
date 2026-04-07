@@ -121,17 +121,26 @@ const doSearch = (data) => {
 
 // Fungsi cek role user & redirect jika admin
 const checkRoleAndRedirect = async () => {
+  if (!localStorage.getItem("token")) return
+
   try {
     const response = await api.get('/profile')
+
     const role = response.data.data.nama_role
     userName.value = response.data.data.name
     userRole.value = role
 
     if (role === 'admin') {
-      router.push('/admin') // Redirect admin ke halaman admin
+      router.push('/admin')
     }
-  } catch {
-    isLoggedIn.value = false
+
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      console.log("LOGIS MAS")
+      isLoggedIn.value = false
+      return
+    }
+    console.error(error)
   }
 }
 
