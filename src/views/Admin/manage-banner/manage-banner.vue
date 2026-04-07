@@ -217,6 +217,7 @@ const handleFile = (e) => {
 
 /* ================= CREATE ================= */
 const submitForm = async () => {
+  console.log("TEST SUBMIT")
   if (!form.value.section || !form.value.file) {
     return showError('Semua field harus diisi!')
   }
@@ -225,6 +226,7 @@ const submitForm = async () => {
     const formData = new FormData()
     formData.append('section', form.value.section)
     formData.append('image', form.value.file)
+    console.log(form.value.file)
 
     const res = await api.post('/content', formData, {
       headers: {
@@ -261,6 +263,8 @@ const openEdit = (banner) => {
 
 const updateBanner = async () => {
   try {
+    console.log(form.value.file)
+
     const formData = new FormData()
     formData.append('section', form.value.section)
 
@@ -268,15 +272,33 @@ const updateBanner = async () => {
       formData.append('image', form.value.file)
     }
 
-    const res = await api.post(`/content/${selectedId.value}?_method=PUT`, formData)
+    const res = await api.post(`/content/${selectedId.value}?_method=PUT`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
 
-    const index = banners.value.findIndex(b => b.id === selectedId.value)
-    banners.value[index] = res.data.data
-
-    showSuccess('Banner berhasil diupdate!')
-    closeModal()
+    if (res.data?.data) {
+      const index = banners.value.findIndex(b => b.id === selectedId.value)
+      if (index !== -1) {
+        banners.value[index] = res.data.data
+      }
+      showSuccess('Banner berhasil diupdate!')
+      closeModal()
+    } else {
+      throw new Error('Data tidak ditemukan dalam respon')
+    }
   } catch (err) {
-    showError(err.response?.data?.message || 'Gagal update')
+    console.error(err)
+    const errors = err.response?.data?.errors;
+    let errorMessage = err.response?.data?.message || 'Gagal update banner.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 }
 
