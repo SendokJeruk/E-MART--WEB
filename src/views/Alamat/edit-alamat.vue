@@ -1,11 +1,14 @@
 <template>
   <Navbar />
   <div class="max-w-2xl mx-auto p-6">
-    <h2 class="text-2xl font-bold mb-6 text-gray-800">Tambah Alamat</h2>
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Alamat</h2>
     
-    <form @submit.prevent="tambahAlamat" class="space-y-5 bg-white p-6 rounded-xl shadow-md">
+    <div v-if="isLoading" class="text-center py-10">
+      <p class="text-gray-500">Memuat data alamat...</p>
+    </div>
+
+    <form v-else @submit.prevent="updateAlamat" class="space-y-5 bg-white p-6 rounded-xl shadow-md">
       
-      <!-- Label Alamat -->
       <div>
         <label class="block mb-1 font-semibold text-gray-700">Label Alamat</label>
         <input 
@@ -16,7 +19,6 @@
         />
       </div>
 
-      <!-- Provinsi -->
       <div>
         <label class="block mb-1 font-semibold text-gray-700">Provinsi</label>
         <select 
@@ -29,7 +31,6 @@
         </select>
       </div>
 
-      <!-- Kota -->
       <div v-if="cities.length">
         <label class="block mb-1 font-semibold text-gray-700">Kota/Kabupaten</label>
         <select 
@@ -42,7 +43,6 @@
         </select>
       </div>
 
-      <!-- Kecamatan -->
       <div v-if="districts.length">
         <label class="block mb-1 font-semibold text-gray-700">Kecamatan</label>
         <select 
@@ -55,7 +55,6 @@
         </select>
       </div>
 
-      <!-- Kelurahan -->
       <div v-if="subdistricts.length">
         <label class="block mb-1 font-semibold text-gray-700">Kelurahan</label>
         <select 
@@ -67,7 +66,6 @@
         </select>
       </div>
 
-      <!-- Kode Domestik & Zip -->
       <div class="flex justify-between items-center">
         <div v-if="showKodeDomestik" class="text-green-700 font-semibold">
           Kode Domestik: {{ form.kode_domestik }} <br />
@@ -75,7 +73,6 @@
         </div>
       </div>
 
-      <!-- Dropdown jika multiple searchResults -->
       <div v-if="searchResults.length" class="border rounded p-3 max-h-48 overflow-auto mt-3 bg-gray-50">
         <p class="mb-2 font-semibold">Pilih alamat yang sesuai:</p>
         <ul>
@@ -100,7 +97,6 @@
         />
       </div>
 
-      <!-- Detail Alamat -->
       <div>
         <label class="block mb-1 font-semibold text-gray-700">Detail Alamat</label>
         <textarea 
@@ -110,18 +106,15 @@
         ></textarea>
       </div>
 
-      <!-- Submit -->
-      <div class="flex justify-end">
+      <div class="flex justify-end gap-3">
+        <router-link to="/alamat" class="bg-gray-300 hover:bg-gray-400 transition text-gray-800 font-semibold px-6 py-2 rounded-lg shadow">
+          Batal
+        </router-link>
         <button type="submit" class="bg-red-600 hover:bg-red-700 transition text-white font-semibold px-6 py-2 rounded-lg shadow">
-          Simpan
+          Perbarui
         </button>
       </div>
 
-      <!-- Pesan -->
-      <div v-if="successMessage" class="text-green-600 font-medium">{{ successMessage }}</div>
-      <!-- <div v-if="errorMessages" class="text-red-600 space-y-1">
-        <div v-for="(msg, key) in errorMessages" :key="key">{{ msg }}</div>
-      </div> --> 
     </form>
   </div>
 </template>
@@ -131,17 +124,17 @@ import Navbar from '@/components/navbar/navbar.vue';
 import { ref, watch, onMounted } from 'vue';
 import api from "@/plugins/axios";
 import { showSuccess, showError } from '@/utils/alert';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
 
 const provinces = ref([]);
 const cities = ref([]);
 const districts = ref([]);
 const subdistricts = ref([]);
 const showKodeDomestik = ref(false);
-const successMessage = ref('');
-const errorMessages = ref([]);
+const isLoading = ref(true);
 
 const form = ref({
   nama_penerima: '',
@@ -156,9 +149,10 @@ const form = ref({
 });
 
 const searchResults = ref([]);
+let isInitialLoad = true;
 
 watch(() => form.value.subdistrict_name, (newVal) => {
-  if (!newVal) return;
+  if (!newVal || isInitialLoad) return;
   const { subdistrict_name, district_name, city_name, province_name } = form.value;
   const parts = [subdistrict_name, district_name, city_name, province_name].filter(Boolean);
   form.value.label = parts.join(', ');
@@ -166,21 +160,54 @@ watch(() => form.value.subdistrict_name, (newVal) => {
   cariKodeDomestik();
 });
 
-const tambahAlamat = async () => {
+const fetchAlamatData = async () => {
   try {
-    const response = await api.post('/alamat', form.value);
-    successMessage.value = response.data.message || 'Alamat berhasil disimpan';
-    showSuccess(successMessage.value);
+    const response = await api.get(`/alamat`);
+    const alamatList = response.data.data.data;
+    const alamat = alamatList.find(a => a.id == route.params.id);
 
-    // Delay dikit biar user lihat pesan sukses
+    if (alamat) {
+      form.value = { ...alamat };
+      
+      // Load hierarchical dropdowns
+      await dapat_Alamat(); // loads provinces
+      const selectedProv = provinces.value.find(p => p.name === alamat.province_name);
+      if (selectedProv) {
+        await loadCitiesForProvince(selectedProv.id);
+        const selectedCity = cities.value.find(c => c.name === alamat.city_name);
+        if (selectedCity) {
+          await loadDistrictsForCity(selectedCity.id);
+          const selectedDist = districts.value.find(d => d.name === alamat.district_name);
+          if (selectedDist) {
+            await loadVillagesForDistrict(selectedDist.id);
+          }
+        }
+      }
+      
+      showKodeDomestik.value = true;
+    } else {
+      showError('Data alamat tidak ditemukan');
+      router.push('/alamat');
+    }
+  } catch (error) {
+    console.error(error);
+    showError('Gagal memuat data alamat');
+  } finally {
+    isInitialLoad = false;
+    isLoading.value = false;
+  }
+};
+
+const updateAlamat = async () => {
+  try {
+    await api.put(`/alamat/${route.params.id}`, form.value);
+    showSuccess('Alamat berhasil diperbarui');
     setTimeout(() => {
-      router.back(); // balik ke halaman sebelumnya
+      router.push('/alamat');
     }, 1000);
-
   } catch (error) {
     if (error.response && error.response.status === 422) {
       const messages = Object.values(error.response.data.errors).flat();
-      errorMessages.value = messages;
       showError(messages.join('\n'));
     } else {
       showError('Terjadi kesalahan server');
@@ -188,70 +215,71 @@ const tambahAlamat = async () => {
   }
 };
 
-
-// Ambil provinsi
 const dapat_Alamat = async () => {
   try {
     const response = await fetch('https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/provinces.json');
-    if (!response.ok) throw new Error('Gagal load provinsi');
     provinces.value = await response.json();
   } catch (error) {
     console.error(error);
-    showError(error.message);
   }
 };
 
-// Ambil kota
+const loadCitiesForProvince = async (provId) => {
+  try {
+    const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/regencies/${provId}.json`);
+    cities.value = await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const getKota = async () => {
+  isInitialLoad = false;
   const selectedProvince = provinces.value.find(p => p.name === form.value.province_name);
   if (!selectedProvince) {
     cities.value = districts.value = subdistricts.value = [];
     return;
   }
+  await loadCitiesForProvince(selectedProvince.id);
+  districts.value = subdistricts.value = [];
+  form.value.city_name = form.value.district_name = form.value.subdistrict_name = '';
+};
+
+const loadDistrictsForCity = async (cityId) => {
   try {
-    const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/regencies/${selectedProvince.id}.json`);
-    if (!response.ok) throw new Error('Gagal load kota');
-    cities.value = await response.json();
-    districts.value = subdistricts.value = [];
-    form.value.city_name = form.value.district_name = form.value.subdistrict_name = '';
+    const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/districts/${cityId}.json`);
+    districts.value = await response.json();
   } catch (error) {
     console.error(error);
-    showError(error.message);
   }
 };
 
-// Ambil kecamatan
 const getKecamatan = async () => {
+  isInitialLoad = false;
   const selectedCity = cities.value.find(c => c.name === form.value.city_name);
   if (!selectedCity) return;
+  await loadDistrictsForCity(selectedCity.id);
+  subdistricts.value = [];
+  form.value.district_name = form.value.subdistrict_name = '';
+};
+
+const loadVillagesForDistrict = async (distId) => {
   try {
-    const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/districts/${selectedCity.id}.json`);
-    if (!response.ok) throw new Error('Gagal load kecamatan');
-    districts.value = await response.json();
-    subdistricts.value = [];
-    form.value.district_name = form.value.subdistrict_name = '';
+    const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/villages/${distId}.json`);
+    subdistricts.value = await response.json();
   } catch (error) {
     console.error(error);
-    showError(error.message);
   }
 };
 
-// Ambil kelurahan
 const getKelurahan = async () => {
+  isInitialLoad = false;
   const selectedDistrict = districts.value.find(d => d.name === form.value.district_name);
   if (!selectedDistrict) return;
-  try {
-    const response = await fetch(`https://sendokjeruk.github.io/wilaijah-repoeblik-indonesia/api/villages/${selectedDistrict.id}.json`);
-    if (!response.ok) throw new Error('Gagal load kelurahan');
-    subdistricts.value = await response.json();
-    form.value.subdistrict_name = '';
-  } catch (error) {
-    console.error(error);
-    showError(error.message);
-  }
+  await loadVillagesForDistrict(selectedDistrict.id);
+  form.value.subdistrict_name = '';
 };
 
-// Cari kode domestik otomatis
 const cariKodeDomestik = async () => {
   if (!form.value.label) return;
   try {
@@ -263,6 +291,7 @@ const cariKodeDomestik = async () => {
       form.value.kode_domestik = '';
       form.value.zip_code = '';
       searchResults.value = [];
+      showKodeDomestik.value = false;
     } else {
       form.value.kode_domestik = results[0].id;
       form.value.zip_code = results[0].zip_code || '';
@@ -274,10 +303,10 @@ const cariKodeDomestik = async () => {
     form.value.kode_domestik = '';
     form.value.zip_code = '';
     searchResults.value = [];
+    showKodeDomestik.value = false;
   }
 };
 
-// Pilih alamat manual jika multiple searchResults
 const pilihAlamat = (item) => {
   form.value.kode_domestik = item.id;
   form.value.zip_code = item.zip_code || '';
@@ -287,8 +316,7 @@ const pilihAlamat = (item) => {
   showSuccess('Alamat berhasil dipilih');
 };
 
-// Load awal
 onMounted(() => {
-  dapat_Alamat();
+  fetchAlamatData();
 });
 </script>

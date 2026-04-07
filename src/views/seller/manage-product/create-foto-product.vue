@@ -143,8 +143,14 @@ const submitForm = async () => {
     search.value = ''
     selectedFileName.value = ''
   } catch (error) {
-    console.error('Gagal submit form:', error)
-    showError(error.response?.data?.message || 'Gagal menambahkan data.')
+    console.error('Gagal submit form:', error);
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan data.';
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+    showError(errorMessage);
   }
 }
 

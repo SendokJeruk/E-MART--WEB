@@ -108,6 +108,7 @@
             <img
               :src="item.foto_cover || ''"
               class="w-20 h-20 object-cover rounded border"
+              @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
             />
 
             <div class="flex-1">

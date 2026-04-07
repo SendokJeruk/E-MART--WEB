@@ -435,8 +435,8 @@ const formTransaction = async () => {
     
   } catch (error) {
     console.error('Gagal transaksi:', error);
-    if (error.response.data.status == 401) {
-      showError("Session Tidak Ada, Silahkan Login");
+    if (error.response.status == 401) {
+      showError("Silahkan Login Terlebih Dahulu");
       router.push(`/login`);
       return
     }
@@ -472,7 +472,7 @@ const handleAddToCart = async () => {
   const result = await addToCart(payload);
   if (result.success === false) {
     if (result.message == "Unauthenticated" ) {
-      showError("Session Tidak Ada, Silahkan Login");
+      showError("Silahkan Login Terlebih Dahulu");
       router.push(`/login`);
       return
     }

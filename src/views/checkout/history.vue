@@ -108,6 +108,7 @@
                   :src="detail.detail_transaction.product.foto_cover || '/placeholder-product.jpg'"
                   :alt="detail.detail_transaction.product.nama_product"
                   class="w-20 h-20 object-cover rounded-lg border"
+                  @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
                 />
 
                 <div class="ml-5 flex-1">
@@ -163,7 +164,6 @@
 
               <!-- Unduh Invoice le --> 
               <button
-                v-if="shipment.status_pengiriman === 'diterima'"
                 @click="downloadInvoice(shipment.kode_transaksi)"
                 class="px-5 py-2 text-sm border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 transition"
               >

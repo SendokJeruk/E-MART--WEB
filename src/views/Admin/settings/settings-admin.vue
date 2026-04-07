@@ -185,10 +185,14 @@ const saveEdit = async (item) => {
     showSuccess('Setting berhasil diupdate')
 
   } catch (error) {
-    console.error("Error updating setting:", error)
-
-    /* notifikasi error */
-    showError('Gagal mengupdate setting')
+    console.error("Error updating setting:", error);
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal mengupdate setting.';
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+    showError(errorMessage);
   }
 }
 

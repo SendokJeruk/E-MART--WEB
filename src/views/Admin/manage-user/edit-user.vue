@@ -235,7 +235,7 @@ const submitForm = async () => {
     });
 
     showSuccess('User berhasil diperbarui!');
-    router.push('/manageuser');
+    router.push('/manage-user');
   } catch (error) {
     const errors = error.response?.data?.errors;
     let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';

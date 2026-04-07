@@ -63,7 +63,7 @@
             </template>
 
             <!-- Data -->
-            <template v-else>
+            <template v-else-if="categories.length > 0">
               <tr v-for="category in categories" :key="category.id">
                 <td class="px-6 py-4 text-sm inter-font text-gray-900">{{ category.nama_category }}</td>
                 <td class="px-6 py-4">
@@ -81,6 +81,11 @@
                     Edit
                   </router-link>
                 </td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr>
+                <td colspan="2" class="text-center py-10 text-gray-500">Tidak ada kategori</td>
               </tr>
             </template>
           </tbody>
@@ -178,14 +183,21 @@ const fetchCategories = async (page = 1) => {
       }
     })
 
-    const data = res.data.data
+    const responseData = res.data?.data || {}
 
-    categories.value = data.data
-    pagination.value.current_page = data.current_page
-    pagination.value.last_page = data.last_page
+    if (Array.isArray(responseData)) {
+      categories.value = responseData
+      pagination.value.current_page = 1
+      pagination.value.last_page = 1
+    } else {
+      categories.value = Array.isArray(responseData.data) ? responseData.data : []
+      pagination.value.current_page = responseData.current_page || 1
+      pagination.value.last_page = responseData.last_page || 1
+    }
 
   } catch (err) {
     console.error('Error fetching category:', err)
+    categories.value = []
   } finally {
     isLoading.value = false
   }

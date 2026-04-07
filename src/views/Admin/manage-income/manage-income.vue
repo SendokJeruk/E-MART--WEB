@@ -105,7 +105,7 @@
 
       <!-- Empty -->
       <div v-if="!isLoading && withdraws.length === 0" class="p-6 text-center text-gray-500">
-        Tidak ada data withdraw
+        Tidak ada data penarikan
       </div>
 
       <!-- Modal -->
@@ -140,7 +140,7 @@
                 </p>
               </div>
 
-              <div class="flex gap-3 mt-6">
+              <div class="flex gap-3 mt-6" v-if="selectedWithdraw.status !== 'accepted'">
                 <button
                   class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                   :disabled="loading"
@@ -197,12 +197,25 @@ const getWithdraw = async (page = 1) => {
       params: { page }
     });
 
-    const resData = response.data.data;
+    let dataList = [];
+    let currPage = 1;
+    let lastPg = 1;
 
-    withdraws.value = Array.isArray(resData.data) ? resData.data : [];
+    // Check the structure: response.data is the main JSON object
+    if (response.data && response.data.data) {
+      const paginator = response.data.data;
+      if (paginator.data && Array.isArray(paginator.data)) {
+         dataList = paginator.data;
+         currPage = paginator.current_page || 1;
+         lastPg = paginator.last_page || 1;
+      } else if (Array.isArray(paginator)) {
+         dataList = paginator;
+      }
+    }
 
-    pagination.value.current_page = resData.current_page;
-    pagination.value.last_page = resData.last_page;
+    withdraws.value = dataList;
+    pagination.value.current_page = currPage;
+    pagination.value.last_page = lastPg;
 
   } catch (error) {
     console.error('Gagal mengambil data withdraw:', error);
@@ -221,11 +234,10 @@ const changePage = async (page) => {
 const updateStatus = async (id, status) => {
   loading.value = true;
   try {
-    // Samakan status dengan backend
     const backendStatus = status === 'approved' ? 'accepted' : 'rejected';
     await api.post(`/withdraw/handle/${id}`, { status: backendStatus });
     await getWithdraw();
-    selectedWithdraw.value = null; // tutup modal
+    selectedWithdraw.value = null;
   } catch (error) {
     console.error('Gagal update status:', error.response?.data || error);
   } finally {

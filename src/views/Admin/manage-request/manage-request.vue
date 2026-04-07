@@ -57,9 +57,9 @@
               <span
                 :class="[
                   'px-3 py-1 text-xs rounded-full font-semibold capitalize',
-                  item.status === 'approved'
+                  (item.status.toLowerCase() === 'accepted')
                     ? 'bg-green-100 text-green-700'
-                    : item.status === 'pending'
+                    : item.status.toLowerCase() === 'pending'
                     ? 'bg-yellow-100 text-yellow-700'
                     : 'bg-red-100 text-red-700'
                 ]"
@@ -77,12 +77,15 @@
 
           <div class="mt-6 flex justify-between items-center">
             <button
+              v-if="item.status.toLowerCase() !== 'accepted'"
               @click="openDetail(item)"
               class="bg-[#7D0A0A] hover:bg-[#BF3131] text-white px-4 py-2 rounded-lg text-sm shadow-md transition"
             >
               Detail
             </button>
             <button
+              v-if="item.status.toLowerCase() === 'accepted'"
+              @click="deleteRequest(item.id)"
               class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm shadow-md transition"
             >
               Delete
@@ -146,19 +149,19 @@
           </h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
-            <p><span class="font-semibold">Status:</span> {{ selectedItem.status }}</p>
-            <p><span class="font-semibold">Note:</span> {{ selectedItem.note }}</p>
-            <p><span class="font-semibold">NIK:</span> {{ selectedItem.nik }}</p>
-            <p><span class="font-semibold">Nama Lengkap:</span> {{ selectedItem.nama_lengkap }}</p>
-            <p><span class="font-semibold">Tempat Lahir:</span> {{ selectedItem.tempat_lahir }}</p>
-            <p><span class="font-semibold">Tanggal Lahir:</span> {{ selectedItem.tanggal_lahir }}</p>
-            <p><span class="font-semibold">Jenis Kelamin:</span> {{ selectedItem.jenis_kelamin }}</p>
-            <p><span class="font-semibold">Alamat KTP:</span> {{ selectedItem.alamat_ktp }}</p>
+            <p><span class="font-semibold">Status:</span> {{ selectedItem?.status }}</p>
+            <p><span class="font-semibold">Note:</span> {{ selectedItem?.note }}</p>
+            <p><span class="font-semibold">NIK:</span> {{ selectedItem?.nik }}</p>
+            <p><span class="font-semibold">Nama Lengkap:</span> {{ selectedItem?.nama_lengkap }}</p>
+            <p><span class="font-semibold">Tempat Lahir:</span> {{ selectedItem?.tempat_lahir }}</p>
+            <p><span class="font-semibold">Tanggal Lahir:</span> {{ selectedItem?.tanggal_lahir }}</p>
+            <p><span class="font-semibold">Jenis Kelamin:</span> {{ selectedItem?.jenis_kelamin }}</p>
+            <p><span class="font-semibold">Alamat KTP:</span> {{ selectedItem?.alamat_ktp }}</p>
           </div>
 
-          <div class="mt-6">
+          <div class="mt-6" v-if="selectedItem?.foto_ktp">
             <span class="font-semibold">Foto KTP:</span><br/>
-            <img :src="selectedItem.foto_ktp" class="w-56 h-36 object-cover rounded-lg border mt-3 shadow"/>
+            <img :src="selectedItem?.foto_ktp" class="w-56 h-36 object-cover rounded-lg border mt-3 shadow"/>
           </div>
 
           <div class="mt-6">
@@ -172,13 +175,13 @@
 
           <div class="mt-8 flex justify-end gap-4">
             <button
-              @click="updateStatus(selectedItem.id, 'rejected')"
+              @click="updateStatus(selectedItem?.id, 'rejected')"
               class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm shadow-md transition"
             >
               Reject
             </button>
             <button
-              @click="updateStatus(selectedItem.id, 'accepted')"
+              @click="updateStatus(selectedItem?.id, 'accepted')"
               class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-sm shadow-md transition"
             >
               Accept
@@ -194,7 +197,7 @@
 import AdminSide from '@/components/navbar/admin-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import api from '@/plugins/axios'
-import { showSuccess, showError } from '@/utils/alert'
+import { showSuccess, showError, showConfirm } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
 const user = ref({})
@@ -207,6 +210,12 @@ const pagination = ref({
   current_page: 1,
   last_page: 1,
 });
+
+const isAccepted = (status) => {
+  if (!status) return false;
+  const s = status.toLowerCase().trim();
+  return s === 'accepted';
+};
 
 const getProfile = async () => {
   try {
@@ -264,11 +273,26 @@ const updateStatus = async (id, status) => {
     selectedItem.value.status = status
     selectedItem.value.note = note.value
     showSuccess(`Pengajuan berhasil diubah menjadi ${status}`)
+    selectedItem.value = null; // Tutup modal setelah update
   } catch (error) {
     console.error('Gagal update status:', error)
     showError('Gagal mengubah status!')
   }
 }
+
+const deleteRequest = async (id) => {
+  const konfirmasi = await showConfirm('Yakin ingin menghapus pengajuan ini?');
+  if (!konfirmasi) return;
+
+  try {
+    await api.delete(`/requestseller/${id}`);
+    requests.value = requests.value.filter(r => r.id !== id);
+    showSuccess('Pengajuan berhasil dihapus.');
+  } catch (error) {
+    console.error('Gagal menghapus pengajuan:', error);
+    showError('Gagal menghapus pengajuan.');
+  }
+};
 
 onMounted(() => {
   getProfile()

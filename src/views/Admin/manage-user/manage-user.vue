@@ -83,7 +83,7 @@
             </template>
 
             <!-- Data user -->
-            <template v-else>
+            <template v-else-if="users.length > 0">
               <tr v-for="user in users" :key="user.id">
                 <td class="px-6 py-4 text-sm font-medium inter-font text-gray-900 ">{{ user.name }}</td>
                 <td class="px-6 py-4 text-sm font-medium inter-font text-gray-900">{{ user.email }}</td>
@@ -102,6 +102,14 @@
                   >
                     Edit
                   </router-link>
+                </td>
+              </tr>
+            </template>
+            
+            <template v-else>
+              <tr>
+                <td colspan="3" class="px-6 py-8 text-center text-gray-500">
+                  Tidak ada data user
                 </td>
               </tr>
             </template>
@@ -209,14 +217,21 @@ const fetchUsers = async (page = 1) => {
       }
     })
 
-    const data = response.data.data
+    const responseData = response.data?.data || {}
 
-    users.value = data.data
-    pagination.value.current_page = data.current_page
-    pagination.value.last_page = data.last_page
+    if (Array.isArray(responseData)) {
+      users.value = responseData
+      pagination.value.current_page = 1
+      pagination.value.last_page = 1
+    } else {
+      users.value = Array.isArray(responseData.data) ? responseData.data : []
+      pagination.value.current_page = responseData.current_page || 1
+      pagination.value.last_page = responseData.last_page || 1
+    }
 
   } catch (error) {
     console.error('Error fetching users:', error)
+    users.value = []
   } finally {
     isLoading.value = false
   }
