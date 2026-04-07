@@ -90,7 +90,7 @@
           <router-link
             :to="{
               name: 'toko',
-              params: { nama_toko: toSlug(produk.user.toko.nama_toko) }
+              query: { nama_toko: produk.user.toko.nama_toko }
             }"
             class="text-sm text-[#7D0A0A] mb-2 hover:underline cursor-pointer"
           >

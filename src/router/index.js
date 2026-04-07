@@ -268,7 +268,7 @@ const routes = [
     },
     //Toko
     {
-        path: '/toko/:nama_toko',
+        path: '/toko',
         name: 'toko',
         component: Toko
     },
