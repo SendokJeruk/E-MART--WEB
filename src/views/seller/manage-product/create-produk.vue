@@ -120,6 +120,7 @@ const submitForm = async () => {
     formData.append('harga', form.value.harga)
     formData.append('stock', form.value.stock)
     formData.append('foto_cover', form.value.foto_cover)
+    if (form.value.foto_cover == null) {formData.delete('foto_cover')} 
     formData.append('status_produk', form.value.status)
     formData.append('berat', form.value.berat)
     formData.append('user_id', form.value.user_id)

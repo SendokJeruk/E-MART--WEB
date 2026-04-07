@@ -128,7 +128,7 @@ const getProfile = async () => {
 const getProduct = async (keyword = '') => {
   try {
     const response = await api.get('/product/myproducts', {
-      params: { search: keyword }
+      params: { nama_product: keyword }
     })
     ProductSeller.value = Array.isArray(response.data.data.data) ? response.data.data.data : []
   } catch (error) {
