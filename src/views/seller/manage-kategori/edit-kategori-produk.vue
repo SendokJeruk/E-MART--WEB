@@ -201,8 +201,14 @@ const submitForm = async () => {
     })
     showSuccess('Kategori produk berhasil diperbarui!')
   } catch (err) {
-    console.error('Gagal update kategori produk:', err)
-    showError(err.response?.data?.message || 'Gagal update kategori produk')
+    console.error('Gagal update kategori produk:', err);
+    const errors = err.response?.data?.errors;
+    let errorMessage = err.response?.data?.message || 'Gagal update kategori produk.';
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+    showError(errorMessage);
   }
 }
 

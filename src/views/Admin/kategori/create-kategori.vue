@@ -51,7 +51,7 @@
 
   } catch (error) {
     const errors = error.response?.data?.errors;
-    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan kategori.';
 
     if (errors) {
       const allErrors = Object.values(errors).flat().join('\n');

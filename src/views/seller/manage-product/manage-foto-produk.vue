@@ -128,7 +128,7 @@
 <script setup>
 import Sellerside from '@/components/navbar/seller-side.vue';
 import api from "@/plugins/axios";
-import { showError, showSuccess } from '@/utils/alert';
+import { showError, showSuccess, showConfirm } from '@/utils/alert';
 import { ref, onMounted } from "vue";
 
 const user = ref({});
@@ -144,7 +144,7 @@ const toggleMenu = (produkId, fotoIndex) => {
 };
 
 const deleteFoto = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus Foto Ini?');
+  const konfirmasi = await showConfirm('Yakin ingin menghapus Foto Ini?');
   if (!konfirmasi) return;
 
   try {

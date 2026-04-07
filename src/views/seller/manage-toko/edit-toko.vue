@@ -315,8 +315,15 @@ const submitForm = async () => {
     showSuccess('Toko & alamat berhasil diperbarui!')
     router.push('/manage-toko')
   } catch (error) {
-    console.error('Gagal submit form:', error)
-    showError(error.response?.data?.message || 'Gagal mengubah data toko/alamat.')
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 }
 

@@ -176,7 +176,7 @@ const updateProfile = async () => {
       errorMessage = allErrors;
     }
 
-    showError(errorMessage);
+  showError(errorMessage);
     
   } finally {
     isLoading.value = false;

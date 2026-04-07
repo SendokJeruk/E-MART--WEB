@@ -77,6 +77,7 @@
               :src="item.product?.foto_cover"
               alt="Produk"
               class="w-16 h-16 object-cover rounded border"
+              @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
             />
             <div class="flex-1">
               <p class="font-medium">{{ item.product?.nama_product }}</p>

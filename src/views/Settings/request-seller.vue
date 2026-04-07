@@ -220,8 +220,14 @@ const submitForm = async () => {
 
     await checkExistingRequest();
   } catch (error) {
-    console.error('Gagal submit form:', error)
-    showError(error.response?.data?.message || 'Gagal mengirim pengajuan.');
+    console.error('Gagal submit form:', error);
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal mengirim pengajuan.';
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+    showError(errorMessage);
   }
 }
 

@@ -237,7 +237,13 @@ const submitForm = async () => {
     showSuccess('Banner berhasil ditambahkan!')
     closeModal()
   } catch (err) {
-    showError(err.response?.data?.message || 'Gagal')
+    const errors = err.response?.data?.errors;
+    let errorMessage = err.response?.data?.message || 'Gagal menambahkan banner.';
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+    showError(errorMessage);
   }
 }
 

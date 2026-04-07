@@ -71,8 +71,13 @@
           </div>
         </div>
 
+        <!-- Empty State -->
+        <div v-else class="text-center py-10 text-gray-500 bg-white shadow rounded-lg border">
+          Tidak ada data penarikan
+        </div>
+
         <div
-          v-if="withdraws.length"
+          v-if="lastPage > 1"
           class="flex justify-center mt-4 space-x-2 mb-4"
         >
           <button
@@ -109,7 +114,7 @@
       <!-- Modal (form withdraw tetap ada di bawah) -->
       <div
         v-if="showModal"
-        class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+        class="fixed inset-0 bg-black/50 flex justify-center items-center z-50"
       >
         <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
           <h2 class="text-xl font-bold mb-4">Withdraw Request</h2>
@@ -220,21 +225,36 @@ const getProfile = async () => {
     console.error('Gagal mengambil profil:', err);
   }
 };
-
 const getWithdraw = async (page = 1) => {
+  isLoading.value = true;
   try {
     const response = await api.get('/withdraw/self', {
       params: { page }
     });
 
-    const resData = response.data.data;
+    let dataList = [];
+    let currPage = 1;
+    let lastPg = 1;
 
-    withdraws.value = resData.data;
-    currentPage.value = resData.current_page;
-    lastPage.value = resData.last_page;
+    // Check the structure: response.data is the main JSON object
+    if (response.data && response.data.data) {
+      const paginator = response.data.data;
+      if (paginator.data && Array.isArray(paginator.data)) {
+         dataList = paginator.data;
+         currPage = paginator.current_page || 1;
+         lastPg = paginator.last_page || 1;
+      } else if (Array.isArray(paginator)) {
+         dataList = paginator;
+      }
+    }
+
+    withdraws.value = dataList;
+    currentPage.value = currPage;
+    lastPage.value = lastPg;
 
   } catch (err) {
     console.error('Gagal mengambil data withdraw:', err);
+    withdraws.value = [];
   } finally {
     isLoading.value = false;
   }
@@ -255,11 +275,13 @@ const submitWithdraw = async () => {
     form.value = { jumlah: '', metode: '', rekening_tujuan: '', catatan: '' };
     await getWithdraw(); 
   } catch (err) {
-    if (err.response?.data?.message) {
-      error.value = err.response.data.message;
-    } else {
-      error.value = 'Terjadi kesalahan, coba lagi.';
+    const errors = err.response?.data?.errors;
+    let errorMessage = err.response?.data?.message || 'Terjadi kesalahan, coba lagi.';
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
     }
+    error.value = errorMessage;
   } finally {
     loading.value = false;
   }

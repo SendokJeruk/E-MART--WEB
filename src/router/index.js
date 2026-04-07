@@ -46,6 +46,7 @@ import ManageBanner from "@/views/Admin/manage-banner/manage-banner.vue";
 import VerifyPage from "@/views/Auth/verify.vue";
 import ResetPass from "@/views/Auth/forget-pass.vue";
 import RequestResetPass from "@/views/Auth/request-forget-pass.vue";
+import EditAlamat from "@/views/Alamat/edit-alamat.vue"
 
 const routes = [
     // Dashboard
@@ -163,6 +164,11 @@ const routes = [
         path: '/create-alamat',
         name: 'CreateAlamat',
         component: CreateAlamat
+    },
+    {
+        path: '/edit-alamat/:id',
+        name: 'EditAlamat',
+        component: EditAlamat
     },
 
     //Checkout + Cart

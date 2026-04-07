@@ -218,13 +218,13 @@ const submitForm = async () => {
     showSuccess('Toko berhasil dibuat!');
     router.push('/manage-toko');
   } catch (error) {
-    if (error.response) {
-      showError(`Gagal: ${error.response.data.message}`);
-      console.error(error.response.data.errors || error.response.data.error);
-    } else {
-      console.error(error);
-      showError('Terjadi kesalahan saat mengirim data.');
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal membuat toko.';
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
     }
+    showError(errorMessage);
   }
 };
 
