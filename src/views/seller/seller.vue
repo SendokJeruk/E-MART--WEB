@@ -5,7 +5,7 @@
       <!-- HEADER -->
       <div class="flex justify-between items-center pb-4 border-b border-gray-200">
 
-        <h1 class="text-2xl font-bold text-gray-800">
+        <h1 class="text-2xl font-bold text-gray-800 navbar-font">
           Dashboard Seller
         </h1>
 
@@ -32,8 +32,8 @@
           />
 
           <div class="flex-1">
-            <p class="text-sm font-semibold text-gray-800">{{ user.name }}</p>
-            <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
+            <p class="text-sm font-semibold text-gray-800 inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-500 truncate inter-font">{{ user.email }}</p>
           </div>
 
         </div>
@@ -65,25 +65,25 @@
         <template v-else>
 
           <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="font-medium text-gray-600 mb-2">Total Product</h2>
-            <p class="text-2xl font-bold text-red-700">{{ ProductSeller.length }}</p>
+            <h2 class="navbar-font text-gray-600 mb-2">Total Product</h2>
+            <p class="text-2xl font-bold text-red-700 inter-font">{{ ProductCount }}</p>
           </div>
 
           <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="font-medium text-gray-600 mb-2">Total Penjualan</h2>
-            <p class="text-2xl font-bold text-red-700">{{ totalPenjualan }}</p>
+            <h2 class="navbar-font text-gray-600 mb-2">Total Penjualan</h2>
+            <p class="text-2xl font-bold text-red-700 inter-font">{{ totalPenjualan }}</p>
           </div>
 
           <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="font-medium text-gray-600 mb-2">Total Income</h2>
-            <p class="text-2xl font-bold text-red-700">
+            <h2 class="navbar-font text-gray-600 mb-2">Total Income</h2>
+            <p class="text-2xl font-bold text-red-700 inter-font">
               Rp. {{ totalIncome.toLocaleString('id-ID') }}
             </p>
           </div>
 
           <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="font-medium text-gray-600 mb-2">Total Wallet</h2>
-            <p class="text-2xl font-bold text-red-700">
+            <h2 class="text-gray-600 mb-2 navbar-font">Total Wallet</h2>
+            <p class="text-2xl font-bold text-red-700 inter-font">
               Rp. {{ totalWallet.toLocaleString('id-ID') }}
             </p>
           </div>
@@ -96,16 +96,16 @@
       <div class="mt-8 flex flex-col md:flex-row items-end md:items-center justify-between gap-4">
         <div class="flex flex-col md:flex-row items-center gap-3">
           <div>
-            <label class="text-sm font-medium text-gray-600 block mb-1">Mulai Tanggal</label>
+            <label class="text-sm font-medium text-gray-600 block mb-1 inter-font">Mulai Tanggal</label>
             <input type="date" v-model="startDate" class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7D0A0A] outline-none" />
           </div>
           <div>
-            <label class="text-sm font-medium text-gray-600 block mb-1">Sampai Tanggal</label>
+            <label class="text-sm font-medium text-gray-600 block mb-1 inter-font">Sampai Tanggal</label>
             <input type="date" v-model="endDate" class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7D0A0A] outline-none" />
           </div>
-          <button @click="applyFilter" class="mt-auto px-4 py-2 bg-[#7D0A0A] text-white text-sm rounded-lg hover:bg-[#BF3131] transition">Filter</button>
+          <button @click="applyFilter" class="mt-auto px-4 py-2 bg-[#7D0A0A] text-white text-sm rounded-lg hover:bg-[#BF3131] transition navbar-font">Filter</button>
         </div>
-        <button @click="exportExcel" class="mt-auto px-4 py-2 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 transition">
+        <button @click="exportExcel" class="mt-auto px-4 py-2 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 transition navbar-font">
           Export Excel
         </button>
       </div>
@@ -115,7 +115,7 @@
 
         <!-- Line Chart -->
         <div class="bg-white rounded-xl shadow-sm border p-6">
-          <h2 class="text-lg font-semibold text-gray-700 mb-4">Tren Penjualan</h2>
+          <h2 class="text-lg navbar-font text-gray-700 mb-4">Tren Penjualan</h2>
           <div v-if="isLoading">
             <Skeleton height="300px"/>
           </div>
@@ -152,6 +152,7 @@ const apexchart = VueApexCharts
 
 // state
 const ProductSeller = ref([])
+const ProductCount = ref([])
 const user = ref({})
 const totalPenjualan = ref(0)
 const totalIncome = ref(0)
@@ -202,6 +203,15 @@ const getProfile = async () => {
     user.value = response.data.data
   } catch (error) {
     console.error("Gagal mengambil profil:", error)
+  }
+}
+
+const getCountProducts = async () => {
+  try {
+    const response = await api.get("/product/myproducts?count")
+    ProductCount.value = response.data.data
+  } catch (error) {
+    console.error("Gagal mengambil jumlah produk:", error)
   }
 }
 
@@ -345,7 +355,8 @@ onMounted(async () => {
       getWallet(),
       getProducts(),
       getDoughnutStatistic(),
-      getLineStatistic()
+      getLineStatistic(),
+      getCountProducts()
     ])
   } catch (error) {
     console.error(error)

@@ -9,13 +9,13 @@
     <div class="flex items-center gap-6 border-b pb-4 mb-6">
 
       <div class="flex-1">
-        <h1 class="text-2xl font-bold text-[#7D0A0A]">
+        <h1 class="text-2xl font-bold text-[#7D0A0A] navbar-font">
           {{ toko.nama_toko }}
         </h1>
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-gray-600 inter-font">
           {{ toko.deskripsi }}
         </p>
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-gray-600 inter-font">
           {{ toko.no_telp }}
         </p>
       </div>
@@ -28,7 +28,7 @@
         :class="[
           'pb-2',
           activeTab === 'produk'
-            ? 'border-b-2 border-[#7D0A0A] text-[#7D0A0A] font-semibold'
+            ? 'border-b-2 border-[#7D0A0A] text-[#7D0A0A] navbar-font'
             : 'text-gray-500'
         ]"
       >
@@ -40,7 +40,7 @@
         :class="[
           'pb-2',
           activeTab === 'info'
-            ? 'border-b-2 border-[#7D0A0A] text-[#7D0A0A] font-semibold'
+            ? 'border-b-2 border-[#7D0A0A] text-[#7D0A0A] navbar-font'
             : 'text-gray-500'
         ]"
       >
@@ -52,7 +52,7 @@
     <!-- TAB: PRODUK -->
     <!-- ===================== -->
     <div v-if="activeTab === 'produk'">
-      <h2 class="text-lg font-semibold mb-4">Produk Dari Toko Ini</h2>
+      <h2 class="text-lg navbar-font mb-4">Produk Dari Toko Ini</h2>
 
       <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div
@@ -70,15 +70,15 @@
             <span v-else class="text-gray-500">No Image</span>
           </div>
 
-          <p class="mt-2 font-medium">
+          <p class="mt-2 navbar-font">
             {{ product.nama_product }}
           </p>
 
-          <p class="text-[#7D0A0A] font-bold">
+          <p class="text-[#7D0A0A] navbar-font">
             Rp {{ formatRupiah(product.harga) }}
           </p>
 
-          <p class="text-xs text-gray-500">
+          <p class="text-xs text-gray-500 inter-font">
             ⭐ {{ product.rating.length ? product.rating[0].rating : '0.0' }}
           </p>
         </div>
@@ -94,9 +94,9 @@
     <!-- ===================== -->
     <div v-if="activeTab === 'info'" class="space-y-4">
 
-      <h2 class="text-lg font-semibold">Informasi Toko</h2>
+      <h2 class="text-lg navbar-font">Informasi Toko</h2>
 
-      <div class="border rounded-lg p-4 bg-white shadow-sm space-y-2">
+      <div class="border rounded-lg p-4 bg-white shadow-sm space-y-2 inter-font">
 
         <p><strong>Nama:</strong> {{ toko.nama_toko }}</p>
         <p><strong>Deskripsi:</strong> {{ toko.deskripsi }}</p>

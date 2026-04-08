@@ -4,7 +4,7 @@
 
       <!-- HEADER -->
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Manage Banner</h1>
+        <h1 class="text-3xl navbar-font">Manage Banner</h1>
 
         <!-- PROFILE -->
         <div v-if="isProfileLoading" class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
@@ -17,8 +17,8 @@
 
         <div v-else class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
-            <p class="text-sm font-bold">{{ user.name }}</p>
-            <p class="text-xs text-gray-600">{{ user.email }}</p>
+            <p class="text-sm inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
           </div>
           <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 rounded-full" />
         </div>
@@ -28,7 +28,7 @@
       <button @click="openCreate"
         class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-6">
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
+        <span class="relative text-sm text-[#7D0A0A] group-hover:text-white navbar-font">
           Tambah Banner
         </span>
       </button>
@@ -39,9 +39,9 @@
 
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-4 py-2">Section</th>
-              <th class="px-4 py-2">Gambar</th>
-              <th class="px-4 py-2">Action</th>
+              <th class="px-4 py-2 navbar-font">Section</th>
+              <th class="px-4 py-2 navbar-font">Gambar</th>
+              <th class="px-4 py-2 navbar-font">Action</th>
             </tr>
           </thead>
 
@@ -73,12 +73,12 @@
               <td class="px-4 py-2">
                 <div class="flex justify-center gap-2">
                   <button @click="openEdit(banner)"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded navbar-font">
                     Edit
                   </button>
 
                   <button @click="deleteBanner(banner.id)"
-                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded navbar-font">
                     Hapus
                   </button>
                 </div>
@@ -135,16 +135,16 @@
       <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div class="bg-white w-[400px] rounded-lg shadow-lg p-6">
 
-          <h2 class="text-xl font-bold mb-4">
+          <h2 class="text-xl font-bold mb-4 navbar-font">
             {{ isEdit ? 'Edit Banner' : 'Tambah Banner' }}
           </h2>
 
           <!-- SECTION -->
           <div class="mb-4">
-            <label class="block text-sm mb-1">Section</label>
+            <label class="block text-sm mb-1 navbar-font">Section</label>
               <select 
                 v-model="form.section" 
-                class="w-full border px-2 py-1 rounded text-sm"
+                class="w-full border px-2 py-1 rounded text-sm inter-font"
               >
                 <option disabled value="">Pilih Section</option>
                 <option value="login">Login</option>
@@ -154,7 +154,7 @@
 
           <!-- FILE -->
           <div class="mb-4">
-            <label class="block text-sm mb-1">Upload Gambar</label>
+            <label class="block text-sm mb-1 navbar-font">Upload Gambar</label>
             <input type="file" @change="handleFile" class="w-full border px-3 py-2 rounded" />
           </div>
 
@@ -165,9 +165,9 @@
 
           <!-- ACTION -->
           <div class="flex justify-end gap-2">
-            <button @click="closeModal" class="px-4 py-2 border rounded">Batal</button>
+            <button @click="closeModal" class="px-4 py-2 border rounded navbar-font">Batal</button>
 
-            <button @click="isEdit ? updateBanner() : submitForm()" class="px-4 py-2 bg-[#7D0A0A] text-white rounded">
+            <button @click="isEdit ? updateBanner() : submitForm()" class="px-4 py-2 bg-[#7D0A0A] text-white rounded navbar-font">
               Simpan
             </button>
           </div>

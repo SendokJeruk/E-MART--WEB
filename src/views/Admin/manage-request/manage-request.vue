@@ -3,7 +3,7 @@
     <div class="p-6">
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-[#7D0A0A]">Manage Pengajuan Seller</h1>
+        <h1 class="text-3xl navbar-font text-[#7D0A0A]">Manage Pengajuan Seller</h1>
 
         <!-- Profile -->
         <div v-if="isLoading" class="bg-white shadow-md rounded-xl px-4 py-2 flex items-center gap-3 w-64 border border-gray-200">
@@ -19,8 +19,8 @@
           class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
         >
           <div class="flex-1">
-            <p class="text-sm font-bold">{{ user.name }}</p>
-            <p class="text-xs text-gray-600">{{ user.email }}</p>
+            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
           </div>
           <img
             :src="user?.foto_profil || 'https://placehold.co/100'"
@@ -56,7 +56,7 @@
             <div class="flex items-center justify-between mb-3">
               <span
                 :class="[
-                  'px-3 py-1 text-xs rounded-full font-semibold capitalize',
+                  'px-3 py-1 text-xs rounded-full navbar-font capitalize',
                   (item.status.toLowerCase() === 'accepted')
                     ? 'bg-green-100 text-green-700'
                     : item.status.toLowerCase() === 'pending'
@@ -66,27 +66,26 @@
               >
                 {{ item.status }}
               </span>
-              <span class="text-xs text-gray-400">#{{ item.id }}</span>
             </div>
 
-            <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            <h2 class="text-lg inter-font text-gray-800 mb-1">
               {{ item.nama_lengkap }}
             </h2>
-            <p class="text-sm text-gray-500">NIK: {{ item.nik }}</p>
+            <p class="text-sm text-gray-500 inter-font">NIK: {{ item.nik }}</p>
           </div>
 
           <div class="mt-6 flex justify-between items-center">
             <button
               v-if="item.status.toLowerCase() !== 'accepted'"
               @click="openDetail(item)"
-              class="bg-[#7D0A0A] hover:bg-[#BF3131] text-white px-4 py-2 rounded-lg text-sm shadow-md transition"
+              class="bg-[#7D0A0A] hover:bg-[#BF3131] text-white px-4 py-2 rounded-lg text-sm shadow-md transition navbar-font"
             >
               Detail
             </button>
             <button
               v-if="item.status.toLowerCase() === 'accepted'"
               @click="deleteRequest(item.id)"
-              class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm shadow-md transition"
+              class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm shadow-md transition navbar-font"
             >
               Delete
             </button>
@@ -138,34 +137,34 @@
     <!-- Modal Detail (tidak perlu skeleton karena muncul setelah klik) -->
     <transition name="modal-fade">
       <div v-if="selectedItem" class="fixed inset-0 flex items-center justify-center z-50 bg-black/30 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-2/3 lg:w-1/2 p-8 relative">
+        <div class="bg-white rounded-xl shadow-xl w-11/12 md:w-1/2 lg:w-1/2 p-4 relative">
           <button
             @click="selectedItem = null"
             class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition"
           >✕</button>
 
-          <h2 class="text-2xl font-bold text-[#7D0A0A] mb-6">
+          <h2 class="text-2xl navbar-font text-[#7D0A0A] mb-6">
             Detail Pengajuan Seller
           </h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
-            <p><span class="font-semibold">Status:</span> {{ selectedItem?.status }}</p>
-            <p><span class="font-semibold">Note:</span> {{ selectedItem?.note }}</p>
-            <p><span class="font-semibold">NIK:</span> {{ selectedItem?.nik }}</p>
-            <p><span class="font-semibold">Nama Lengkap:</span> {{ selectedItem?.nama_lengkap }}</p>
-            <p><span class="font-semibold">Tempat Lahir:</span> {{ selectedItem?.tempat_lahir }}</p>
-            <p><span class="font-semibold">Tanggal Lahir:</span> {{ selectedItem?.tanggal_lahir }}</p>
-            <p><span class="font-semibold">Jenis Kelamin:</span> {{ selectedItem?.jenis_kelamin }}</p>
-            <p><span class="font-semibold">Alamat KTP:</span> {{ selectedItem?.alamat_ktp }}</p>
+            <p><span class="inter-font">Status:</span> {{ selectedItem?.status }}</p>
+            <p><span class="inter-font">Note:</span> {{ selectedItem?.note }}</p>
+            <p><span class="inter-font">NIK:</span> {{ selectedItem?.nik }}</p>
+            <p><span class="inter-font">Nama Lengkap:</span> {{ selectedItem?.nama_lengkap }}</p>
+            <p><span class="inter-font">Tempat Lahir:</span> {{ selectedItem?.tempat_lahir }}</p>
+            <p><span class="inter-font">Tanggal Lahir:</span> {{ selectedItem?.tanggal_lahir }}</p>
+            <p><span class="inter-font">Jenis Kelamin:</span> {{ selectedItem?.jenis_kelamin }}</p>
+            <p><span class="inter-font">Alamat KTP:</span> {{ selectedItem?.alamat_ktp }}</p>
           </div>
 
           <div class="mt-6" v-if="selectedItem?.foto_ktp">
-            <span class="font-semibold">Foto KTP:</span><br/>
+            <span class="inter-font">Foto KTP:</span><br/>
             <img :src="selectedItem?.foto_ktp" class="w-56 h-36 object-cover rounded-lg border mt-3 shadow"/>
           </div>
 
           <div class="mt-6">
-            <label class="font-semibold block mb-2">Catatan Admin</label>
+            <label class="inter-font block mb-2">Catatan Admin</label>
             <textarea
               v-model="admin_note"
               rows="3"

@@ -25,11 +25,14 @@
         </router-link>
 
         <!-- Foto profil, default jika tidak ada -->
-        <img
-          :src="user?.foto_profil || 'https://placehold.co/100'"
-          alt="Foto Profil"
-          class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border"
-        />
+         
+        <router-link to="/profile" class="inline-block">
+          <img
+            :src="user?.foto_profil || 'https://placehold.co/100'"
+            alt="Foto Profil"
+            class="w-18 sm:w-20 aspect-square rounded-full object-cover border"
+          />
+        </router-link>
 
         <!-- Search bar -->
         <div class="flex-grow w-full md:mx-8">

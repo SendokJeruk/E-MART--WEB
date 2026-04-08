@@ -1,13 +1,13 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <h2 class="text-xl font-bold mb-4">Form Upload Foto dan Hubungkan ke Produk</h2>
+      <h2 class="text-xl navbar-font mb-4">Form Upload Foto dan Hubungkan ke Produk</h2>
       
       <form @submit.prevent="submitForm">
 
         <!-- Dropdown search -->
         <div class="mb-4 relative">
-          <label class="block mb-1">Cari Produk</label>
+          <label class="block mb-1 navbar-font">Cari Produk</label>
           <input
             type="text"
             v-model="search"
@@ -27,7 +27,7 @@
               v-for="product in ProductSeller"
               :key="product.id"
               @mousedown.prevent="selectProduct(product)"
-              class="px-3 py-2 hover:bg-blue-100 cursor-pointer"
+              class="px-3 py-2 hover:bg-blue-100 cursor-pointer inter-font"
             >
               {{ product.nama_product }}
             </li>
@@ -43,7 +43,7 @@
         <div class="mb-4">
           <label for="foto" class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer">
             <div class="flex items-center justify-center gap-4">
-              <span class="font-medium">Upload Foto Produk</span>
+              <span class="navbar-font">Upload Foto Produk</span>
               <div v-if="selectedFileName" class="text-sm text-gray-500">
                 {{ selectedFileName }}
               </div>
@@ -52,7 +52,7 @@
           </label>
         </div>
 
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 navbar-font">
           Submit
         </button>
       </form>

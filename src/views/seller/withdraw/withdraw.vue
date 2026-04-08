@@ -3,12 +3,12 @@
     <div class="p-6 overflow-x-auto">
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Withdraw</h1>
+        <h1 class="text-3xl navbar-font">Withdraw</h1>
 
         <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
-            <p class="text-sm font-bold">{{ user.name }}</p>
-            <p class="text-xs text-gray-600">{{ user.email }}</p>
+            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
           </div>
           <img
             :src="user?.foto_profil || 'https://placehold.co/100'"
@@ -20,7 +20,7 @@
       <!-- Tombol Withdraw -->
       <button
         @click="showModal = true"
-        class="px-6 py-2 mb-6 bg-red-700 hover:bg-red-800 text-white font-semibold rounded-lg shadow"
+        class="px-6 py-2 mb-6 bg-red-700 hover:bg-red-800 text-white navbar-font rounded-lg shadow"
       >
         + Withdraw
       </button>
@@ -49,16 +49,16 @@
           >
             <div class="flex justify-between items-center">
               <div>
-                <p class="font-bold text-lg">Rp {{ item.jumlah.toLocaleString() }}</p>
-                <p class="text-sm text-gray-600">Metode: {{ item.metode }}</p>
-                <p class="text-sm text-gray-600">Rekening: {{ item.rekening_tujuan }}</p>
-                <p class="text-sm text-gray-600" v-if="item.catatan">
+                <p class="text-lg navbar-font">Rp {{ item.jumlah.toLocaleString() }}</p>
+                <p class="text-sm text-gray-600 inter-font">Metode: {{ item.metode }}</p>
+                <p class="text-sm text-gray-600 inter-font">Rekening: {{ item.rekening_tujuan }}</p>
+                <p class="text-sm text-gray-600 inter-font" v-if="item.catatan">
                   Catatan: {{ item.catatan }}
                 </p>
               </div>
 
               <span
-                class="px-3 py-1 text-sm font-semibold rounded-lg"
+                class="px-3 py-1 text-sm navbar-font rounded-lg"
                 :class="{
                   'bg-yellow-100 text-yellow-700': item.status === 'pending',
                   'bg-green-100 text-green-700': item.status === 'success',
@@ -117,25 +117,25 @@
         class="fixed inset-0 bg-black/50 flex justify-center items-center z-50"
       >
         <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
-          <h2 class="text-xl font-bold mb-4">Withdraw Request</h2>
+          <h2 class="text-xl mb-4 navbar-font">Withdraw Request</h2>
 
           <form @submit.prevent="submitWithdraw">
             <div class="mb-4">
-              <label class="block text-sm font-semibold mb-1">Jumlah (Rp)</label>
+              <label class="block text-sm navbar-font mb-1">Jumlah (Rp)</label>
               <input
                 type="number"
                 v-model="form.jumlah"
-                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600 inter-font"
                 placeholder="Minimal 10000, Maksimal 1000000"
                 required
               />
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-semibold mb-1">Metode</label>
+              <label class="block text-sm navbar-font mb-1">Metode</label>
               <select
                 v-model="form.metode"
-                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600 inter-font"
                 required
               >
                 <option value="">-- Pilih Metode --</option>
@@ -148,21 +148,21 @@
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-semibold mb-1">Rekening Tujuan</label>
+              <label class="block text-sm navbar-font mb-1">Rekening Tujuan</label>
               <input
                 type="text"
                 v-model="form.rekening_tujuan"
-                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600 inter-font"
                 placeholder="Nomor rekening / ID e-wallet"
                 required
               />
             </div>
 
             <div class="mb-4">
-              <label class="block text-sm font-semibold mb-1">Catatan (Opsional)</label>
+              <label class="block text-sm navbar-font mb-1">Catatan (Opsional)</label>
               <textarea
                 v-model="form.catatan"
-                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-600 inter-font"
                 placeholder="Tambahkan catatan jika perlu"
               ></textarea>
             </div>
@@ -175,13 +175,13 @@
               <button
                 type="button"
                 @click="closeModal"
-                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg"
+                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg navbar-font"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                class="px-6 py-2 bg-red-700 hover:bg-red-800 text-white font-semibold rounded-lg shadow"
+                class="px-6 py-2 bg-red-700 hover:bg-red-800 text-white navbar-font rounded-lg shadow navbar-font"
                 :disabled="loading"
               >
                 {{ loading ? 'Mengirim...' : 'Submit' }}

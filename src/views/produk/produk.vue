@@ -84,7 +84,7 @@
       <!-- Detail Produk -->
       <div class="flex flex-col space-y-6">
         <div>
-          <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1">
+          <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1 navbar-font">
             {{ produk.nama_product }}
           </h1>
           <router-link
@@ -92,23 +92,23 @@
               name: 'toko',
               query: { nama_toko: produk.user.toko.nama_toko }
             }"
-            class="text-sm text-[#7D0A0A] mb-2 hover:underline cursor-pointer"
+            class="text-sm text-[#7D0A0A] mb-2 hover:underline cursor-pointer navbar-font"
           >
             {{ produk.user.toko.nama_toko }}
           </router-link>
-          <p class="text-2xl font-bold text-[#7D0A0A]">
+          <p class="text-2xl font-bold text-[#7D0A0A] navbar-font">
             Rp {{ formatRupiah(produk.harga) }}
           </p>
         </div>
 
-        <div class="text-sm text-yellow-700 font-medium">
+        <div class="text-sm text-yellow-700 font-medium inter-font">
           Stok tersedia: {{ produk.stock }}
         </div>
 
         <div class="flex items-center flex-wrap gap-4">
           <form @submit.prevent="formTransaction">
             <button
-              class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed inter-font"
               :disabled="isFetching">
               <span v-if="isFetching">Loading...</span>
               <span v-else>Beli Sekarang</span>
@@ -116,7 +116,7 @@
           </form>
 
           <button
-            class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+            class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition inter-font"
             @click="handleAddToCart"
           >
             + Keranjang
@@ -139,10 +139,10 @@
         </div>
 
         <div>
-          <h2 class="text-lg font-semibold text-[#7D0A0A] mb-2">
+          <h2 class="text-lg font-semibold text-[#7D0A0A] mb-2 navbar-font">
             Deskripsi Produk
           </h2>
-          <p class="text-gray-700 text-sm whitespace-pre-wrap">
+          <p class="text-gray-700 text-sm whitespace-pre-wrap inter-font">
             <span v-if="!readMore">
               {{ produk.deskripsi.slice(0, 100) }}...
               <br />

@@ -6,7 +6,7 @@
 
       <!-- Header -->
       <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold text-black">Pesanan</h1>
+        <h1 class="text-2xl font-bold text-black navbar-font">Pesanan</h1>
       </div>
 
 
@@ -22,28 +22,28 @@
         />
 
         <div class="flex-1">
-          <h3 class="text-lg font-semibold">
+          <h3 class="text-lg navbar-font">
             {{ pengiriman?.detail_shipments?.[0]?.detail_transaction?.product?.nama_product }}
           </h3>
 
-          <p class="text-gray-500 text-sm">
+          <p class="text-gray-500 text-sm inter-font">
             Toko :
             {{ pengiriman?.detail_shipments?.[0]?.detail_transaction?.product?.user?.toko?.nama_toko ?? '-' }}
           </p>
 
-          <p class="text-red-600 font-bold">
+          <p class="text-red-600 navbar-font">
             Rp.{{ pengiriman?.detail_shipments?.[0]?.detail_transaction?.harga }}
           </p>
         </div>
 
         <div class="text-right text-sm">
           <p>
-            <span class="font-semibold">Nomor Resi :</span>
+            <span class="navbar-font">Nomor Resi :</span>
             {{ pengiriman?.kode_resi ?? '-' }}
           </p>
 
           <p>
-            <span class="font-semibold">Kurir :</span>
+            <span class="navbar-font">Kurir :</span>
             {{ pengiriman?.kurir ?? '-' }}
           </p>
         </div>
@@ -80,7 +80,7 @@
         </div>
 
 
-        <div class="flex justify-between text-xs mt-2 font-medium">
+        <div class="flex justify-between text-xs mt-2 font-medium inter-font">
 
           <span :class="stepTextClass(1)">Diproses</span>
           <span :class="stepTextClass(2)">Pickup</span>
@@ -110,17 +110,17 @@
 
           <div>
 
-            <p class="text-sm font-medium">
+            <p class="text-sm font-medium inter-font">
               {{ item.manifest_date }} - {{ item.manifest_time }}
             </p>
 
             <p
-              :class="index === 0 ? 'text-red-600 font-semibold' : 'text-gray-600'"
+              :class="index === 0 ? 'text-red-600' : 'text-gray-600 navbar-font'"
             >
               {{ item.manifest_description }}
             </p>
 
-            <p class="text-xs text-gray-400">
+            <p class="text-xs text-gray-400 inter-font">
               {{ item.city_name }}
             </p>
 

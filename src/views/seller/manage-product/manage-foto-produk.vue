@@ -3,12 +3,12 @@
     <div class="p-6 overflow-x-auto">
         
         <div class="flex justify-between items-center mb-6">
-          <h1 class="text-3xl font-bold">Manage Foto Produk</h1>
+          <h1 class="text-3xl navbar-font">Manage Foto Produk</h1>
 
           <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
             <div class="flex-1">
-              <p class="text-sm font-bold">{{ user.name }}</p>
-              <p class="text-xs text-gray-600">{{ user.email }}</p>
+              <p class="text-sm font-bold inter-font">{{ user.name }}</p>
+              <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
             </div>
             <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
           </div>
@@ -23,7 +23,7 @@
           ></span>
 
           <span
-            class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white"
+            class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white navbar-font"
           >
             Tambah Foto Produk
           </span>
@@ -38,7 +38,7 @@
           ></span>
 
           <span
-            class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white"
+            class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white navbar-font"
           >
             Manage Product
           </span>
@@ -48,14 +48,14 @@
         <table class="min-w-full table-fixed divide-y divide-gray-200">
             <thead class="bg-gray-200">
             <tr>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Nama</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Foto</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm text-gray-700 navbar-font">Nama</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm text-gray-700 navbar-font">Foto</th>
 
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
             <tr v-for="produk in ProductSeller" :key="produk.id">
-                <td class="px-4 py-2 text-sm text-gray-900">{{ produk.nama_product }}</td>
+                <td class="px-4 py-2 text-sm text-gray-900 inter-font">{{ produk.nama_product }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 max-w-[200px]">
                 <div v-if="Array.isArray(produk.foto) && produk.foto.length > 0" class="overflow-x-auto">
                     <div class="flex w-max">
@@ -76,10 +76,10 @@
                                 v-if="openMenuIndex === `${produk.id}-${index}`" 
                                 class="absolute top-1/2 left-full transform -translate-y-1/2 ml-2 bg-white border shadow-md rounded p-2 space-y-2 z-20"
                             >
-                                <router-link :to="`/edit-foto-product/${item.id}`" class="block w-full text-sm text-yellow-600 hover:underline">
+                                <router-link :to="`/edit-foto-product/${item.id}`" class="block w-full text-sm text-yellow-600 hover:underline inter-font">
                                 Edit
                                 </router-link>
-                                <button @click="deleteFoto(item.id)" class="block w-full text-sm text-red-600 hover:underline">
+                                <button @click="deleteFoto(item.id)" class="block w-full text-sm text-red-600 hover:underline inter-font">
                                     Hapus
                                 </button>
                             </div>

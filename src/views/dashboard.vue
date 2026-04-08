@@ -32,7 +32,7 @@
         'px-4 py-1 rounded-full whitespace-nowrap',
         selectedCategories.includes(cat.id)
           ? 'bg-[#7D0A0A] text-white'
-          : 'border border-[#7D0A0A] text-[#7D0A0A]'
+          : 'border border-[#7D0A0A] text-[#7D0A0A] navbar-font'
       ]"
     >
       {{ cat.nama_category }}
@@ -73,7 +73,7 @@
   <div v-if="currentPage < lastPage" class="flex justify-center my-6">
     <button
       @click="loadMore"
-      class="bg-[#7D0A0A] text-white px-6 py-2 rounded hover:bg-[#BF3131] transition"
+      class="bg-[#7D0A0A] text-white px-6 py-2 rounded hover:bg-[#BF3131] transition inter-font"
       :disabled="isLoading"
     >
       {{ isLoading ? 'Memuat...' : 'Tampilkan Lebih Banyak' }}

@@ -5,12 +5,12 @@
 
       <!-- HEADER -->
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Manage Produk</h1>
+        <h1 class="text-3xl navbar-font">Manage Produk</h1>
 
         <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
-            <p class="text-sm font-bold">{{ user.name }}</p>
-            <p class="text-xs text-gray-600">{{ user.email }}</p>
+            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
           </div>
           <img
             :src="user?.foto_profil || 'https://placehold.co/100'"
@@ -42,7 +42,7 @@
         to="/create-produk"
       >
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
+        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
           Tambah Produk
         </span>
       </router-link>
@@ -52,7 +52,7 @@
         to="/manage-foto-product"
       >
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
+        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
           Manage Foto
         </span>
       </router-link>
@@ -64,11 +64,11 @@
           <table class="min-w-full table-fixed">
             <thead class="bg-gray-200">
               <tr>
-                <th class="px-4 py-2">Nama</th>
-                <th class="px-4 py-2">Harga</th>
-                <th class="px-4 py-2">Stok</th>
-                <th class="px-4 py-2">Status</th>
-                <th class="px-4 py-2">Action</th>
+                <th class="px-4 py-2 navbar-font">Nama</th>
+                <th class="px-4 py-2 navbar-font">Harga</th>
+                <th class="px-4 py-2 navbar-font">Stok</th>
+                <th class="px-4 py-2 navbar-font">Status</th>
+                <th class="px-4 py-2 navbar-font">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -102,11 +102,11 @@
           <table class="min-w-full table-fixed divide-y divide-gray-200">
             <thead class="bg-gray-200">
               <tr>
-                <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Nama</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Harga</th>
-                <th class="w-1/12 px-4 py-2 text-left text-sm font-semibold text-gray-700">Stok</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Status</th>
-                <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Action</th>
+                <th class="w-1/4 px-4 py-2 text-left text-sm inter-font text-gray-700">Nama</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm inter-font text-gray-700">Harga</th>
+                <th class="w-1/12 px-4 py-2 text-left text-sm inter-font text-gray-700">Stok</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm inter-font text-gray-700">Status</th>
+                <th class="w-1/4 px-4 py-2 text-left text-sm inter-font text-gray-700">Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -178,7 +178,7 @@
       <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
           <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-            <h2 class="text-xl font-bold text-gray-800">Detail Produk</h2>
+            <h2 class="text-xl font-bold text-gray-800 navbar-font">Detail Produk</h2>
             <button @click="closeDetail" class="text-gray-500 hover:text-red-500 transition-colors">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -198,21 +198,21 @@
               
               <div class="w-full md:w-2/3 space-y-4">
                 <div>
-                  <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Nama Produk</h3>
-                  <p class="text-lg font-medium text-gray-900">{{ selectedProduct.nama_product }}</p>
+                  <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Nama Produk</h3>
+                  <p class="text-lg font-medium inter-font text-gray-900 inter-font">{{ selectedProduct.nama_product }}</p>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Harga</h3>
-                    <p class="text-base text-gray-900">{{ selectedProduct.harga }}</p>
+                    <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Harga</h3>
+                    <p class="text-base text-gray-900 inter-font">{{ selectedProduct.harga }}</p>
                   </div>
                   <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Stok</h3>
-                    <p class="text-base text-gray-900">{{ selectedProduct.stock }}</p>
+                    <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Stok</h3>
+                    <p class="text-base text-gray-900 inter-font">{{ selectedProduct.stock }}</p>
                   </div>
                   <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Status</h3>
+                    <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Status</h3>
                     <p class="text-base">
                       <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800" v-if="selectedProduct.status_produk === 'Aktif'">{{ selectedProduct.status_produk }}</span>
                       <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800" v-else>{{ selectedProduct.status_produk }}</span>
@@ -221,8 +221,8 @@
                 </div>
 
                 <div>
-                  <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Deskripsi</h3>
-                  <div class="bg-gray-50 p-3 rounded border text-sm text-gray-700 whitespace-pre-wrap">
+                  <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider mb-1">Deskripsi</h3>
+                  <div class="bg-gray-50 p-3 rounded border text-sm text-gray-700 whitespace-pre-wrap inter-font">
                     {{ selectedProduct.deskripsi || '-' }}
                   </div>
                 </div>

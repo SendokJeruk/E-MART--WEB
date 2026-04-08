@@ -54,7 +54,7 @@
         class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border mb-3"
       />
 
-      <h2 class="text-xl sm:text-2xl font-bold mb-4 text-center">
+      <h2 class="text-xl sm:text-2xl mb-4 text-center navbar-font">
         {{ user?.name || 'UserName' }}
       </h2>
 
@@ -62,18 +62,18 @@
         class="w-full bg-gray-100 rounded-lg p-4 sm:p-5 text-sm sm:text-base text-gray-800 space-y-2"
       >
         <div class="flex justify-between border-b pb-1">
-          <span class="font-semibold">Full Name</span>
-          <span class="text-right">{{ user?.name }}</span>
+          <span class="navbar-font">Full Name</span>
+          <span class="text-right inter-font">{{ user?.name }}</span>
         </div>
 
         <div class="flex justify-between border-b pb-1">
-          <span class="font-semibold">Email</span>
-          <span class="text-right break-all">{{ user?.email }}</span>
+          <span class="navbar-font">Email</span>
+          <span class="text-right break-all inter-font">{{ user?.email }}</span>
         </div>
 
         <div class="flex justify-between border-b pb-1">
-          <span class="font-semibold">No Telepon</span>
-          <span class="text-right break-all">{{ user?.no_telp }}</span>
+          <span class="navbar-font">No Telepon</span>
+          <span class="text-right break-all inter-font">{{ user?.no_telp }}</span>
         </div>
       </div>
 
@@ -81,14 +81,14 @@
 
       <button
         @click="logout"
-        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3"
+        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3 navbar-font"
       >
         Log Out
       </button>
 
       <router-link
         :to="`/edit-profil/${user?.id}`"
-        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3"
+        class="w-full bg-[#7D0A0A] text-white py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3 navbar-font"
       >
         Edit Profil
       </router-link>
@@ -96,7 +96,7 @@
       <router-link
         v-if="userRole === 'seller'"
         :to="tokoseller.length > 0 ? '/seller' : '/create-toko'"
-        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3"
+        class="w-full bg-[#7D0A0A] text-white py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3 navbar-font"
       >
         {{ tokoseller.length > 0 ? 'Seller Dashboard' : 'Buat Toko' }}
       </router-link>
@@ -104,7 +104,7 @@
       <router-link
         v-if="userRole === 'buyer'"
         to="/pengajuan-seller"
-        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-green-600 text-center block mt-3"
+        class="w-full bg-[#7D0A0A] text-white py-2 rounded-lg transition duration-300 hover:bg-white hover:text-green-600 text-center block mt-3"
       >
         Jadi Seller
       </router-link>

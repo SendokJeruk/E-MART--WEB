@@ -37,10 +37,13 @@
 
       <!-- BUTTON -->
       <router-link
-        class="group inline-block border border-[#7D0A0A] px-8 py-3 mb-5"
+        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5"
         to="/create-kategori"
       >
-        <span class="text-[#7D0A0A] group-hover:text-white">Tambah Kategori</span>
+        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] group-hover:h-full"></span>
+        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
+          Tambah Kategori
+        </span>
       </router-link>
 
       <!-- TABLE -->
@@ -48,8 +51,8 @@
         <table class="min-w-full table-auto">
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-6 py-3 text-left">Nama Kategori</th>
-              <th class="px-6 py-3 text-left">Action</th>
+              <th class="px-6 py-3 text-left navbar-font">Nama Kategori</th>
+              <th class="px-6 py-3 text-left navbar-font">Action</th>
             </tr>
           </thead>
 
@@ -69,14 +72,14 @@
                 <td class="px-6 py-4">
                   <button
                     @click="deleteCategory(category.id)"
-                    class="bg-red-500 text-white px-3 py-1 rounded mr-2"
+                    class="bg-red-500 text-white px-3 py-1 rounded mr-2 navbar-font"
                   >
                     Delete
                   </button>
 
                   <router-link
                     :to="`/edit-kategori/${category.id}`"
-                    class="bg-yellow-500 text-white px-3 py-1 rounded"
+                    class="bg-yellow-500 text-white px-3 py-1 rounded navbar-font"
                   >
                     Edit
                   </router-link>
