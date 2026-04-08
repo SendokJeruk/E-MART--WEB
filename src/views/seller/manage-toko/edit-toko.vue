@@ -82,91 +82,105 @@
           </div>
 
           <div class="mb-4">
-            <label class="block mb-1">Provinsi</label>
-            <select
-              v-model="form.province_id"
-              @change="getKota"
-              class="w-full border px-3 py-2 rounded"
+            <button
+              type="button"
+              @click="isEditingAlamat = !isEditingAlamat"
+              class="bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2 rounded hover:bg-gray-200 transition-colors"
             >
-              <option disabled value="">Pilih Provinsi</option>
-              <option v-for="prov in provinces" :key="prov.id" :value="prov.id">
-                {{ prov.name }}
-              </option>
-            </select>
+              {{ isEditingAlamat ? 'Batal Edit Alamat Toko' : 'Edit Alamat Toko' }}
+            </button>
           </div>
 
-          <div class="mb-4">
-            <label class="block mb-1">Kota / Kabupaten</label>
-            <select
-              v-model="form.city_name"
-              @change="getKecamatan"
-              class="w-full border px-3 py-2 rounded"
-            >
-              <option value="" disabled>Pilih Kota</option>
-              <option v-for="city in cities" :key="city.id" :value="city.name">
-                {{ city.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="mb-4">
-            <label class="block mb-1">Kecamatan</label>
-            <select
-              v-model="form.district_name"
-              @change="getKelurahan"
-              class="w-full border px-3 py-2 rounded"
-            >
-              <option value="" disabled>Pilih Kecamatan</option>
-              <option v-for="district in districts" :key="district.id" :value="district.name">
-                {{ district.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="mb-4">
-            <label class="block mb-1">Kelurahan</label>
-            <select
-              v-model="form.subdistrict_name"
-              class="w-full border px-3 py-2 rounded"
-            >
-              <option value="" disabled>Pilih Kelurahan</option>
-              <option v-for="sub in subdistricts" :key="sub.id" :value="sub.name">
-                {{ sub.name }}
-              </option>
-            </select>
-          </div>
-
-          <div v-if="searchResults.length" class="border rounded p-3 max-h-48 overflow-auto mt-3 bg-gray-50">
-            <p class="mb-2 font-semibold">Pilih alamat yang sesuai:</p>
-
-            <ul>
-              <li
-                v-for="item in searchResults"
-                :key="item.id"
-                class="cursor-pointer p-2 hover:bg-gray-200 rounded"
-                @click="pilihAlamat(item)"
+          <div v-if="isEditingAlamat" class="border p-4 rounded mb-4 bg-gray-50">
+            <h3 class="font-semibold mb-3 border-b pb-2">Form Alamat Toko</h3>
+            
+            <div class="mb-4">
+              <label class="block mb-1">Provinsi</label>
+              <select
+                v-model="form.province_id"
+                @change="getKota"
+                class="w-full border px-3 py-2 rounded bg-white"
               >
-                {{ item.label }}
-              </li>
-            </ul>
-          </div>
+                <option disabled value="">Pilih Provinsi</option>
+                <option v-for="prov in provinces" :key="prov.id" :value="prov.id">
+                  {{ prov.name }}
+                </option>
+              </select>
+            </div>
 
-          <div class="mb-4">
-            <label class="block mb-1">Kode Pos</label>
-            <input
-              v-model="form.zip_code"
-              type="text"
-              class="w-full border px-3 py-2 rounded"
-            />
-          </div>
+            <div class="mb-4">
+              <label class="block mb-1">Kota / Kabupaten</label>
+              <select
+                v-model="form.city_name"
+                @change="getKecamatan"
+                class="w-full border px-3 py-2 rounded bg-white"
+              >
+                <option value="" disabled>Pilih Kota</option>
+                <option v-for="city in cities" :key="city.id" :value="city.name">
+                  {{ city.name }}
+                </option>
+              </select>
+            </div>
 
-          <div class="mb-4">
-            <label class="block mb-1">Detail Alamat</label>
-            <textarea
-              v-model="form.detail_alamat"
-              rows="2"
-              class="w-full border px-3 py-2 rounded"
-            ></textarea>
+            <div class="mb-4">
+              <label class="block mb-1">Kecamatan</label>
+              <select
+                v-model="form.district_name"
+                @change="getKelurahan"
+                class="w-full border px-3 py-2 rounded bg-white"
+              >
+                <option value="" disabled>Pilih Kecamatan</option>
+                <option v-for="district in districts" :key="district.id" :value="district.name">
+                  {{ district.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="block mb-1">Kelurahan</label>
+              <select
+                v-model="form.subdistrict_name"
+                class="w-full border px-3 py-2 rounded bg-white"
+              >
+                <option value="" disabled>Pilih Kelurahan</option>
+                <option v-for="sub in subdistricts" :key="sub.id" :value="sub.name">
+                  {{ sub.name }}
+                </option>
+              </select>
+            </div>
+
+            <div v-if="searchResults.length" class="border rounded p-3 max-h-48 overflow-auto mt-3 bg-white">
+              <p class="mb-2 font-semibold">Pilih alamat yang sesuai:</p>
+
+              <ul>
+                <li
+                  v-for="item in searchResults"
+                  :key="item.id"
+                  class="cursor-pointer p-2 hover:bg-gray-200 rounded"
+                  @click="pilihAlamat(item)"
+                >
+                  {{ item.label }}
+                </li>
+              </ul>
+            </div>
+
+            <div class="mb-4">
+              <label class="block mb-1">Kode Pos</label>
+              <input
+                v-model="form.zip_code"
+                type="text"
+                class="w-full border px-3 py-2 rounded bg-white"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block mb-1">Detail Alamat</label>
+              <textarea
+                v-model="form.detail_alamat"
+                rows="2"
+                class="w-full border px-3 py-2 rounded bg-white"
+              ></textarea>
+            </div>
           </div>
 
           <button
@@ -201,6 +215,7 @@ const searchResults = ref([])
 const errorMessages = ref(null)
 const successMessage = ref(null)
 const isLoading = ref(true)
+const isEditingAlamat = ref(false)
 
 const form = ref({
   user_id: '',
@@ -299,20 +314,24 @@ const submitForm = async () => {
 
     await api.post(`/toko/${route.params.id}`, tokoForm)
 
-    const alamatForm = new FormData()
-    alamatForm.append('province_name', form.value.province_name) // ⬅️ DIUBAH
-    alamatForm.append('city_name', form.value.city_name)
-    alamatForm.append('district_name', form.value.district_name)
-    alamatForm.append('subdistrict_name', form.value.subdistrict_name)
-    alamatForm.append('zip_code', form.value.zip_code)
-    alamatForm.append('detail_alamat', form.value.detail_alamat)
-    alamatForm.append('label', form.value.label)
-    alamatForm.append('kode_domestik', form.value.kode_domestik)
-    alamatForm.append('_method', 'PUT')
+    if (isEditingAlamat.value) {
+      const alamatForm = new FormData()
+      alamatForm.append('province_name', form.value.province_name) // ⬅️ DIUBAH
+      alamatForm.append('city_name', form.value.city_name)
+      alamatForm.append('district_name', form.value.district_name)
+      alamatForm.append('subdistrict_name', form.value.subdistrict_name)
+      alamatForm.append('zip_code', form.value.zip_code)
+      alamatForm.append('detail_alamat', form.value.detail_alamat)
+      alamatForm.append('label', form.value.label)
+      alamatForm.append('kode_domestik', form.value.kode_domestik)
+      alamatForm.append('_method', 'PUT')
 
-    await api.post(`/toko/alamat/${route.params.id}`, alamatForm)
+      await api.post(`/toko/alamat/${route.params.id}`, alamatForm)
+      showSuccess('Toko & alamat berhasil diperbarui!')
+    } else {
+      showSuccess('Toko berhasil diperbarui!')
+    }
 
-    showSuccess('Toko & alamat berhasil diperbarui!')
     router.push('/manage-toko')
   } catch (error) {
     const errors = error.response?.data?.errors;
