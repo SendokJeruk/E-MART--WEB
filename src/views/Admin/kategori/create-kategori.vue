@@ -1,22 +1,22 @@
 <template>
     <adminside>
       <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-        <h2 class="text-xl font-bold mb-4">Form Tambah Kategori</h2>
+        <h2 class="text-xl navbar-font mb-4">Form Tambah Kategori</h2>
         <form @submit.prevent="submitForm">
           <div class="mb-4">
-            <label for="nama_category" class="block mb-1">Nama Kategori</label>
+            <label for="nama_category" class="block mb-1 navbar-font">Nama Kategori</label>
             <input
               id="nama_category"
               name="nama_category"
               v-model="form.nama_category"
               type="text"
-              class="w-full border px-3 py-2 rounded"
+              class="w-full border px-3 py-2 rounded inter-font"
             />
           </div>
   
           <button
             type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 navbar-font"
           >
             Submit
           </button>

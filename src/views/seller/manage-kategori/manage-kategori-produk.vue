@@ -2,12 +2,12 @@
   <sellerside>
     <div class="p-6 overflow-x-auto">
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Manage Kategori Produk</h1>
+        <h1 class="text-3xl navbar-font">Manage Kategori Produk</h1>
 
         <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
-            <p class="text-sm font-bold">{{ user.name }}</p>
-            <p class="text-xs text-gray-600">{{ user.email }}</p>
+            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
           </div>
           <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
         </div>
@@ -18,7 +18,7 @@
         to="/create-kategori-produk"
       >
         <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white">
+        <span class="relative text-sm navbar-font text-[#7D0A0A] transition-colors group-hover:text-white">
           Tambah Kategori Produk
         </span>
       </router-link>
@@ -27,14 +27,14 @@
         <table class="min-w-full table-fixed divide-y divide-gray-200">
           <thead class="bg-gray-200">
             <tr>
-              <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Produk</th>
-              <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Kategori</th>
+              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">Produk</th>
+              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">Kategori</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
             <tr v-for="produk in groupedProducts" :key="produk.id">
-              <td class="px-4 py-2 text-sm text-gray-900">{{ produk.nama }}</td>
-              <td class="px-4 py-2 text-sm text-gray-900">
+              <td class="px-4 py-2 text-sm text-gray-900 inter-font">{{ produk.nama }}</td>
+              <td class="px-4 py-2 text-sm text-gray-900 inter-font">
                 <div class="flex gap-2 flex-wrap">
                   <span 
                     v-for="kategori in produk.categories" 

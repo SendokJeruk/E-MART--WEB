@@ -16,7 +16,7 @@
 
       <!-- Login Form -->
       <div class="w-full md:w-1/2 bg-[#7D0A0A] text-white p-10 text-center">
-        <h2 class="text-2xl navbar-font mb-6">Login</h2>
+        <h2 class="text-2xl navbar-font mb-6">Login ke eleven market</h2>
         <form @submit.prevent="loginUser" class="space-y-4">
           <input
             v-model="form.email"

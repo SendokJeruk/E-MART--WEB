@@ -1,36 +1,36 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <h2 class="text-xl font-bold mb-4">Form Tambah Produk</h2>
+      <h2 class="text-xl font-bold mb-4 navbar-font">Form Tambah Produk</h2>
       <form @submit.prevent="submitForm">
         <div class="mb-4">
-          <label for="nama_product" class="block mb-1">Nama Produk</label>
-          <input id="nama_product" v-model="form.nama_product" type="text" class="w-full border px-3 py-2 rounded" />
+          <label for="nama_product" class="block mb-1 navbar-font">Nama Produk</label>
+          <input id="nama_product" v-model="form.nama_product" type="text" class="w-full border px-3 py-2 rounded inter-font" />
         </div>
 
         <div class="mb-4">
-          <label for="deskripsi" class="block mb-1">Deskripsi</label>
-          <textarea id="deskripsi" v-model="form.deskripsi" class="w-full border px-3 py-2 rounded"></textarea>
+          <label for="deskripsi" class="block mb-1 navbar-font">Deskripsi</label>
+          <textarea id="deskripsi" v-model="form.deskripsi" class="w-full border px-3 py-2 rounded inter-font"></textarea>
         </div>
 
         <div class="mb-4">
-          <label for="harga" class="block mb-1">Harga</label>
-          <input id="harga" v-model="form.harga" type="text" class="w-full border px-3 py-2 rounded" />
+          <label for="harga" class="block mb-1 navbar-font">Harga</label>
+          <input id="harga" v-model="form.harga" type="text" class="w-full border px-3 py-2 rounded inter-font" />
         </div>
 
         <div class="mb-4">
-          <label for="stock" class="block mb-1">Stok</label>
-          <input id="stock" v-model="form.stock" type="number" class="w-full border px-3 py-2 rounded" />
+          <label for="stock" class="block mb-1 navbar-font">Stok</label>
+          <input id="stock" v-model="form.stock" type="number" class="w-full border px-3 py-2 rounded inter-font" />
         </div>
 
         <div class="mb-4">
-          <label for="berat" class="block mb-1">Berat</label>
-          <input id="berat" v-model="form.berat" type="number" class="w-full border px-3 py-2 rounded" required />
+          <label for="berat" class="block mb-1 navbar-font">Berat</label>
+          <input id="berat" v-model="form.berat" type="number" class="w-full border px-3 py-2 rounded inter-font" required />
         </div>
 
         <div class="mb-4">
-          <label for="status" class="block mb-1">Status Produk</label>
-          <select id="status" v-model="form.status" class="w-full border px-3 py-2 rounded">
+          <label for="status" class="block mb-1 navbar-font">Status Produk</label>
+          <select id="status" v-model="form.status" class="w-full border px-3 py-2 rounded inter-font">
             <option value="">Pilih status</option>
             <option value="draft">Draft</option>
             <option value="publish">Publish</option>
@@ -41,7 +41,7 @@
           <label for="foto_cover"
             class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer">
             <div class="flex items-center justify-center gap-4">
-              <span class="font-medium">Upload Foto Produk</span>
+              <span class="inter-font">Upload Foto Produk</span>
               <div v-if="selectedFileName" class="text-sm text-gray-500">
                 {{ selectedFileName }}
               </div>

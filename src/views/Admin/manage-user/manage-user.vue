@@ -4,7 +4,7 @@
 
       <!-- HEADER -->
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Manage User</h1>
+        <h1 class="text-3xl navbar-font">Manage User</h1>
 
         <!-- Header Skeleton saat loading -->
         <div
@@ -25,8 +25,8 @@
           class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
         >
           <div class="flex-1">
-            <p class="text-sm font-bold">{{ user.name }}</p>
-            <p class="text-xs text-gray-600">{{ user.email }}</p>
+            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
           </div>
           <img
             :src="user?.foto_profil || 'https://placehold.co/100'"
@@ -61,9 +61,9 @@
         <table class="min-w-full table-auto divide-y divide-gray-200">
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-6 py-3 text-left text-sm font-semibold">Name</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold">Email</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold">Action</th>
+              <th class="px-6 py-3 text-left text-sm navbar-font">Name</th>
+              <th class="px-6 py-3 text-left text-sm navbar-font">Email</th>
+              <th class="px-6 py-3 text-left text-sm navbar-font">Action</th>
             </tr>
           </thead>
 
@@ -90,14 +90,14 @@
                 <td class="px-6 py-4">
                   <button
                     @click="deleteUser(user.id)"
-                    class="bg-red-500 text-white px-3 py-1 rounded mr-2"
+                    class="bg-red-500 text-white px-3 py-1 rounded mr-2 navbar-font"
                   >
                     Hapus
                   </button>
 
                   <router-link
                     :to="`/edit-user/${user.id}`"
-                    class="bg-yellow-500 text-white px-3 py-1 rounded"
+                    class="bg-yellow-500 text-white px-3 py-1 rounded navbar-font"
                   >
                     Edit
                   </router-link>

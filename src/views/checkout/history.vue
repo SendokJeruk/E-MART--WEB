@@ -71,11 +71,11 @@
             <div class="bg-gray-50 px-6 py-4 flex justify-between items-center border-b">
               <div class="flex items-center gap-6">
 
-                <span class="text-sm text-gray-500">
+                <span class="text-sm text-gray-500 navbar-font">
                   {{ formatDate(shipment.created_at) }}
                 </span>
 
-                <span class="text-sm">
+                <span class="text-sm navbar-font">
                   Kode Pesanan: {{ shipment.kode_transaksi || "SJK-GAGAL-KODE" }}
                 </span>
 
@@ -89,7 +89,7 @@
                   'text-red-600 font-medium': shipment.status_pengiriman === 'dibatalkan',
                   'text-purple-600 font-medium': shipment.status_pengiriman === 'tiba',
                 }"
-                class="text-sm font-semibold"
+                class="text-sm font-semibold navbar-font"
               >
                 {{ shipment.status_pengiriman }}
               </span>
@@ -112,25 +112,21 @@
                 />
 
                 <div class="ml-5 flex-1">
-                  <h3 class="text-base font-medium text-gray-800 mb-1 line-clamp-2">
+                  <h3 class="text-base font-medium text-gray-800 mb-1 line-clamp-2 navbar-font">
                     {{ detail.detail_transaction.product.nama_product }}
                   </h3>
 
-                  <p class="text-xs text-gray-500 mb-1">
-                    Variasi: Standar
-                  </p>
-
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-gray-500 inter-font">
                     Jumlah: {{ detail.detail_transaction.jumlah }}
                   </p>
                 </div>
 
                 <div class="text-right">
-                  <p class="text-sm font-semibold text-gray-800">
+                  <p class="text-sm font-semibold text-gray-800 navbar-font">
                     Rp {{ formatPrice(detail.detail_transaction.harga) }}
                   </p>
 
-                  <p class="text-xs text-gray-500 mt-1">
+                  <p class="text-xs text-gray-500 mt-1 navbar-font">
                     Total: Rp {{ formatPrice(detail.detail_transaction.harga * detail.detail_transaction.jumlah) }}
                   </p>
                 </div>
@@ -142,11 +138,11 @@
 
               <div class="flex items-center gap-2 text-sm">
 
-                <span class="text-gray-600">
+                <span class="text-gray-600 navbar-font">
                   Total Belanja:
                 </span>
 
-                <span class="text-lg font-bold text-[#FF5722]">
+                <span class="text-lg font-bold text-[#7D0A0A] navbar-font">
                   Rp {{ formatPrice(shipment.transaction.total_harga) }}
                 </span>
 

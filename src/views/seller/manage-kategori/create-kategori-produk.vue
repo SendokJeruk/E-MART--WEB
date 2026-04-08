@@ -1,18 +1,18 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <h2 class="text-xl font-bold mb-4">Form Tambah Kategori Produk</h2>
+      <h2 class="text-xl navbar-font mb-4">Form Tambah Kategori Produk</h2>
       <form @submit.prevent="submitForm">
         <!-- Produk Searchable -->
         <div class="mb-4 relative">
-          <label for="product_search" class="block mb-1">Pilih Produk</label>
+          <label for="product_search" class="block mb-1 navbar-font">Pilih Produk</label>
           <input
             type="text"
             id="product_search"
             v-model="productSearch"
             @input="filterProducts"
             placeholder="Cari Produk..."
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             autocomplete="off"
             required
           />
@@ -24,7 +24,7 @@
               v-for="product in filteredProducts"
               :key="product.id"
               @click="selectProduct(product)"
-              class="px-3 py-2 hover:bg-blue-100 cursor-pointer"
+              class="px-3 py-2 hover:bg-blue-100 cursor-pointer inter-font"
             >
               {{ product.nama_product }}
             </li>
@@ -33,14 +33,14 @@
 
         <!-- Kategori Searchable -->
         <div class="mb-4 relative">
-          <label for="category_search" class="block mb-1">Pilih Kategori</label>
+          <label for="category_search" class="block mb-1 navbar-font">Pilih Kategori</label>
           <input
             type="text"
             id="category_search"
             v-model="categorySearch"
             @input="filterCategories"
             placeholder="Cari Kategori..."
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             autocomplete="off"
             required
           />
@@ -52,7 +52,7 @@
               v-for="category in filteredCategories"
               :key="category.id"
               @click="selectCategory(category)"
-              class="px-3 py-2 hover:bg-blue-100 cursor-pointer"
+              class="px-3 py-2 hover:bg-blue-100 cursor-pointer inter-font"
             >
               {{ category.nama_category }}
             </li>
@@ -61,7 +61,7 @@
 
         <button
           type="submit"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 navbar-font"
         >
           Submit
         </button>

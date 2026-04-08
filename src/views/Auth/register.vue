@@ -10,7 +10,7 @@
       </div>
 
       <div class="w-full md:w-1/2 bg-[#7d0a0a] p-10 text-white text-center flex flex-col justify-center">
-        <h2 class="navbar-font text-2xl mb-6">Register</h2>
+        <h2 class="navbar-font text-2xl mb-6">Register ke eleven market</h2>
 
         <form @submit.prevent="registerUser" class="space-y-4 inter-font">
           <input v-model="form.name" type="text" placeholder="Full Name" required

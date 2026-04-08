@@ -3,7 +3,7 @@
     <div class="p-6">
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Manage Income</h1>
+        <h1 class="text-3xl navbar-font">Manage Income</h1>
 
         <!-- Profile -->
         <div v-if="isLoading" class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
@@ -16,8 +16,8 @@
 
         <div v-else class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
           <div class="flex-1">
-            <p class="text-sm font-bold">{{ user.name }}</p>
-            <p class="text-xs text-gray-600">{{ user.email }}</p>
+            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
           </div>
           <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 bg-gray-300 rounded-full"/>
         </div>
@@ -41,14 +41,14 @@
           class="bg-white shadow rounded-xl p-4 flex flex-col justify-between"
         >
           <div>
-            <p class="font-bold text-gray-800">{{ withdraw.user.name }}</p>
-            <p class="text-xs text-gray-500 mb-2">{{ withdraw.user.email }}</p>
-            <p class="text-lg font-bold text-red-700">
+            <p class="font-bold text-gray-800 navbar-font">{{ withdraw.user.name }}</p>
+            <p class="text-xs text-gray-500 mb-2 inter-font">{{ withdraw.user.email }}</p>
+            <p class="text-lg font-bold text-red-700 navbar-font">
               Rp {{ withdraw.jumlah.toLocaleString() }}
             </p>
 
             <span
-              class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold"
+              class="mt-2 inline-block px-3 py-1 rounded-full text-xs navbar-font"
               :class="{
                 'bg-yellow-100 text-yellow-700': withdraw.status === 'pending',
                 'bg-green-100 text-green-700': withdraw.status === 'accepted',
@@ -60,7 +60,7 @@
           </div>
 
           <button
-            class="mt-4 w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+            class="mt-4 w-full px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 navbar-font"
             @click="openDetail(withdraw)"
           >
             Lihat Detail
@@ -115,20 +115,20 @@
             <div v-if="selectedWithdraw" class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
               <button class="absolute top-3 right-3 text-gray-500 hover:text-gray-700" @click="selectedWithdraw = null">✖</button>
 
-              <h2 class="text-xl font-bold mb-4">Detail Withdraw</h2>
+              <h2 class="text-xl navbar-font mb-4">Detail Withdraw</h2>
 
               <div class="space-y-2 text-sm text-gray-700">
-                <p><span class="font-semibold">Seller:</span> {{ selectedWithdraw.user.name }}</p>
-                <p><span class="font-semibold">Email:</span> {{ selectedWithdraw.user.email }}</p>
-                <p><span class="font-semibold">Jumlah:</span> Rp {{ selectedWithdraw.jumlah.toLocaleString() }}</p>
-                <p><span class="font-semibold">Metode:</span> {{ selectedWithdraw.metode }}</p>
-                <p><span class="font-semibold">Rekening Tujuan:</span> {{ selectedWithdraw.rekening_tujuan }}</p>
-                <p><span class="font-semibold">Catatan:</span> {{ selectedWithdraw.catatan }}</p>
+                <p><span class="inter-font">Seller:</span> {{ selectedWithdraw.user.name }}</p>
+                <p><span class="inter-font">Email:</span> {{ selectedWithdraw.user.email }}</p>
+                <p><span class="inter-font">Jumlah:</span> Rp {{ selectedWithdraw.jumlah.toLocaleString() }}</p>
+                <p><span class="inter-font">Metode:</span> {{ selectedWithdraw.metode }}</p>
+                <p><span class="inter-font">Rekening Tujuan:</span> {{ selectedWithdraw.rekening_tujuan }}</p>
+                <p><span class="inter-font">Catatan:</span> {{ selectedWithdraw.catatan }}</p>
 
                 <p>
-                  <span class="font-semibold">Status:</span>
+                  <span class="inter-font">Status:</span>
                   <span
-                    class="ml-2 px-3 py-1 rounded-full text-xs font-semibold"
+                    class="ml-2 px-3 py-1 rounded-full text-xs navbar-font"
                     :class="{
                       'bg-yellow-100 text-yellow-700': selectedWithdraw.status === 'pending',
                       'bg-green-100 text-green-700': selectedWithdraw.status === 'accepted',
@@ -142,7 +142,7 @@
 
               <div class="flex gap-3 mt-6" v-if="selectedWithdraw.status !== 'accepted'">
                 <button
-                  class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 navbar-font"
                   :disabled="loading"
                   @click="updateStatus(selectedWithdraw.id, 'approved')"
                 >
@@ -150,7 +150,7 @@
                 </button>
 
                 <button
-                  class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 navbar-font"
                   :disabled="loading"
                   @click="updateStatus(selectedWithdraw.id, 'rejected')"
                 >

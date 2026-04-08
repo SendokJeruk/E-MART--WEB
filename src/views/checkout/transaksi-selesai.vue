@@ -21,12 +21,12 @@
       </div>
 
       <!-- Title -->
-      <h1 class="text-2xl font-bold text-gray-800 mt-6">
+      <h1 class="text-2xl font-bold text-gray-800 mt-6 navbar-font">
         Pembayaran Berhasil
       </h1>
 
       <!-- Subtitle -->
-      <p class="text-gray-500 text-sm mt-2">
+      <p class="text-gray-500 text-sm mt-2 inter-font">
         Transaksi kamu sudah selesai diproses.
       </p>
 
@@ -34,7 +34,7 @@
       <button 
         @click="router.push('/dashboard')" 
         class="mt-8 w-full py-3 bg-[#7D0A0A] text-white rounded-xl font-semibold 
-               hover:bg-[#a32727] transition duration-300 shadow-md">
+               hover:bg-[#a32727] transition duration-300 shadow-md navbar-font">
         Kembali
       </button>
 

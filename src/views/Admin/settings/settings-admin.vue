@@ -1,16 +1,16 @@
 <template>
   <adminside>
     <div class="p-6 overflow-x-auto">
-      <h1 class="text-2xl font-bold mb-4">Settings</h1>
+      <h1 class="text-2xl navbar-font mb-4">Settings</h1>
 
       <!-- TABLE SETTINGS -->
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-auto divide-y divide-gray-200">
           <thead class="bg-gray-200">
             <tr>
-              <th class="px-6 py-3 text-left text-sm font-semibold">Name</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold">Value</th>
-              <th class="px-6 py-3 text-left text-sm font-semibold">Action</th>
+              <th class="px-6 py-3 text-left text-sm navbar-font">Name</th>
+              <th class="px-6 py-3 text-left text-sm navbar-font">Value</th>
+              <th class="px-6 py-3 text-left text-sm navbar-font">Action</th>
             </tr>
           </thead>
 
@@ -33,7 +33,7 @@
               <tr v-for="item in settings" :key="item.id">
 
                 <!-- NAME -->
-                <td class="px-6 py-4 text-sm font-medium">
+                <td class="px-6 py-4 text-sm font-medium inter-font">
                   {{ item.name }}
                 </td>
 
@@ -43,7 +43,7 @@
                     v-if="editing[item.id]"
                     v-model="item.value"
                     type="text"
-                    class="border rounded px-2 py-1 w-full"
+                    class="border rounded px-2 py-1 w-full inter-font"
                   />
 
                   <span v-else>
@@ -58,14 +58,14 @@
                   <template v-if="editing[item.id]">
                     <button
                       @click="saveEdit(item)"
-                      class="px-3 py-1 text-xs bg-green-500 text-white rounded"
+                      class="px-3 py-1 text-xs bg-green-500 text-white rounded navbar-font"
                     >
                       Save
                     </button>
 
                     <button
                       @click="cancelEdit(item.id)"
-                      class="px-3 py-1 text-xs bg-gray-300 rounded"
+                      class="px-3 py-1 text-xs bg-gray-300 rounded navbar-font"
                     >
                       Cancel
                     </button>
@@ -75,14 +75,14 @@
                   <template v-else>
                     <button
                       @click="toggleShow(item.id)"
-                      class="px-3 py-1 text-xs bg-gray-200 rounded"
+                      class="px-3 py-1 text-xs bg-gray-200 rounded navbar-font"
                     >
                       {{ shown[item.id] ? "Hide" : "Show" }}
                     </button>
 
                     <button
                       @click="enableEdit(item.id)"
-                      class="px-3 py-1 text-xs bg-blue-500 text-white rounded"
+                      class="px-3 py-1 text-xs bg-blue-500 text-white rounded navbar-font"
                     >
                       Edit
                     </button>

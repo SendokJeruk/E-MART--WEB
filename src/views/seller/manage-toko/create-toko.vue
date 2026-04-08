@@ -1,53 +1,53 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <h2 class="text-xl font-bold mb-4">Form Tambah Toko</h2>
+      <h2 class="text-xl navbar-font mb-4">Form Tambah Toko</h2>
       
       <form @submit.prevent="submitForm">
         <!-- Nama Toko -->
         <div class="mb-4">
-          <label for="nama_toko" class="block mb-1">Nama Toko</label>
+          <label for="nama_toko" class="block mb-1 navbar-font">Nama Toko</label>
           <input
             type="text"
             id="nama_toko"
             v-model="form.nama_toko"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             required
           />
         </div>
 
         <!-- Deskripsi -->
         <div class="mb-4">
-          <label for="deskripsi" class="block mb-1">Deskripsi</label>
+          <label for="deskripsi" class="block mb-1 navbar-font">Deskripsi</label>
           <input
             type="text"
             id="deskripsi"
             v-model="form.deskripsi"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             required
           />
         </div>
 
         <!-- No. Telepon -->
         <div class="mb-4">
-          <label for="no_telp" class="block mb-1">No. Telepon</label>
+          <label for="no_telp" class="block mb-1 navbar-font">No. Telepon</label>
           <input
             type="text"
             id="no_telp"
             v-model="form.no_telp"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             required
           />
         </div>
 
         <!-- Alamat: Provinsi -->
         <div class="mb-4">
-          <label for="province_name" class="block mb-1">Provinsi</label>
+          <label for="province_name" class="block mb-1 navbar-font">Provinsi</label>
           <select
             id="province_name"
             v-model="form.province_name"
             @change="getKota"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             required
           >
             <option value="" disabled selected>Pilih Provinsi</option>
@@ -59,12 +59,12 @@
 
         <!-- Alamat: Kota -->
         <div class="mb-4">
-          <label for="city_name" class="block mb-1">Kota / Kabupaten</label>
+          <label for="city_name" class="block mb-1 navbar-font">Kota / Kabupaten</label>
           <select
             id="city_name"
             v-model="form.city_name"
             @change="getKecamatan"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             required
           >
             <option value="" disabled selected>Pilih Kota</option>
@@ -76,12 +76,12 @@
 
         <!-- Alamat: Kecamatan -->
         <div class="mb-4">
-          <label for="district_name" class="block mb-1">Kecamatan</label>
+          <label for="district_name" class="block mb-1 navbar-font">Kecamatan</label>
           <select
             id="district_name"
             v-model="form.district_name"
             @change="getKelurahan"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             required
           >
             <option value="" disabled selected>Pilih Kecamatan</option>
@@ -93,11 +93,11 @@
 
         <!-- Alamat: Kelurahan -->
         <div class="mb-4">
-          <label for="subdistrict_name" class="block mb-1">Kelurahan</label>
+          <label for="subdistrict_name" class="block mb-1 navbar-font">Kelurahan</label>
           <select
             id="subdistrict_name"
             v-model="form.subdistrict_name"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             required
           >
             <option value="" disabled selected>Pilih Kelurahan</option>
@@ -109,11 +109,11 @@
 
         <!-- Alamat: Detail -->
         <div class="mb-4">
-          <label for="detail_alamat" class="block mb-1">Detail Alamat (Jalan, RT/RW, dsb)</label>
+          <label for="detail_alamat" class="block mb-1 navbar-font">Detail Alamat (Jalan, RT/RW, dsb)</label>
           <textarea
             id="detail_alamat"
             v-model="form.detail_alamat"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
             rows="2"
             required
           ></textarea>
@@ -121,18 +121,18 @@
 
         <!-- Cari Kode Domestik -->
         <div class="mb-4 flex items-center space-x-2">
-          <span class="text-sm text-gray-700" v-if="form.kode_domestik">
+          <span class="text-sm text-gray-700 inter-font" v-if="form.kode_domestik">
             Kode: {{ form.kode_domestik }}
           </span>
         </div>
 
         <div v-if="searchResults.length" class="border rounded p-3 max-h-48 overflow-auto mt-3 bg-gray-50">
-          <p class="mb-2 font-semibold">Pilih alamat yang sesuai:</p>
+          <p class="mb-2 navbar-font">Pilih alamat yang sesuai:</p>
           <ul>
             <li
               v-for="item in searchResults"
               :key="item.id"
-              class="cursor-pointer p-2 hover:bg-gray-200 rounded"
+              class="cursor-pointer p-2 hover:bg-gray-200 rounded inter-font"
               @click="pilihAlamat(item)"
             >
               {{ item.label }}
@@ -142,7 +142,7 @@
 
         <button
           type="submit"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 navbar-font"
         >
           Submit
         </button>

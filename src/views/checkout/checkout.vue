@@ -1,7 +1,7 @@
 <template>
   <Navbar />
 
-  <div class="p-4 space-y-4 bg-[#FFF5F5] min-h-screen">
+  <div class="p-4 space-y-4 min-h-screen">
 
     <!-- Judul -->
     <h1 class="text-xl font-bold navbar-font mb-4">| Checkout</h1>
@@ -62,11 +62,11 @@
 
       <!-- Pilihan Alamat -->
       <div class="bg-white rounded-lg shadow p-4">
-        <h3 class="font-semibold mb-3">Alamat Pengiriman</h3>
+        <h3 class="font-semibold mb-3 navbar-font">Alamat Pengiriman</h3>
 
         <select
           v-model="selectedAlamat"
-          class="border rounded p-2 w-full text-sm"
+          class="border rounded p-2 w-full text-sm inter-font"
           @change="handleAlamatChange"
         >
           <option disabled value="">Pilih Alamat</option>
@@ -93,7 +93,7 @@
           class="bg-white rounded-lg shadow p-4 space-y-4"
         >
 
-          <h2 class="font-semibold text-gray-800">
+          <h2 class="font-semibold text-gray-800 navbar-font">
             {{ toko.nama_toko }}
           </h2>
 
@@ -112,17 +112,17 @@
             />
 
             <div class="flex-1">
-              <h3 class="text-base font-semibold text-gray-800">
+              <h3 class="text-base font-semibold text-gray-800 navbar-font">
                 {{ item.nama_product || 'Produk tidak ditemukan' }}
               </h3>
 
-              <p class="text-sm font-bold text-red-600 mt-1">
+              <p class="text-sm font-bold text-red-600 mt-1 navbar-font">
                 Rp {{ formatRupiah(item.harga) }}
               </p>
             </div>
 
             <div class="flex flex-col items-end gap-2">
-              <span class="text-sm">x{{ item.jumlah }}</span>
+              <span class="text-sm navbar-font">x{{ item.jumlah }}</span>
 
               <button
                 @click="deleteProductscheckout(item.detail_transaction_id, toko.toko_id)"
@@ -137,12 +137,12 @@
 
           <!-- Kurir -->
           <div>
-            <h3 class="font-semibold mb-2 text-sm">Pilih Kurir</h3>
+            <h3 class="font-semibold mb-2 text-sm navbar-font">Pilih Kurir</h3>
 
             <select
               v-model="toko.items[0].selectedKurir"
               @change="postRajaOngkir(toko)"
-              class="border rounded p-2 w-full text-sm"
+              class="border rounded p-2 w-full text-sm inter-font"
             >
               <option disabled value="">-- Pilih Kurir --</option>
 
@@ -197,7 +197,7 @@
         <!-- Rincian Pembayaran -->
         <div class="bg-white rounded-lg shadow p-4">
 
-          <h3 class="font-semibold mb-3">
+          <h3 class="font-semibold mb-3 navbar-font text-[#7D0A0A]">
             Rincian Pembayaran
           </h3>
 
@@ -211,7 +211,7 @@
               <div
                 v-for="item in toko.items"
                 :key="item.product_id"
-                class="flex justify-between"
+                class="flex justify-between navbar-font"
               >
 
                 <span>{{ item.nama_product }}</span>
@@ -225,19 +225,14 @@
             </div>
 
 
-            <div class="flex justify-between text-gray-500">
+            <div class="flex justify-between text-gray-500 navbar-font">
               <span>Total Ongkir</span>
               <span>Rp {{ formatRupiah(totalOngkir) }}</span>
             </div>
 
-            <div class="flex justify-between text-gray-500">
-              <span>Biaya Admin</span>
-              <span>Rp 0</span>
-            </div>
-
             <hr class="my-2">
 
-            <div class="flex justify-between font-bold">
+            <div class="flex justify-between font-bold navbar-font">
               <span>Total</span>
 
               <span class="text-[#7D0A0A]">

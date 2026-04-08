@@ -1,7 +1,7 @@
 <template>
   <Navbar />
 
-  <div class="p-4 bg-[#FFF5F5] min-h-screen">
+  <div class="p-4 min-h-screen">
     <h1 class="text-xl font-bold navbar-font mb-4 text-black">| List Transaksi</h1>
 
     <div v-if="isLoading" class="space-y-4">
@@ -58,7 +58,7 @@
       >
         <!-- Header Transaksi -->
         <div class="flex justify-between items-center border-b pb-2 mb-3">
-          <span class="text-xs font-semibold text-gray-500">Kode Transaksi : {{ trx.kode_transaksi }}</span>
+          <span class="text-xs font-semibold text-gray-500 inter-font">Kode Transaksi : {{ trx.kode_transaksi }}</span>
           <button
             @click="deleteProductscheckout(trx.kode_transaksi)"
             class="text-red-500 text-xs hover:text-red-700 font-medium"
@@ -80,16 +80,16 @@
               @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
             />
             <div class="flex-1">
-              <p class="font-medium">{{ item.product?.nama_product }}</p>
-              <p class="text-xs text-gray-500">Jumlah: {{ item.jumlah }}</p>
-              <p class="text-xs text-gray-500">Harga: Rp {{ formatRupiah(item.harga) }}</p>
+              <p class="font-medium navbar-font">{{ item.product?.nama_product }}</p>
+              <p class="text-xs text-gray-500 inter-font">Jumlah: {{ item.jumlah }}</p>
+              <p class="text-xs text-gray-500 inter-font">Harga: Rp {{ formatRupiah(item.harga) }}</p>
             </div>
           </div>
         </div>
 
         <div class="border-t pt-3 mt-3 text-sm flex justify-between items-center font-semibold">
-          <span class="text-gray-600">Total Harga</span>
-          <span class="text-[#7D0A0A] text-lg">Rp {{ formatRupiah(trx.total_harga) }}</span>
+          <span class="text-gray-600 inter-font">Total Harga</span>
+          <span class="text-[#7D0A0A] text-lg navbar-font">Rp {{ formatRupiah(trx.total_harga) }}</span>
         </div>
 
         <div class="mt-4">

@@ -2,7 +2,7 @@
   <adminside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
       <!-- Judul -->
-      <h2 class="text-xl font-bold mb-4">Form Edit User</h2>
+      <h2 class="text-xl navabr-font mb-4">Form Edit User</h2>
       <!-- Skeleton Form -->
       <div v-if="isLoading" class="space-y-4">
         <div>
@@ -38,59 +38,59 @@
       <!-- Form Asli -->
       <form v-else @submit.prevent="submitForm">
         <div class="mb-4">
-          <label for="name" class="block mb-1">Name</label>
+          <label for="name" class="block mb-1 navbar-font">Name</label>
           <input
             id="name"
             name="name"
             v-model="form.name"
             type="text"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
           />
         </div>
 
         <div class="mb-4">
-          <label for="email" class="block mb-1">Email</label>
+          <label for="email" class="block mb-1 navbar-font">Email</label>
           <input
             id="email"
             name="email"
             v-model="form.email"
             type="email"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
           />
         </div>
 
         <div class="mb-4">
-          <label for="password" class="block mb-1">Password</label>
+          <label for="password" class="block mb-1 navbar-font">Password</label>
           <input
             id="password"
             name="password"
             v-model="form.password"
             type="password"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
           />
         </div>
 
         <div class="mb-4">
-          <label for="no_telp" class="block mb-1">No. Telepon</label>
+          <label for="no_telp" class="block mb-1 navbar-font">No. Telepon</label>
           <input
             id="no_telp"
             name="no_telp"
             v-model="form.no_telp"
             type="text"
-            class="w-full border px-3 py-2 rounded"
+            class="w-full border px-3 py-2 rounded inter-font"
           />
         </div>
 
         <div class="mb-4">
-          <label for="role_id" class="block mb-1">Role</label>
+          <label for="role_id" class="block mb-1 navbar-font">Role</label>
 
           <select
             id="role_id"
             name="role_id"
             v-model="form.role_id"
-            class="w-full border px-3 py-2 rounded text-black bg-white"
+            class="w-full border px-3 py-2 rounded text-black bg-white inter-font"
           >
-            <option disabled value="">Pilih Role</option>
+            <option disabled value="" class="navbar-font">Pilih Role</option>
 
             <option
               v-for="role in roleIds"
@@ -108,7 +108,7 @@
             class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer"
           >
             <div class="flex items-center justify-center gap-4">
-              <span class="font-medium">Upload Foto Profil</span>
+              <span class="navbar-font">Upload Foto Profil</span>
 
               <div v-if="selectedFileName" class="text-sm text-gray-500">
                 {{ selectedFileName }}
@@ -143,7 +143,7 @@
 
         <button
           type="submit"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 navbar-font"
         >
           Submit
         </button>

@@ -30,13 +30,13 @@
       class="w-full max-w-md bg-white p-6 rounded-2xl shadow-lg space-y-5"
     >
 
-      <h2 class="text-2xl font-bold text-center text-gray-700">Edit Profil</h2>
+      <h2 class="text-2xl navbar-font text-center text-gray-700">Edit Profil</h2>
 
       <!-- Foto Profil -->
       <div class="text-center">
         <img
           :src="previewImage || user?.foto_profil || 'https://placehold.co/100'"
-          class="w-24 h-24 mx-auto rounded-full object-cover mb-3 border-2 border-yellow-500"
+          class="w-24 h-24 mx-auto rounded-full object-cover mb-3 border-2 border-[#7D0A0A]"
         />
 
         <input
@@ -49,37 +49,37 @@
 
       <!-- Nama -->
       <div>
-        <label class="block text-sm font-semibold text-gray-600 mb-1">Nama</label>
+        <label class="block text-sm font-semibold text-gray-600 mb-1 inter-font">Nama</label>
         <input
           type="text"
           v-model="form.name"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm inter-font"
         />
       </div>
 
       <!-- Email -->
       <div>
-        <label class="block text-sm font-semibold text-gray-600 mb-1">Email</label>
+        <label class="block text-sm font-semibold text-gray-600 mb-1 inter-font">Email</label>
         <input
           type="email"
           v-model="form.email"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm inter-font"
         />
       </div>
 
       <!-- No Telepon -->
       <div>
-        <label class="block text-sm font-semibold text-gray-600 mb-1">No Telepon</label>
+        <label class="block text-sm font-semibold text-gray-600 mb-1 inter-font">No Telepon</label>
         <input
           type="text"
           v-model="form.no_telp"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm inter-font"
         />
       </div>
 
       <!-- Password -->
       <div>
-        <label class="block text-sm font-semibold text-gray-600 mb-1">Password</label>
+        <label class="block text-sm font-semibold text-gray-600 mb-1 inter-font">Password</label>
         <input
           type="password"
           v-model="form.password"
@@ -90,7 +90,7 @@
       <button
         type="submit"
         :disabled="isLoading"
-        class="w-full bg-yellow-500 text-white font-semibold py-2 rounded-lg"
+        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg navbar-font"
       >
         Simpan Perubahan
       </button>

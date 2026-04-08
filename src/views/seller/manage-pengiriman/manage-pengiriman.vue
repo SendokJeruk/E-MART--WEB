@@ -4,7 +4,7 @@
 
       <!-- HEADER -->
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">
+        <h1 class="text-3xl navbar-font text-gray-800">
           Manage Pengiriman
         </h1>
 
@@ -14,8 +14,8 @@
             class="w-10 h-10 rounded-full object-cover border"
           />
           <div>
-            <p class="text-sm font-semibold text-gray-800">{{ user.name }}</p>
-            <p class="text-xs text-gray-500">{{ user.email }}</p>
+            <p class="text-sm font-semibold text-gray-800 inter-font">{{ user.name }}</p>
+            <p class="text-xs text-gray-500 inter-font">{{ user.email }}</p>
           </div>
         </div>
       </div>
@@ -26,13 +26,11 @@
         <table class="min-w-full text-sm">
           <thead class="bg-gray-100 text-gray-700">
             <tr>
-              <th class="px-4 py-3 text-left">Kode Transaksi</th>
-              <th class="px-4 py-3 text-left">Kurir</th>
-              <th class="px-4 py-3 text-left">Plat Nomor</th>
-              <th class="px-4 py-3 text-left">Kode Resi</th>
-              <th class="px-4 py-3 text-left">Status</th>
-              <th class="px-4 py-3 text-left">Estimasi</th>
-              <th class="px-4 py-3 text-left">Aksi</th>
+              <th class="px-4 py-3 text-left navbar-font">Kode Transaksi</th>
+              <th class="px-4 py-3 text-left navbar-font">Kurir</th>
+              <th class="px-4 py-3 text-left navbar-font">Kode Resi</th>
+              <th class="px-4 py-3 text-left navbar-font">Status</th>
+              <th class="px-4 py-3 text-left navbar-font">Aksi</th>
             </tr>
           </thead>
 
@@ -57,16 +55,12 @@
               class="hover:bg-gray-50 transition"
             >
 
-              <td class="px-4 py-3">
+              <td class="px-4 py-3 inter-font">
                 {{ item.kode_transaksi }}
               </td>
 
-              <td class="px-4 py-3">
+              <td class="px-4 py-3 inter-font">
                 {{ item.kurir || '-' }}
-              </td>
-
-              <td class="px-4 py-3">
-                {{ item.plat_nomor || '-' }}
               </td>
 
               <!-- INPUT RESI -->
@@ -75,12 +69,12 @@
                   v-model="item.kode_resi"
                   type="text"
                   placeholder="Masukkan resi"
-                  class="border rounded px-2 py-1 text-sm w-32"
+                  class="border rounded px-2 py-1 text-sm w-32 inter-font"
                 />
               </td>
 
               <!-- STATUS -->
-              <td class="px-4 py-3">
+              <td class="px-4 py-3 inter-font">
                 <select
                   v-model="item.status_pengiriman"
                   @change="updateStatus(item)"
@@ -98,20 +92,16 @@
               </td>
 
               <td class="px-4 py-3">
-                {{ item.estimasi_tiba || '-' }}
-              </td>
-
-              <td class="px-4 py-3">
                 <div class="flex items-center gap-2">
                   <button
                     @click="openDetailModal(item)"
-                    class="px-3 py-1 rounded-lg text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white"
+                    class="px-3 py-1 rounded-lg text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white navbar-font"
                   >
                     Detail
                   </button>
                   <button
                     @click="cetakStruk(item.id)"
-                    class="px-3 py-1 rounded-lg text-sm font-medium border border-gray-600 text-gray-700 hover:bg-gray-100"
+                    class="px-3 py-1 rounded-lg text-sm font-medium border border-gray-600 text-gray-700 hover:bg-gray-100 navbar-font"
                   >
                     Cetak Struk
                   </button>
@@ -166,7 +156,7 @@
       <div v-if="selectedPengiriman" class="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
         <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col relative">
           <div class="p-5 border-b sticky top-0 bg-white z-10 rounded-t-xl flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">Detail Pengiriman</h2>
+            <h2 class="text-xl navbar-font text-gray-800">Detail Pengiriman</h2>
             <button @click="closeDetailModal" class="text-gray-500 hover:text-gray-800">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -177,29 +167,29 @@
           <div class="p-6 overflow-y-auto flex-1 space-y-6">
             <!-- Info Transaksi -->
             <div>
-              <h3 class="text-lg font-semibold text-[#7D0A0A] border-b pb-2 mb-3">Informasi Transaksi</h3>
+              <h3 class="text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">Informasi Transaksi</h3>
               <div class="grid grid-cols-2 gap-y-2 text-sm">
-                <p class="text-gray-600">Kode Transaksi</p>
-                <p class="font-medium">: {{ selectedPengiriman.kode_transaksi }}</p>
-                <p class="text-gray-600">Tanggal Transaksi</p>
-                <p class="font-medium">: {{ selectedPengiriman.transaction?.tanggal_transaksi }}</p>
-                <p class="text-gray-600">Total Harga Barang</p>
-                <p class="font-medium text-red-600">: Rp {{ Number(selectedPengiriman.transaction?.total_harga || 0).toLocaleString('id-ID') }}</p>
-                <p class="text-gray-600">Ongkos Kirim</p>
-                <p class="font-medium text-red-600">: Rp {{ Number(selectedPengiriman.ongkir || 0).toLocaleString('id-ID') }}</p>
-                <p class="text-gray-600">Total Berat</p>
-                <p class="font-medium">: {{ selectedPengiriman.transaction?.total_berat }} gr</p>
+                <p class="text-gray-600 navbar-font">Kode Transaksi</p>
+                <p class="inter-font">: {{ selectedPengiriman.kode_transaksi }}</p>
+                <p class="text-gray-600 navbar-font">Tanggal Transaksi</p>
+                <p class="inter-font">: {{ selectedPengiriman.transaction?.tanggal_transaksi }}</p>
+                <p class="text-gray-600 navbar-font">Total Harga Barang</p>
+                <p class="inter-font text-red-600">: Rp {{ Number(selectedPengiriman.transaction?.total_harga || 0).toLocaleString('id-ID') }}</p>
+                <p class="text-gray-600 navbar-font">Ongkos Kirim</p>
+                <p class="inter-font text-red-600">: Rp {{ Number(selectedPengiriman.ongkir || 0).toLocaleString('id-ID') }}</p>
+                <p class="text-gray-600 navbar-font">Total Berat</p>
+                <p class="inter-font">: {{ selectedPengiriman.transaction?.total_berat }} gr</p>
               </div>
             </div>
 
             <!-- Info Pembeli & Tujuan -->
             <div>
-              <h3 class="text-lg font-semibold text-[#7D0A0A] border-b pb-2 mb-3">Tujuan Pengiriman</h3>
+              <h3 class="text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">Tujuan Pengiriman</h3>
               <div class="grid grid-cols-1 gap-y-2 text-sm bg-gray-50 p-4 rounded-lg border">
-                <p><span class="font-semibold text-gray-700">Penerima:</span> {{ selectedPengiriman.alamat?.nama_penerima }}</p>
-                <p><span class="font-semibold text-gray-700">No. Telp Pembeli:</span> {{ selectedPengiriman.transaction?.user?.no_telp || '-' }}</p>
-                <p><span class="font-semibold text-gray-700">Alamat Lengkap:</span></p>
-                <p class="text-gray-600 leading-relaxed">
+                <p><span class="inter-font text-gray-700">Penerima:</span> {{ selectedPengiriman.alamat?.nama_penerima }}</p>
+                <p><span class="inter-font text-gray-700">No. Telp Pembeli:</span> {{ selectedPengiriman.transaction?.user?.no_telp || '-' }}</p>
+                <p><span class="inter-font text-gray-700">Alamat Lengkap:</span></p>
+                <p class="text-gray-600 leading-relaxed inter-font font-bold">
                   {{ selectedPengiriman.alamat?.detail_alamat }}<br/>
                   {{ selectedPengiriman.alamat?.subdistrict_name }}, {{ selectedPengiriman.alamat?.district_name }}<br/>
                   {{ selectedPengiriman.alamat?.city_name }}, {{ selectedPengiriman.alamat?.province_name }}<br/>
@@ -210,7 +200,7 @@
 
             <!-- Info Barang -->
             <div>
-              <h3 class="text-lg font-semibold text-[#7D0A0A] border-b pb-2 mb-3">Daftar Barang</h3>
+              <h3 class="text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">Daftar Barang</h3>
               <div class="space-y-3">
                 <div v-for="detail in selectedPengiriman.detail_shipments" :key="detail.id" class="flex gap-4 border rounded-lg p-3 items-center">
                   <img 
@@ -219,11 +209,11 @@
                     @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
                   />
                   <div class="flex-1">
-                    <p class="font-semibold text-gray-800">{{ detail.detail_transaction?.product?.nama_product }}</p>
-                    <p class="text-xs text-gray-500 line-clamp-1">{{ detail.detail_transaction?.product?.deskripsi }}</p>
+                    <p class="navbar-font text-gray-800">{{ detail.detail_transaction?.product?.nama_product }}</p>
+                    <p class="text-xs text-gray-500 line-clamp-1 inter-font">{{ detail.detail_transaction?.product?.deskripsi }}</p>
                     <div class="flex justify-between items-center mt-2">
-                      <p class="text-sm font-medium text-gray-700">{{ detail.detail_transaction?.jumlah }}x @ Rp {{ Number(detail.detail_transaction?.harga || 0).toLocaleString('id-ID') }}</p>
-                      <p class="text-sm font-bold text-red-600">Rp {{ Number(detail.detail_transaction?.subtotal || 0).toLocaleString('id-ID') }}</p>
+                      <p class="text-sm font-bold inter-font text-gray-700">{{ detail.detail_transaction?.jumlah }}x @ Rp {{ Number(detail.detail_transaction?.harga || 0).toLocaleString('id-ID') }}</p>
+                      <p class="text-sm navbar-font text-red-600">Rp {{ Number(detail.detail_transaction?.subtotal || 0).toLocaleString('id-ID') }}</p>
                     </div>
                   </div>
                 </div>
@@ -233,7 +223,7 @@
           
           <!-- Modal Footer -->
           <div class="p-4 border-t sticky bottom-0 bg-white z-10 rounded-b-xl flex justify-end">
-            <button @click="closeDetailModal" class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition">Tutup</button>
+            <button @click="closeDetailModal" class="px-6 py-2 bg-gray-200 text-gray-800 navbar-font rounded-lg hover:bg-gray-300 transition">Tutup</button>
           </div>
         </div>
       </div>
