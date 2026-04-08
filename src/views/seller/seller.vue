@@ -66,7 +66,7 @@
 
           <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
             <h2 class="font-medium text-gray-600 mb-2">Total Product</h2>
-            <p class="text-2xl font-bold text-red-700">{{ ProductSeller.length }}</p>
+            <p class="text-2xl font-bold text-red-700">{{ ProductCount }}</p>
           </div>
 
           <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
@@ -152,6 +152,7 @@ const apexchart = VueApexCharts
 
 // state
 const ProductSeller = ref([])
+const ProductCount = ref([])
 const user = ref({})
 const totalPenjualan = ref(0)
 const totalIncome = ref(0)
@@ -202,6 +203,15 @@ const getProfile = async () => {
     user.value = response.data.data
   } catch (error) {
     console.error("Gagal mengambil profil:", error)
+  }
+}
+
+const getCountProducts = async () => {
+  try {
+    const response = await api.get("/product/myproducts?count")
+    ProductCount.value = response.data.data
+  } catch (error) {
+    console.error("Gagal mengambil jumlah produk:", error)
   }
 }
 
@@ -345,7 +355,8 @@ onMounted(async () => {
       getWallet(),
       getProducts(),
       getDoughnutStatistic(),
-      getLineStatistic()
+      getLineStatistic(),
+      getCountProducts()
     ])
   } catch (error) {
     console.error(error)
