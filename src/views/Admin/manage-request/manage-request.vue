@@ -4,29 +4,6 @@
       <!-- Header -->
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl navbar-font text-[#7D0A0A]">Manage Pengajuan Seller</h1>
-
-        <!-- Profile -->
-        <div v-if="isLoading" class="bg-white shadow-md rounded-xl px-4 py-2 flex items-center gap-3 w-64 border border-gray-200">
-          <Skeleton type="circle" size="48px"/>
-          <div class="flex-1 space-y-2">
-            <Skeleton height="14px" width="70%"/>
-            <Skeleton height="12px" width="90%"/>
-          </div>
-        </div>
-
-        <div
-          v-else
-          class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
-        >
-          <div class="flex-1">
-            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-          </div>
-          <img
-            :src="user?.foto_profil || 'https://placehold.co/100'"
-            class="w-10 h-10 bg-gray-300 rounded-full"
-          />
-        </div>
       </div>
 
       <!-- Skeleton Cards -->
@@ -199,7 +176,6 @@ import api from '@/plugins/axios'
 import { showSuccess, showError, showConfirm } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
-const user = ref({})
 const requests = ref([])
 const selectedItem = ref(null)
 const note = ref('')
@@ -215,15 +191,6 @@ const isAccepted = (status) => {
   const s = status.toLowerCase().trim();
   return s === 'accepted';
 };
-
-const getProfile = async () => {
-  try {
-    const response = await api.get('/profile')
-    user.value = response.data.data
-  } catch (error) {
-    console.error('Gagal mengambil profil:', error)
-  }
-}
 
 const getRequestSeller = async (page = 1) => {
   isLoading.value = true;
@@ -294,7 +261,6 @@ const deleteRequest = async (id) => {
 };
 
 onMounted(() => {
-  getProfile()
   getRequestSeller(1)
 })
 </script>

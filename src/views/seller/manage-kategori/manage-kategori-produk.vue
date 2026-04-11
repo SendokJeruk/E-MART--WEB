@@ -1,50 +1,68 @@
 <template>
   <sellerside>
-    <div class="p-6 overflow-x-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl navbar-font">Manage Kategori Produk</h1>
+    <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
 
-        <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-          <div class="flex-1">
-            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-          </div>
-          <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
-        </div>
+      <!-- HEADER -->
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+        <h1 class="text-2xl md:text-3xl navbar-font text-gray-800">
+          Manage Kategori Produk
+        </h1>
       </div>
 
-      <router-link
-        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
-        to="/create-kategori-produk"
-      >
-        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm navbar-font text-[#7D0A0A] transition-colors group-hover:text-white">
-          Tambah Kategori Produk
-        </span>
-      </router-link>
+      <!-- BUTTON TAMBAH KATEGORI -->
+      <div class="flex flex-wrap gap-3 mb-5">
+        <router-link
+          to="/create-kategori-produk"
+          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg focus:ring-2 focus:ring-[#BF3131] focus:outline-none"
+        >
+          <span
+            class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all duration-200 group-hover:h-full"
+          ></span>
+          <span
+            class="relative text-sm navbar-font text-[#7D0A0A] transition-colors group-hover:text-white"
+          >
+            Tambah Kategori Produk
+          </span>
+        </router-link>
+      </div>
 
-      <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
-        <table class="min-w-full table-fixed divide-y divide-gray-200">
-          <thead class="bg-gray-200">
+      <!-- TABLE -->
+      <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+        <table class="min-w-[600px] w-full table-auto divide-y divide-gray-200">
+          <thead class="bg-gray-100">
             <tr>
-              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">Produk</th>
-              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">Kategori</th>
+              <th class="px-4 py-3 text-left text-xs md:text-sm navbar-font text-gray-700 whitespace-nowrap">
+                Produk
+              </th>
+              <th class="px-4 py-3 text-left text-xs md:text-sm navbar-font text-gray-700 whitespace-nowrap">
+                Kategori
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr v-for="produk in groupedProducts" :key="produk.id">
-              <td class="px-4 py-2 text-sm text-gray-900 inter-font">{{ produk.nama }}</td>
-              <td class="px-4 py-2 text-sm text-gray-900 inter-font">
-                <div class="flex gap-2 flex-wrap">
-                  <span 
-                    v-for="kategori in produk.categories" 
+            <tr
+              v-for="produk in groupedProducts"
+              :key="produk.id"
+              class="hover:bg-gray-50 transition"
+            >
+              <!-- NAMA PRODUK -->
+              <td class="px-4 py-3 text-xs md:text-sm text-gray-900 inter-font whitespace-nowrap">
+                {{ produk.nama }}
+              </td>
+
+              <!-- KATEGORI -->
+              <td class="px-4 py-3 text-xs md:text-sm text-gray-900 inter-font">
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    v-for="kategori in produk.categories"
                     :key="kategori.id"
-                    class="px-2 py-1 bg-gray-200 text-sm rounded flex items-center gap-1"
+                    class="px-2 py-1 bg-gray-200 text-xs md:text-sm rounded flex items-center gap-1"
                   >
                     {{ kategori.nama }}
-                    <button 
-                      @click="deleteCategoryProduct(kategori.pivotId)" 
-                      class="text-red-600 hover:underline text-xs ml-1"
+                    <button
+                      @click="deleteCategoryProduct(kategori.pivotId)"
+                      class="text-red-600 hover:text-red-800 text-xs ml-1"
+                      aria-label="Hapus kategori"
                     >
                       ✕
                     </button>
@@ -54,12 +72,16 @@
             </tr>
           </tbody>
         </table>
-        <div class="flex justify-center mt-4 space-x-2 mb-4">
+
+        <!-- PAGINATION -->
+        <div
+          class="flex flex-wrap justify-center items-center gap-2 mt-4 mb-4 px-2"
+        >
           <!-- Previous -->
           <button
             @click="changePage(currentPage - 1)"
             :disabled="currentPage === 1"
-            class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+            class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
           >
             Previous
           </button>
@@ -69,7 +91,12 @@
             v-for="page in lastPage"
             :key="page"
             @click="changePage(page)"
-            :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+            :class="[
+              'px-3 py-1 text-xs md:text-sm rounded',
+              page === currentPage
+                ? 'bg-[#7D0A0A] text-white'
+                : 'bg-gray-200 text-gray-700'
+            ]"
           >
             {{ page }}
           </button>
@@ -78,7 +105,7 @@
           <button
             @click="changePage(currentPage + 1)"
             :disabled="currentPage === lastPage"
-            class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+            class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
           >
             Next
           </button>

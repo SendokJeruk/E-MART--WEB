@@ -3,14 +3,6 @@
     <div class="p-6 overflow-x-auto">
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl navbar-font">Manage Toko</h1>
-
-        <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-          <div class="flex-1">
-            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-          </div>
-          <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
-        </div>
       </div>
 
       <router-link

@@ -1,130 +1,149 @@
 <template>
-  <div class="flex h-screen">
-    <div
-      v-if="isSidebarOpen"
-      @click="toggleSidebar"
-      class="fixed inset-0 z-30 bg-transparent lg:hidden transition-opacity duration-300 ease-in-out"
-    ></div>
+  <div class="flex h-screen overflow-hidden">
+    <!-- Overlay Mobile -->
+    <transition name="fade">
+      <div
+        v-if="isSidebarOpen"
+        @click="toggleSidebar"
+        class="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+      ></div>
+    </transition>
 
-    <div
-      :class="[ 
-        'fixed z-40 lg:static flex h-full flex-col justify-between border-e border-gray-100 transition-transform duration-300 ease-in-out', 
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0', 
-        'w-64', 
-        'bg-[#7D0A0A]' 
+    <!-- Sidebar -->
+    <aside
+      :class="[
+        'fixed lg:static z-40 h-full w-64 bg-gradient-to-b from-[#7D0A0A] to-[#5E0A0A] text-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
     >
-      <div class="px-4 py-6 h-full flex flex-col justify-center">
-        <ul class="space-y-1">
+      <!-- Logo / Title -->
+      <div class="px-6 py-6 text-center border-b border-white/10">
+        <h1 class="text-xl font-bold tracking-wide navbar-font">Seller Dashboard</h1>
+      </div>
 
-          <li>
+      <!-- Menu Navigasi (Tengah) -->
+      <div class="flex-1 flex items-center justify-center">
+        <ul class="space-y-3 w-full px-6">
+          <li v-for="item in menuItems" :key="item.path">
             <router-link
-              to="/seller"
-              :class="linkClass('/seller')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-              :disabled="!hasToko"
+              :to="item.path"
+              :class="linkClass(item.path, item.requiresToko)"
+              @click="closeSidebar"
+              class="block w-full text-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 navbar-font"
             >
-              Home
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/manage-produk"
-              :class="linkClass('/manage-produk')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-              :disabled="!hasToko"
-            >
-              Manage Produk
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/manage-kategori-produk"
-              :class="linkClass('/manage-kategori-produk')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-              :disabled="!hasToko"
-            >
-              Manage Kategori Produk
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/manage-toko"
-              :class="linkClass('/manage-toko')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage Toko
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/manage-pengiriman"
-              :class="linkClass('/manage-pengiriman')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage Pengiriman
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/withdraw"
-              :class="linkClass('/withdraw')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Withdraw
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/dashboard"
-              :class="linkClass('/dashboard')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-              :disabled="!hasToko"
-            >
-              Kembali
+              {{ item.label }}
             </router-link>
           </li>
         </ul>
       </div>
-    </div>
 
-    <div class="flex-1 p-4 lg:p-8 bg-gray-100 w-full overflow-auto">
-      <button
-        @click="toggleSidebar"
-        class="lg:hidden mb-4 inline-flex items-center rounded-md bg-[#7D0A0A] px-4 py-2 text-white hover:bg-[#A61D1D] navbar-font"
-      >
-        ☰ Menu
-      </button>
+      <!-- Kotak Profil di Bawah -->
+      <div class="p-4 border-t border-white/10">
+        <!-- Skeleton Loading -->
+        <div
+          v-if="isLoading"
+          class="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/10 animate-pulse"
+        >
+          <div class="w-14 h-14 rounded-full bg-white/30"></div>
+          <div class="h-3 w-2/3 bg-white/30 rounded"></div>
+          <div class="h-3 w-1/2 bg-white/20 rounded"></div>
+        </div>
 
-      <router-view />
-      <slot/>
+        <!-- Profil User -->
+        <div
+          v-else
+          class="flex flex-col items-center text-center p-4 rounded-xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
+        >
+          <img
+            :src="user?.foto_profil || 'https://placehold.co/100x100'"
+            alt="User Avatar"
+            class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md mb-2"
+          />
+
+          <p class="text-sm font-semibold truncate w-full">
+            {{ user?.name || 'Nama Pengguna' }}
+          </p>
+          <p class="text-xs text-white/70 truncate w-full">
+            {{ user?.email || 'email@example.com' }}
+          </p>
+
+          <!-- Tombol Logout -->
+          <button
+            @click="logout"
+            class="mt-4 w-full px-4 py-2 text-sm font-medium rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-300"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Konten Utama -->
+    <div class="flex-1 flex flex-col bg-gray-100 overflow-auto">
+      <!-- Header Mobile -->
+      <header class="lg:hidden p-4 bg-white shadow flex items-center">
+        <button
+          @click="toggleSidebar"
+          class="inline-flex items-center rounded-md bg-[#7D0A0A] px-4 py-2 text-white hover:bg-[#A61D1D] transition"
+        >
+          ☰ Menu
+        </button>
+      </header>
+
+      <!-- Konten Halaman -->
+      <main class="flex-1 p-4 lg:p-8">
+        <router-view />
+        <slot />
+      </main>
     </div>
   </div>
 </template>
   
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import api from '@/plugins/axios'
-import { useRouter } from 'vue-router'
+import { showConfirm, showError } from '@/utils/alert'
+
+const router = useRouter()
+const route = useRoute()
 
 const user = ref(null)
 const tokoseller = ref([])
 const hasToko = ref(false)
 const isSidebarOpen = ref(false)
-const router = useRouter()
+const isLoading = ref(true)
 
-function linkClass(path) {
+const menuItems = [
+  { label: 'Home', path: '/seller', requiresToko: true },
+  { label: 'Manage Produk', path: '/manage-produk', requiresToko: true },
+  { label: 'Manage Kategori Produk', path: '/manage-kategori-produk', requiresToko: true },
+  { label: 'Manage Toko', path: '/manage-toko', requiresToko: false },
+  { label: 'Manage Pengiriman', path: '/manage-pengiriman', requiresToko: false },
+  { label: 'Withdraw', path: '/withdraw', requiresToko: false },
+  { label: 'Kembali', path: '/dashboard', requiresToko: true }
+]
+
+function linkClass(path, requiresToko) {
   return [
     'text-white',
-    router.currentRoute.value.path === path ? 'bg-[#5E0A0A]' : 'bg-[#7D0A0A] hover:bg-[#A61D1D]',
-    !hasToko.value && path !== '/manage-toko' ? 'opacity-50 pointer-events-none' : ''
+    route.path === path
+      ? 'bg-white/20 shadow-lg'
+      : 'hover:bg-white/10',
+    !hasToko.value && requiresToko
+      ? 'opacity-50 pointer-events-none'
+      : ''
   ]
+}
+
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+
+function closeSidebar() {
+  if (window.innerWidth < 1024) {
+    isSidebarOpen.value = false
+  }
 }
 
 const getProfile = async () => {
@@ -133,19 +152,13 @@ const getProfile = async () => {
     user.value = res.data.data
     const role = user.value.nama_role
 
-    if (role === 'admin') {
-      router.push('/admin')
-      return
-    }
-    if (role === 'buyer') {
-      router.push('/dashboard')
-      return
-    }
-    if (role === 'seller') {
-      await getToko()
-    }
-  } catch (err) {
+    if (role === 'admin') return router.push('/admin')
+    if (role === 'buyer') return router.push('/dashboard')
+    if (role === 'seller') await getToko()
+  } catch (error) {
     router.push('/login')
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -153,20 +166,34 @@ const getToko = async () => {
   try {
     const res = await api.get('/toko')
     const alltoko = res.data.data.data
-    tokoseller.value = alltoko.filter(t => t.user_id === user.value.id)
+    tokoseller.value = alltoko.filter(
+      (t) => t.user_id === user.value.id
+    )
     hasToko.value = tokoseller.value.length > 0
 
-    if (!hasToko.value && router.currentRoute.value.path !== '/create-toko') {
+    if (!hasToko.value && route.path !== '/create-toko') {
       router.push('/create-toko')
     }
-  } catch (err) {}
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const logout = async () => {
+  const confirmed = await showConfirm("Anda yakin mau logout ? ")
+  if (!confirmed) return
+
+  try {
+    await api.post('/auth/logout')
+    localStorage.removeItem("token")
+    user.value = null
+    router.push('/login')
+  } catch (error) {
+    showError('Logout failed, please try again.')
+  }
 }
 
 onMounted(() => {
   getProfile()
 })
-
-function toggleSidebar() {
-  isSidebarOpen.value = !isSidebarOpen.value
-}
 </script>

@@ -1,112 +1,100 @@
 <template>
-  <div class="flex h-screen">
-    <div
-      v-if="isSidebarOpen"
-      @click="toggleSidebar"
-      class="fixed inset-0 z-30 bg-transparent lg:hidden transition-opacity duration-300 ease-in-out"
-    ></div>
+  <div class="flex h-screen overflow-hidden">
+    <!-- Overlay untuk Mobile -->
+    <transition name="fade">
+      <div
+        v-if="isSidebarOpen"
+        @click="toggleSidebar"
+        class="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+      ></div>
+    </transition>
 
-    <div
-      :class="[ 
-        'fixed z-40 lg:static flex h-full flex-col justify-between border-e border-gray-100 transition-transform duration-300 ease-in-out', 
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0', 
-        'w-64', 
-        'bg-[#7D0A0A]' 
+    <!-- Sidebar -->
+    <aside
+      :class="[
+        'fixed lg:static z-40 h-full w-64 bg-gradient-to-b from-[#7D0A0A] to-[#5E0A0A] text-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
     >
-      <div class="px-4 py-6">
-        <ul class="mt-6 space-y-1">
-          <li>
+      <!-- Header Sidebar -->
+      <div class="px-6 py-6 text-center border-b border-white/10">
+        <h1 class="text-xl font-bold tracking-wide">Admin Panel</h1>
+      </div>
+
+      <!-- Menu Navigasi di Tengah -->
+      <div class="flex-1 flex items-center justify-center overflow-y-auto">
+        <ul class="space-y-3 w-full px-6">
+          <li v-for="item in menuItems" :key="item.path">
             <router-link
-              to="/admin"
-              :class="linkClass('/admin')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+              :to="item.path"
+              :class="linkClass(item.path)"
+              @click="closeSidebar"
+              class="block w-full text-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
             >
-              Home
+              {{ item.label }}
             </router-link>
           </li>
+        </ul>
+      </div>
 
-          <li>
-            <router-link
-              to="/manage-user"
-              :class="linkClass('/manage-user')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage User
-            </router-link>
-          </li>
+      <!-- Kotak Profil di Bawah -->
+      <div class="p-4 border-t border-white/10">
+        <!-- Skeleton Loading -->
+        <div
+          v-if="isLoading"
+          class="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/10 animate-pulse"
+        >
+          <div class="w-16 h-16 rounded-full bg-white/30"></div>
+          <div class="h-3 w-2/3 bg-white/30 rounded"></div>
+          <div class="h-3 w-1/2 bg-white/20 rounded"></div>
+        </div>
 
-          <li>
-            <router-link
-              to="/kategori"
-              :class="linkClass('/kategori')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage Kategori
-            </router-link>
-          </li>
+        <!-- Profil Admin -->
+        <div
+          v-else
+          class="flex flex-col items-center text-center p-4 rounded-xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
+        >
+          <img
+            :src="user?.foto_profil || 'https://placehold.co/100x100'"
+            alt="Admin Avatar"
+            class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md mb-2"
+          />
 
-          <li>
-            <router-link
-              to="/manage-request"
-              :class="linkClass('/manage-request')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage Request Seller
-            </router-link>
-          </li>
+          <p class="text-sm font-semibold truncate w-full">
+            {{ user?.name || 'Admin' }}
+          </p>
+          <p class="text-xs text-white/70 truncate w-full">
+            {{ user?.email || 'admin@example.com' }}
+          </p>
 
-          <li>
-            <router-link
-              to="/settings-admin"
-              :class="linkClass('/settings-admin')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage Setting Admin
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/manage-income"
-              :class="linkClass('/manage-income')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage Income
-            </router-link>
-          </li>
-
-          <li>
-            <router-link
-              to="/manage-banner"
-              :class="linkClass('/manage-banner')"
-              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
-            >
-              Manage Banner
-            </router-link>
-          </li>
-
+          <!-- Tombol Logout -->
           <button
             @click="logout"
-            class="w-full text-left rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#A61D1D]"
+            class="mt-4 w-full px-4 py-2 text-sm font-medium rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-300"
           >
             Logout
           </button>
-
-        </ul>
+        </div>
       </div>
-    </div>
+    </aside>
 
-    <div class="flex-1 p-4 lg:p-8 bg-gray-100 w-full overflow-auto">
-      <button
-        @click="toggleSidebar"
-        class="lg:hidden mb-4 inline-flex items-center rounded-md bg-[#7D0A0A] px-4 py-2 text-white hover:bg-[#A61D1D]"
-      >
-        ☰ Menu
-      </button>
+    <!-- Konten Utama -->
+    <div class="flex-1 flex flex-col bg-gray-100 overflow-auto">
+      <!-- Header Mobile -->
+      <header class="lg:hidden p-4 bg-white shadow flex items-center">
+        <button
+          @click="toggleSidebar"
+          class="inline-flex items-center rounded-md bg-[#7D0A0A] px-4 py-2 text-white hover:bg-[#A61D1D] transition"
+        >
+          ☰ Menu
+        </button>
+      </header>
 
-      <router-view />
-      <slot/>
+      <!-- Konten Halaman -->
+      <main class="flex-1 p-4 lg:p-8">
+        <router-view />
+        <slot />
+      </main>
     </div>
   </div>
 </template>
@@ -114,53 +102,82 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { showConfirm, showError, showSuccess } from '@/utils/alert'
 
 const router = useRouter()
-const userName = ref('')
-const email = ref('')
-const userRole = ref('')
-const isSidebarOpen = ref(false)
+const route = useRoute()
 
+const user = ref(null)
+const isSidebarOpen = ref(false)
+const isLoading = ref(true)
+
+// Daftar Menu Admin
+const menuItems = [
+  { label: 'Home', path: '/admin' },
+  { label: 'Manage User', path: '/manage-user' },
+  { label: 'Manage Kategori', path: '/kategori' },
+  { label: 'Manage Request Seller', path: '/manage-request' },
+  { label: 'Manage Setting Admin', path: '/settings-admin' },
+  { label: 'Manage Income', path: '/manage-income' },
+  { label: 'Manage Banner', path: '/manage-banner' }
+]
+
+// Styling untuk menu aktif
 function linkClass(path) {
   return [
     'text-white',
-    router.currentRoute.value.path === path ? 'bg-[#5E0A0A]' : 'bg-[#7D0A0A] hover:bg-[#A61D1D]',
+    route.path === path
+      ? 'bg-white/20 shadow-lg'
+      : 'hover:bg-white/10'
   ]
 }
 
+// Toggle Sidebar
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+
+// Tutup sidebar saat menu dipilih di mobile
+function closeSidebar() {
+  if (window.innerWidth < 1024) {
+    isSidebarOpen.value = false
+  }
+}
+
+// Logout
 const logout = async () => {
-  const confirmed = await showConfirm("Anda Yakin Mau Logout ?")
+  const confirmed = await showConfirm("Anda Yakin Mau Logout?")
   if (!confirmed) return
 
   try {
     await api.post('/auth/logout')
-    localStorage.removeItem("token")
-    router.push('/login')
+    localStorage.removeItem('token')
     showSuccess("Logout Berhasil")
+    router.push('/login')
   } catch (error) {
-    console.error('Logout failed:', error)
-    showError('Gagal Untuk Logout.')
+    console.error(error)
+    showError("Gagal Untuk Logout.")
   }
 }
 
-onMounted(async () => {
+// Ambil data profil admin
+const getProfile = async () => {
   try {
     const response = await api.get('/profile')
-    userName.value = response.data.data.name
-    email.value = response.data.data.email
-    userRole.value = response.data.data.nama_role
+    user.value = response.data.data
 
-    if (userRole.value === 'seller' || userRole.value === 'buyer') {
+    if (user.value.nama_role !== 'admin') {
       router.push('/dashboard')
     }
   } catch (error) {
     router.push('/login')
+  } finally {
+    isLoading.value = false
   }
-})
-
-function toggleSidebar() {
-  isSidebarOpen.value = !isSidebarOpen.value
 }
+
+onMounted(() => {
+  getProfile()
+})
 </script>

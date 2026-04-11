@@ -1,75 +1,188 @@
 <template>
   <header class="bg-[#BF3131] shadow-md">
+    <div class="mx-auto max-w-screen-xl px-3 sm:px-6 lg:px-8 py-3">
 
-    <!-- Skeleton Navbar saat loading -->
-    <div v-if="isLoading" class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 py-4">
-      <div class="flex items-center gap-4">
-        <Skeleton width="120px" height="40px"/>
-        <Skeleton type="circle" size="48px"/>
-        <Skeleton height="36px" class="flex-1"/>
-        <Skeleton type="circle" size="32px"/>
-        <Skeleton type="circle" size="32px"/>
-        <Skeleton width="90px" height="36px"/>
+      <!-- ===================== -->
+      <!-- SKELETON NAVBAR -->
+      <!-- ===================== -->
+      <div v-if="isLoading" class="flex items-center gap-2 sm:gap-3">
+        <!-- Logo Skeleton -->
+        <Skeleton width="90px" height="32px" class="flex-shrink-0" />
+
+        <!-- Search Bar Skeleton -->
+        <div class="flex-1">
+          <Skeleton height="32px" class="rounded-full w-full" />
+        </div>
+
+        <!-- Cart Skeleton -->
+        <Skeleton type="circle" size="24px" />
+
+        <!-- Settings Skeleton (Desktop Only) -->
+        <Skeleton
+          type="circle"
+          size="24px"
+          class="hidden md:block"
+        />
+
+        <!-- Profile Skeleton (Desktop Only) -->
+        <Skeleton
+          type="circle"
+          size="36px"
+          class="hidden md:block"
+        />
+
+        <!-- Hamburger Skeleton (Mobile Only) -->
+        <Skeleton
+          type="circle"
+          size="26px"
+          class="md:hidden"
+        />
       </div>
-    </div>
 
-    <!-- Navbar utama -->
-    <div v-else class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-wrap md:flex-nowrap items-center justify-between gap-4 py-4">
+      <!-- ===================== -->
+      <!-- NAVBAR UTAMA -->
+      <!-- ===================== -->
+      <div v-else class="flex items-center gap-2 sm:gap-3">
 
-        <!-- Logo mengarah ke dashboard -->
-        <router-link to="/dashboard">
-          <img src="@/assets/img/LOGO E-MART APP.png"
-               alt="Logo"
-               class="h-10 sm:h-14 w-auto object-contain" />
-        </router-link>
-
-        <!-- Foto profil, default jika tidak ada -->
-         
-        <router-link to="/profile" class="inline-block">
+        <!-- Logo -->
+        <router-link to="/dashboard" class="flex-shrink-0">
           <img
-            :src="user?.foto_profil || 'https://placehold.co/100'"
-            alt="Foto Profil"
-            class="w-18 sm:w-20 aspect-square rounded-full object-cover border"
+            src="@/assets/img/LOGO E-MART APP.png"
+            alt="Logo E-MART"
+            class="h-8 sm:h-10 w-auto object-contain"
           />
         </router-link>
 
-        <!-- Search bar -->
-        <div class="flex-grow w-full md:mx-8">
+        <!-- Search Bar -->
+        <div class="relative flex-1 min-w-0">
+          <span
+            class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+          >
+            search
+          </span>
           <input
             v-model="search"
             type="text"
-            placeholder="Cari di E-MART"
-            class="w-full p-2 text-sm sm:text-base border border-gray-300 rounded-md bg-white"
+            placeholder="Cari..."
+            class="w-full pl-8 pr-2 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-full bg-white focus:ring-2 focus:ring-red-300 focus:outline-none"
             @keyup.enter="searchBar"
           />
         </div>
 
-        <!-- Icon hanya muncul jika user login -->
-        <div v-if="isLoggedIn" class="flex items-center gap-3">
-          <router-link to="/cart" class="material-symbols-outlined text-white text-2xl">shopping_cart</router-link>
-          <router-link to="/settings" class="material-symbols-outlined text-white text-2xl">settings</router-link>
+        <!-- Right Icons -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+
+          <!-- Cart Icon -->
+          <router-link
+            v-if="isLoggedIn"
+            to="/cart"
+            class="relative text-white hover:scale-110 active:scale-95 transition-transform"
+            aria-label="Keranjang"
+          >
+            <span class="material-symbols-outlined text-[22px] sm:text-2xl">
+              shopping_cart
+            </span>
+            <span
+              v-if="cartCount > 0"
+              class="absolute -top-1.5 -right-1.5 bg-yellow-400 text-[#7D0A0A] text-[9px] sm:text-[10px] font-bold px-1 py-0.5 rounded-full min-w-[16px] text-center"
+            >
+              {{ cartCount > 99 ? '99+' : cartCount }}
+            </span>
+          </router-link>
+
+          <!-- Settings Icon (Desktop Only) -->
+          <router-link
+            v-if="isLoggedIn"
+            to="/settings"
+            class="hidden md:block text-white hover:scale-110 active:scale-95 transition-transform"
+            aria-label="Pengaturan"
+          >
+            <span class="material-symbols-outlined text-2xl">
+              settings
+            </span>
+          </router-link>
+
+          <!-- Profile (Desktop Only) -->
+          <router-link
+            v-if="isLoggedIn"
+            to="/profile"
+            class="hidden md:block"
+            aria-label="Profil"
+          >
+            <img
+              :src="user?.foto_profil || 'https://placehold.co/100'"
+              alt="Foto Profil"
+              class="w-9 h-9 rounded-full object-cover border-2 border-white"
+            />
+          </router-link>
+
+          <!-- Hamburger Menu (Mobile Only) -->
+          <button
+            @click="toggleMenu"
+            class="text-white md:hidden"
+            aria-label="Menu"
+          >
+            <span class="material-symbols-outlined text-[26px]">
+              {{ isMenuOpen ? 'close' : 'menu' }}
+            </span>
+          </button>
         </div>
-
-        <!-- Tombol login/register atau logout -->
-        <div class="flex items-center gap-2">
-          <div v-if="!isLoggedIn" class="flex gap-2">
-            <buttonred label="Login" to="/login" />
-            <buttonred label="Register" to="/register" />
-          </div>
-
-          <div v-else>
-            <button
-              @click="logout"
-              class="bg-white text-[#7D0A0A] font-semibold px-4 py-2 rounded-lg hover:bg-red-100">
-              Logout
-            </button>
-          </div>
-        </div>
-
       </div>
-    </div>
 
+      <!-- ===================== -->
+      <!-- MOBILE DROPDOWN MENU -->
+      <!-- ===================== -->
+      <transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2"
+      >
+        <div
+          v-if="isMenuOpen && !isLoading"
+          class="md:hidden mt-3 bg-white rounded-xl shadow-lg p-4 space-y-3"
+        >
+          <router-link
+            v-if="isLoggedIn"
+            to="/profile"
+            @click="toggleMenu"
+            class="flex items-center gap-3"
+          >
+            <img
+              :src="user?.foto_profil || 'https://placehold.co/100'"
+              class="w-10 h-10 rounded-full object-cover"
+            />
+            <span class="font-semibold text-gray-800">Profil</span>
+          </router-link>
+
+          <router-link
+            v-if="isLoggedIn"
+            to="/settings"
+            @click="toggleMenu"
+            class="flex items-center gap-3 text-gray-700"
+          >
+            <span class="material-symbols-outlined">settings</span>
+            <span>Pengaturan</span>
+          </router-link>
+
+          <button
+            v-if="isLoggedIn"
+            @click="logout"
+            class="flex items-center gap-3 w-full text-left text-red-600 font-semibold"
+          >
+            <span class="material-symbols-outlined">logout</span>
+            <span>Logout</span>
+          </button>
+
+          <div v-if="!isLoggedIn" class="flex flex-col gap-2">
+            <buttonred label="Login" to="/login" @click="toggleMenu" />
+            <buttonred label="Register" to="/register" @click="toggleMenu" />
+          </div>
+        </div>
+      </transition>
+    </div>
   </header>
 </template>
 
@@ -86,14 +199,15 @@ import { useRouter } from 'vue-router'
 import api from "@/plugins/axios"
 import buttonred from "@/components/button/buttonred.vue"
 import Skeleton from "@/components/Skeleton.vue"
-import { showConfirm, showError } from '@/utils/alert'
+import { showConfirm, showError } from '@/utils/alert'  
 
 const search = ref('')
 const isLoading = ref(false)
 const user = ref(null)
-
+const isMenuOpen = ref(false);
 const router = useRouter()
 const emit = defineEmits(['search'])
+const cartCount = ref(0)
 
 /*
   Status login berdasarkan token
@@ -102,6 +216,10 @@ const isLoggedIn = computed(() => {
   return !!localStorage.getItem("token")
 })
 
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
+
 /*
   Mengambil data profil jika token tersedia
 */
@@ -109,13 +227,10 @@ const getProfile = async () => {
   if (!localStorage.getItem("token")) return
 
   try {
-    isLoading.value = true
     const response = await api.get('/profile')
     user.value = response.data.data
   } catch (error) {
     user.value = null
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -166,7 +281,22 @@ const logout = async () => {
   }
 }
 
-onMounted(() => {
-  getProfile()
+const getCartCount = async () => {
+  try {
+    const response = await api.get('/cart/count')
+    cartCount.value = response.data.data || 0
+  } catch (error) {
+    console.error('Error fetching cart count:', error)
+    cartCount.value = 0
+  }
+}
+
+onMounted(async () => {
+  isLoading.value = true
+  await Promise.all([
+    getProfile(),
+    getCartCount()
+  ])
+  isLoading.value = false
 })
 </script>

@@ -1,130 +1,151 @@
 <template>
   <Navbar />
-  <div class="p-4 min-h-screen bg-[#FFFFFF]">
-    <h1 class="text-2xl font-bold navbar-font mb-4">| Keranjang</h1>
+  <div class="p-4 min-h-screen bg-gray-50 pb-32">
+    <h1 class="navbar-font text-xl flex items-center gap-2 mb-4">
+      <span class="block w-1 h-6 bg-[#BF3131] rounded-sm"></span>
+      Keranjang
+    </h1>
 
+    <!-- Skeleton -->
     <template v-if="isLoading">
-      <div v-for="n in 3" :key="n" class="flex items-center bg-white rounded-2xl shadow-md p-4 border border-gray-200 animate-pulse space-x-4">
-        <Skeleton width="24px" height="24px" />
-        <Skeleton width="80px" height="80px" />
-        <div class="flex-1 space-y-2">
-          <Skeleton width="60%" height="20px"/>
-          <Skeleton width="40%" height="16px"/>
-          <Skeleton width="80%" height="14px"/>
-          <Skeleton width="50%" height="16px"/>
-        </div>
-        <Skeleton width="60px" height="30px" />
-        <div class="flex space-x-2">
-          <Skeleton width="28px" height="28px"/>
-          <Skeleton width="40px" height="28px"/>
-          <Skeleton width="28px" height="28px"/>
+      <div v-for="n in 3" :key="n" class="bg-white rounded-xl border border-gray-200 p-4 mb-3 animate-pulse">
+        <div class="grid grid-cols-[auto_auto_1fr] gap-3">
+          <div class="w-4 h-4 bg-gray-200 rounded mt-1"></div>
+          <div class="w-20 h-20 bg-gray-200 rounded-lg"></div>
+          <div class="space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+            <div class="h-3 bg-gray-200 rounded w-full"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
         </div>
       </div>
     </template>
 
     <template v-else-if="cart?.cart_detail?.length">
-      <div class="space-y-4">
+      <!-- Pilih semua -->
+      <div class="flex items-center gap-2 mb-3 px-1">
+        <input
+          type="checkbox"
+          id="select-all"
+          :checked="allSelected"
+          :indeterminate="someSelected && !allSelected"
+          @change="toggleAll($event.target.checked)"
+          class="w-4 h-4 accent-[#BF3131] cursor-pointer"
+        />
+        <label for="select-all" class="inter-font text-sm text-gray-500 cursor-pointer">
+          Pilih semua ({{ cart.cart_detail.length }} produk)
+        </label>
+      </div>
+
+      <!-- List produk -->
+      <div class="space-y-3">
         <div
           v-for="item in cart.cart_detail"
           :key="item.id"
-          class="flex items-center bg-white rounded-2xl shadow-md p-4 border border-gray-200"
+          class="bg-white rounded-xl border border-gray-200 p-4"
         >
-          <!-- ✅ Checkbox -->
-          <input
-            type="checkbox"
-            v-model="selectedIds"
-            :value="item.id"
-            class="mr-3 w-5 h-5 text-[#BF3131] border-gray-300 rounded"
-          />
-
-          <img
-            :src="item.product?.foto_cover || 'https://placehold.co/100'"
-            alt="Produk"
-            class="w-20 h-20 object-cover rounded-lg border border-gray-200 mr-4"
-          />
-
-          <div class="flex-1">
-            <h2 class="font-bold text-lg text-black leading-tight">
-              {{ item.product?.nama_product || 'Produk tidak ditemukan' }}
-            </h2>
-
-            <p class="text-sm text-gray-500">
-              Toko : {{ item.product?.user?.toko?.nama_toko }}
-            </p>
-
-            <p class="text-sm text-gray-600 mt-1">
-              {{ item.product?.deskripsi || 'Deskripsi tidak tersedia' }}
-            </p>
-
-            <div class="mt-2 space-y-0.5">
-              <p class="text-xs text-gray-500">
-                Harga satuan:
-                <span class="font-semibold text-black">
-                  Rp {{ formatRupiah(item.product?.harga) }}
-                </span>
-              </p>
-              <p class="text-sm font-bold text-[#BF3131]">
-                Subtotal: Rp {{ formatRupiah(item.harga) }}
-              </p>
-            </div>
-          </div>
-
-          <button
-            @click="deleteProductcart(item.id)"
-            class="bg-[#BF3131] hover:bg-[#a32727] text-white px-3 py-1 rounded-md text-sm ml-4"
-          >
-            Delete
-          </button>
-
-          <div class="flex items-center space-x-2 ml-4">
-            <button
-              @click="decrementQuantity(item)"
-              class="w-7 h-7 flex items-center justify-center bg-gray-200 rounded text-lg font-bold"
-            >−</button>
-
+          <div class="grid grid-cols-[auto_auto_1fr] gap-3 items-start">
+            <!-- Checkbox -->
             <input
-              type="number"
-              min="1"
-              :max="item.product?.stok"
-              v-model.number="item.jumlah"
-              @input="onQuantityChange(item)"
-              class="w-12 h-8 text-center border border-gray-300 rounded-md text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#BF3131]"
+              type="checkbox"
+              :checked="selectedIds.includes(item.id)"
+              @change="toggleItem(item.id)"
+              class="mt-1 w-4 h-4 accent-[#BF3131] cursor-pointer"
             />
 
-            <button
-              @click="incrementQuantity(item)"
-              class="w-7 h-7 flex items-center justify-center bg-gray-200 rounded text-lg font-bold"
-            >＋</button>
-          </div>
-        </div>
+            <!-- Foto -->
+            <img
+              :src="item.product?.foto_cover || 'https://placehold.co/80'"
+              alt="Produk"
+              class="w-20 h-20 object-cover rounded-lg border border-gray-100 flex-shrink-0"
+            />
 
-        <div
-          class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 px-4 py-3 flex justify-end items-center space-x-4 shadow-md"
-        >
-          <div class="flex items-center pr-4 border-r border-gray-300">
-            <!-- ✅ Ganti total pakai selectedTotal -->
-            <span class="font-bold text-lg">
-              Total : Rp {{ formatRupiah(selectedTotal) }}
-            </span>
-          </div>
+            <!-- Info -->
+            <div class="min-w-0">
+              <h2 class="navbar-font text-sm text-gray-900 leading-snug truncate">
+                {{ item.product?.nama_product || 'Produk tidak ditemukan' }}
+              </h2>
+              <p class="inter-font text-xs text-gray-400 mt-0.5">
+                Toko: {{ item.product?.user?.toko?.nama_toko }}
+              </p>
+              <p class="inter-font text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+                {{ item.product?.deskripsi || 'Deskripsi tidak tersedia' }}
+              </p>
 
-          <!-- ✅ Tombol checkout -->
-          <button
-            class="bg-[#BF3131] hover:bg-[#a32727] text-white px-6 py-2 rounded-md font-semibold"
-            @click="checkoutSelected"
-          >
-            Checkout
-          </button>
+              <!-- Harga -->
+              <div class="mt-2 space-y-0.5">
+                <p class="inter-font text-xs text-gray-400">
+                  Harga satuan:
+                  <span class="font-medium text-gray-800">
+                    Rp {{ formatRupiah(item.product?.harga) }}
+                  </span>
+                </p>
+                <p class="inter-font text-sm font-semibold text-[#BF3131]">
+                  Subtotal: Rp {{ formatRupiah(item.harga) }}
+                </p>
+              </div>
+
+              <!-- Footer: qty + hapus -->
+              <div class="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-gray-100">
+                <!-- Qty -->
+                <div class="flex items-center gap-1.5">
+                  <button
+                    @click="decrementQuantity(item)"
+                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md text-base font-semibold transition-colors"
+                  >−</button>
+
+                  <input
+                    type="number"
+                    min="1"
+                    :max="item.product?.stok"
+                    v-model.number="item.jumlah"
+                    @input="onQuantityChange(item)"
+                    class="inter-font w-11 h-7 text-center text-sm font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#BF3131]"
+                  />
+
+                  <button
+                    @click="incrementQuantity(item)"
+                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md text-base font-semibold transition-colors"
+                  >+</button>
+                </div>
+
+                <!-- Hapus -->
+                <button
+                  @click="deleteProductcart(item.id)"
+                  class="inter-font px-3 py-1.5 text-xs font-medium text-[#BF3131] border border-[#BF3131] rounded-md hover:bg-[#BF3131] hover:text-white transition-colors"
+                >
+                  Hapus
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      
     </template>
 
     <template v-else>
-      <div class="text-center py-20 text-gray-400">
-        Keranjang masih kosong...
+      <div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-2">
+        <span class="text-4xl opacity-30">🛒</span>
+        <p class="inter-font text-sm">Keranjang masih kosong...</p>
       </div>
     </template>
+  </div>
+
+  <!-- Checkout bar -->
+  <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between gap-4 shadow-sm z-10">
+    <div>
+      <p class="inter-font text-xs text-gray-400 mb-0.5">Total dipilih</p>
+      <p class="navbar-font text-base text-gray-900">
+        Rp {{ formatRupiah(selectedTotal) }}
+      </p>
+    </div>
+    <button
+      class="inter-font bg-[#BF3131] hover:bg-[#a32727] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"
+      @click="checkoutSelected"
+    >
+      Checkout
+    </button>
   </div>
 </template>
 
@@ -148,13 +169,45 @@ const formatRupiah = (value) => {
   }).format(value)
 }
 
-// ✅ Hitung total harga dari item yang dicentang
+// Hitung total harga dari item yang dicentang
 const selectedTotal = computed(() => {
   if (!cart.value?.cart_detail) return 0
   return cart.value.cart_detail
     .filter(item => selectedIds.value.includes(item.id))
     .reduce((sum, item) => sum + (item.harga || 0), 0)
 })
+
+// Cek apakah semua item tercentang
+const allSelected = computed(() => {
+  if (!cart.value?.cart_detail?.length) return false
+  return cart.value.cart_detail.every(item => selectedIds.value.includes(item.id))
+})
+
+// Cek apakah sebagian item tercentang (untuk indeterminate)
+const someSelected = computed(() => {
+  if (!cart.value?.cart_detail?.length) return false
+  return cart.value.cart_detail.some(item => selectedIds.value.includes(item.id))
+})
+
+// Toggle satu item
+const toggleItem = (id) => {
+  const idx = selectedIds.value.indexOf(id)
+  if (idx === -1) {
+    selectedIds.value.push(id)
+  } else {
+    selectedIds.value.splice(idx, 1)
+  }
+}
+
+// Toggle semua item
+const toggleAll = (checked) => {
+  if (!cart.value?.cart_detail) return
+  if (checked) {
+    selectedIds.value = cart.value.cart_detail.map(item => item.id)
+  } else {
+    selectedIds.value = []
+  }
+}
 
 const getCart = async () => {
   try {
@@ -171,7 +224,7 @@ const getCart = async () => {
     console.error(error)
   } finally {
     isLoading.value = false
-  } 
+  }
 }
 
 const onQuantityChange = (item) => {
@@ -208,7 +261,6 @@ const incrementQuantity = (item) => {
     showError(`Jumlah melebihi stok! Maksimal hanya ${item.product.stok}`)
     return
   }
-
   item.jumlah++
   updateCartItem(item, item.jumlah)
 }

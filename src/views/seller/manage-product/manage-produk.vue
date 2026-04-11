@@ -1,94 +1,77 @@
 <template>
   <sellerside>
-
-    <div class="p-6 overflow-x-auto relative">
+    <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
 
       <!-- HEADER -->
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl navbar-font">Manage Produk</h1>
-
-        <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-          <div class="flex-1">
-            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-          </div>
-          <img
-            :src="user?.foto_profil || 'https://placehold.co/100'"
-            class="w-10 h-10 bg-gray-300 rounded-full"
-          />
-        </div>
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-3">
+        <h1 class="text-2xl md:text-3xl navbar-font text-gray-800">
+          Manage Produk
+        </h1>
       </div>
 
       <!-- SEARCH BAR -->
-      <div class="mb-4 flex items-center gap-3">
+      <div class="mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <input
           type="text"
           v-model="searchQuery"
           @keyup.enter="searchProduct"
           placeholder="Cari produk..."
-          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7D0A0A]"
+          class="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7D0A0A]"
         />
         <button
           @click="searchProduct"
-          class="px-4 py-2 bg-[#7D0A0A] text-white rounded hover:bg-[#5C0707]"
+          class="w-full sm:w-auto px-4 py-2 bg-[#7D0A0A] text-white text-sm font-medium rounded-lg hover:bg-[#5C0707] transition"
         >
           Cari
         </button>
       </div>
 
-      <!-- BUTTON -->
-      <router-link
-        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5 ml-2"
-        to="/create-produk"
-      >
-        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
-          Tambah Produk
-        </span>
-      </router-link>
+      <!-- BUTTONS -->
+      <div class="flex flex-wrap gap-3 mb-5">
+        <router-link
+          to="/create-produk"
+          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg"
+        >
+          <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
+          <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
+            Tambah Produk
+          </span>
+        </router-link>
 
-      <router-link
-        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5 ml-2"
-        to="/manage-foto-product"
-      >
-        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
-          Manage Foto
-        </span>
-      </router-link>
-
+        <router-link
+          to="/manage-foto-product"
+          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg"
+        >
+          <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
+          <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
+            Manage Foto
+          </span>
+        </router-link>
+      </div>
 
       <!-- ================= LOADING ================= -->
       <template v-if="isLoading">
-        <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
-          <table class="min-w-full table-fixed">
-            <thead class="bg-gray-200">
+        <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+          <table class="min-w-[700px] w-full table-auto">
+            <thead class="bg-gray-100">
               <tr>
-                <th class="px-4 py-2 navbar-font">Nama</th>
-                <th class="px-4 py-2 navbar-font">Harga</th>
-                <th class="px-4 py-2 navbar-font">Stok</th>
-                <th class="px-4 py-2 navbar-font">Status</th>
-                <th class="px-4 py-2 navbar-font">Action</th>
+                <th class="px-4 py-3 text-left text-sm">Nama</th>
+                <th class="px-4 py-3 text-left text-sm">Harga</th>
+                <th class="px-4 py-3 text-left text-sm">Stok</th>
+                <th class="px-4 py-3 text-left text-sm">Status</th>
+                <th class="px-4 py-3 text-left text-sm">Action</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="n in 6" :key="n" class="border-t">
-                <td class="px-4 py-3">
-                  <Skeleton width="120px" height="14px"/>
-                </td>
-                <td class="px-4 py-3">
-                  <Skeleton width="60px" height="14px"/>
-                </td>
-                <td class="px-4 py-3">
-                  <Skeleton width="40px" height="14px"/>
-                </td>
-                <td class="px-4 py-3">
-                  <Skeleton width="80px" height="14px"/>
-                </td>
+                <td class="px-4 py-3"><Skeleton width="120px" height="14px" /></td>
+                <td class="px-4 py-3"><Skeleton width="80px" height="14px" /></td>
+                <td class="px-4 py-3"><Skeleton width="40px" height="14px" /></td>
+                <td class="px-4 py-3"><Skeleton width="80px" height="14px" /></td>
                 <td class="px-4 py-3 flex gap-2">
-                  <Skeleton width="60px" height="30px"/>
-                  <Skeleton width="60px" height="30px"/>
-                  <Skeleton width="60px" height="30px"/>
+                  <Skeleton width="60px" height="30px" />
+                  <Skeleton width="60px" height="30px" />
+                  <Skeleton width="60px" height="30px" />
                 </td>
               </tr>
             </tbody>
@@ -98,51 +81,77 @@
 
       <!-- ================= DATA ================= -->
       <template v-else-if="product.length">
-        <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
-          <table class="min-w-full table-fixed divide-y divide-gray-200">
-            <thead class="bg-gray-200">
+        <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+          <table class="min-w-[700px] w-full table-auto divide-y divide-gray-200">
+            <thead class="bg-gray-100">
               <tr>
-                <th class="w-1/4 px-4 py-2 text-left text-sm inter-font text-gray-700">Nama</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm inter-font text-gray-700">Harga</th>
-                <th class="w-1/12 px-4 py-2 text-left text-sm inter-font text-gray-700">Stok</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm inter-font text-gray-700">Status</th>
-                <th class="w-1/4 px-4 py-2 text-left text-sm inter-font text-gray-700">Action</th>
+                <th class="px-4 py-3 text-left text-xs md:text-sm text-gray-700 navbar-font whitespace-nowrap">Nama</th>
+                <th class="px-4 py-3 text-left text-xs md:text-sm text-gray-700 navbar-font whitespace-nowrap">Harga</th>
+                <th class="px-4 py-3 text-left text-xs md:text-sm text-gray-700 navbar-font whitespace-nowrap">Stok</th>
+                <th class="px-4 py-3 text-left text-xs md:text-sm text-gray-700 navbar-font whitespace-nowrap">Status</th>
+                <th class="px-4 py-3 text-left text-xs md:text-sm text-gray-700 navbar-font whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-              <tr v-for="produk in product" :key="produk.id">
-                <td class="px-4 py-2 text-sm">{{ produk.nama_product }}</td>
-                <td class="px-4 py-2 text-sm">{{ produk.harga }}</td>
-                <td class="px-4 py-2 text-sm">{{ produk.stock }}</td>
-                <td class="px-4 py-2 text-sm">{{ produk.status_produk }}</td>
-                <td class="px-4 py-2 flex flex-wrap gap-2 items-center">
-                  <button
-                    @click="openDetail(produk)"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+              <tr
+                v-for="produk in product"
+                :key="produk.id"
+                class="hover:bg-gray-50 transition"
+              >
+                <td class="px-4 py-3 text-xs md:text-sm whitespace-nowrap">
+                  {{ produk.nama_product }}
+                </td>
+                <td class="px-4 py-3 text-xs md:text-sm whitespace-nowrap">
+                  Rp {{ Number(produk.harga).toLocaleString('id-ID') }}
+                </td>
+                <td class="px-4 py-3 text-xs md:text-sm whitespace-nowrap">
+                  {{ produk.stock }}
+                </td>
+                <td class="px-4 py-3 text-xs md:text-sm whitespace-nowrap">
+                  <span
+                    class="px-2 py-1 rounded-full text-xs font-medium"
+                    :class="produk.status_produk === 'Aktif'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'"
                   >
-                    Detail
-                  </button>
-                  <router-link
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
-                    :to="`/edit-produk/${produk.id}`"
-                  >
-                    Edit
-                  </router-link>
-                  <button
-                    @click="deleteProduct(produk.id)"
-                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                  >
-                    Hapus
-                  </button>
+                    {{ produk.status_produk }}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      @click="openDetail(produk)"
+                      class="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                    >
+                      Detail
+                    </button>
+                    <router-link
+                      :to="`/edit-produk/${produk.id}`"
+                      class="px-3 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                    >
+                      Edit
+                    </router-link>
+                    <button
+                      @click="deleteProduct(produk.id)"
+                      class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition"
+                    >
+                      Hapus
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
           </table>
-          <div v-if="product.length" class="flex justify-center mt-4 space-x-2 mb-4">
+
+          <!-- PAGINATION -->
+          <div
+            v-if="product.length"
+            class="flex flex-wrap justify-center items-center gap-2 mt-4 mb-4"
+          >
             <button
               @click="changePage(currentPage - 1)"
               :disabled="currentPage === 1"
-              class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+              class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
             >
               Previous
             </button>
@@ -151,7 +160,12 @@
               v-for="page in lastPage"
               :key="page"
               @click="changePage(page)"
-              :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+              :class="[
+                'px-3 py-1 text-xs md:text-sm rounded',
+                page === currentPage
+                  ? 'bg-[#7D0A0A] text-white'
+                  : 'bg-gray-200 text-gray-700'
+              ]"
             >
               {{ page }}
             </button>
@@ -159,7 +173,7 @@
             <button
               @click="changePage(currentPage + 1)"
               :disabled="currentPage === lastPage"
-              class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+              class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
             >
               Next
             </button>
@@ -175,63 +189,102 @@
       </template>
 
       <!-- ================= MODAL DETAIL ================= -->
-      <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div
+        v-if="isModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      >
+        <div
+          class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+        >
+          <!-- Modal Header -->
           <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-            <h2 class="text-xl font-bold text-gray-800 navbar-font">Detail Produk</h2>
-            <button @click="closeDetail" class="text-gray-500 hover:text-red-500 transition-colors">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <h2 class="text-lg md:text-xl font-bold text-gray-800 navbar-font">
+              Detail Produk
+            </h2>
+            <button
+              @click="closeDetail"
+              class="text-gray-500 hover:text-red-500 transition"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
-          
-          <div class="p-6 overflow-y-auto flex-1" v-if="selectedProduct">
+
+          <!-- Modal Body -->
+          <div
+            class="p-6 overflow-y-auto flex-1"
+            v-if="selectedProduct"
+          >
             <div class="flex flex-col md:flex-row gap-6">
-              <div class="w-full md:w-1/3 flex-shrink-0">
+              <div class="w-full md:w-1/3">
                 <img
                   :src="selectedProduct.foto_cover"
                   class="w-full aspect-square object-cover rounded-lg shadow-sm border"
                   alt="Foto Produk"
                 />
               </div>
-              
+
               <div class="w-full md:w-2/3 space-y-4">
                 <div>
-                  <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Nama Produk</h3>
-                  <p class="text-lg font-medium inter-font text-gray-900 inter-font">{{ selectedProduct.nama_product }}</p>
+                  <h3 class="text-xs text-gray-500 uppercase">Nama Produk</h3>
+                  <p class="text-base md:text-lg font-medium text-gray-900">
+                    {{ selectedProduct.nama_product }}
+                  </p>
                 </div>
-                
+
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Harga</h3>
-                    <p class="text-base text-gray-900 inter-font">{{ selectedProduct.harga }}</p>
-                  </div>
-                  <div>
-                    <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Stok</h3>
-                    <p class="text-base text-gray-900 inter-font">{{ selectedProduct.stock }}</p>
-                  </div>
-                  <div>
-                    <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider">Status</h3>
-                    <p class="text-base">
-                      <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800" v-if="selectedProduct.status_produk === 'Aktif'">{{ selectedProduct.status_produk }}</span>
-                      <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800" v-else>{{ selectedProduct.status_produk }}</span>
+                    <h3 class="text-xs text-gray-500 uppercase">Harga</h3>
+                    <p class="text-sm md:text-base">
+                      Rp {{ Number(selectedProduct.harga).toLocaleString('id-ID') }}
                     </p>
+                  </div>
+                  <div>
+                    <h3 class="text-xs text-gray-500 uppercase">Stok</h3>
+                    <p class="text-sm md:text-base">
+                      {{ selectedProduct.stock }}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 class="text-xs text-gray-500 uppercase">Status</h3>
+                    <span
+                      class="px-2 py-1 rounded-full text-xs font-medium"
+                      :class="selectedProduct.status_produk === 'Aktif'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-800'"
+                    >
+                      {{ selectedProduct.status_produk }}
+                    </span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 class="text-sm navbar-font text-gray-500 uppercase tracking-wider mb-1">Deskripsi</h3>
-                  <div class="bg-gray-50 p-3 rounded border text-sm text-gray-700 whitespace-pre-wrap inter-font">
+                  <h3 class="text-xs text-gray-500 uppercase mb-1">Deskripsi</h3>
+                  <div class="bg-gray-50 p-3 rounded border text-sm text-gray-700 whitespace-pre-wrap">
                     {{ selectedProduct.deskripsi || '-' }}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          
+
+          <!-- Modal Footer -->
           <div class="p-4 border-t bg-gray-50 flex justify-end">
-            <button @click="closeDetail" class="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
+            <button
+              @click="closeDetail"
+              class="px-5 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition"
+            >
               Tutup
             </button>
           </div>

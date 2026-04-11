@@ -4,17 +4,6 @@
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl navbar-font">Withdraw</h1>
-
-        <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-          <div class="flex-1">
-            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-          </div>
-          <img
-            :src="user?.foto_profil || 'https://placehold.co/100'"
-            class="w-10 h-10 bg-gray-300 rounded-full"
-          />
-        </div>
       </div>
 
       <!-- Tombol Withdraw -->
@@ -200,7 +189,6 @@ import Skeleton from '@/components/Skeleton.vue';
 import api from '@/plugins/axios';
 import { onMounted, ref } from 'vue';
 
-const user = ref({});
 const withdraws = ref([]);
 const showModal = ref(false);
 const loading = ref(false);
@@ -217,14 +205,6 @@ const form = ref({
   catatan: ''
 });
 
-const getProfile = async () => {
-  try {
-    const response = await api.get('/profile');
-    user.value = response.data.data;
-  } catch (err) {
-    console.error('Gagal mengambil profil:', err);
-  }
-};
 const getWithdraw = async (page = 1) => {
   isLoading.value = true;
   try {
@@ -294,7 +274,6 @@ const closeModal = () => {
 };
 
 onMounted(async () => {
-  await getProfile();
   await getWithdraw();
 });
 </script>

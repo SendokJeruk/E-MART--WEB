@@ -1,27 +1,23 @@
 <template>
   <sellerside>
-    <div class="p-6 overflow-x-auto">
-        
-        <div class="flex justify-between items-center mb-6">
-          <h1 class="text-3xl navbar-font">Manage Foto Produk</h1>
+    <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
 
-          <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-            <div class="flex-1">
-              <p class="text-sm font-bold inter-font">{{ user.name }}</p>
-              <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-            </div>
-            <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
-          </div>
-        </div>
+      <!-- HEADER -->
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+        <h1 class="text-2xl md:text-3xl navbar-font text-gray-800">
+          Manage Foto Produk
+        </h1>
+      </div>
 
+      <!-- NAVIGATION BUTTONS -->
+      <div class="flex flex-wrap gap-3 mb-5">
         <router-link
-          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
           to="/create-foto-product"
+          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg focus:ring-2 focus:ring-[#BF3131] focus:outline-none"
         >
           <span
-            class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"
+            class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all duration-200 group-hover:h-full"
           ></span>
-
           <span
             class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white navbar-font"
           >
@@ -30,98 +26,132 @@
         </router-link>
 
         <router-link
-          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
           to="/manage-produk"
+          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg focus:ring-2 focus:ring-[#BF3131] focus:outline-none"
         >
           <span
-            class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"
+            class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all duration-200 group-hover:h-full"
           ></span>
-
           <span
             class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white navbar-font"
           >
             Manage Product
           </span>
         </router-link>
+      </div>
 
-        <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
-        <table class="min-w-full table-fixed divide-y divide-gray-200">
-            <thead class="bg-gray-200">
+      <!-- TABLE -->
+      <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+        <table class="min-w-[600px] w-full table-auto divide-y divide-gray-200">
+          <thead class="bg-gray-100">
             <tr>
-                <th class="w-1/6 px-4 py-2 text-left text-sm text-gray-700 navbar-font">Nama</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm text-gray-700 navbar-font">Foto</th>
-
+              <th class="px-4 py-3 text-left text-xs md:text-sm text-gray-700 navbar-font whitespace-nowrap">
+                Nama Produk
+              </th>
+              <th class="px-4 py-3 text-left text-xs md:text-sm text-gray-700 navbar-font whitespace-nowrap">
+                Foto
+              </th>
             </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-            <tr v-for="produk in ProductSeller" :key="produk.id">
-                <td class="px-4 py-2 text-sm text-gray-900 inter-font">{{ produk.nama_product }}</td>
-                <td class="px-4 py-2 text-sm text-gray-900 max-w-[200px]">
-                <div v-if="Array.isArray(produk.foto) && produk.foto.length > 0" class="overflow-x-auto">
-                    <div class="flex w-max">
-                        <div 
-                            v-for="(item, index) in produk.foto" 
-                            :key="index" 
-                            class="text-center flex-shrink-0 relative"
-                            :class="openMenuIndex === `${produk.id}-${index}` ? 'mr-20' : 'mr-2'" 
-                            >
-                            <img 
-                                :src="item.foto" 
-                                alt="foto produk" 
-                                class="w-16 h-16 object-cover rounded mb-1 cursor-pointer"
-                                @click="toggleMenu(produk.id, index)"
-                            />
+          </thead>
 
-                            <div 
-                                v-if="openMenuIndex === `${produk.id}-${index}`" 
-                                class="absolute top-1/2 left-full transform -translate-y-1/2 ml-2 bg-white border shadow-md rounded p-2 space-y-2 z-20"
-                            >
-                                <router-link :to="`/edit-foto-product/${item.id}`" class="block w-full text-sm text-yellow-600 hover:underline inter-font">
-                                Edit
-                                </router-link>
-                                <button @click="deleteFoto(item.id)" class="block w-full text-sm text-red-600 hover:underline inter-font">
-                                    Hapus
-                                </button>
-                            </div>
+          <tbody class="divide-y divide-gray-200">
+            <tr
+              v-for="produk in ProductSeller"
+              :key="produk.id"
+              class="hover:bg-gray-50 transition"
+            >
+              <!-- NAMA PRODUK -->
+              <td class="px-4 py-3 text-xs md:text-sm text-gray-900 inter-font whitespace-nowrap">
+                {{ produk.nama_product }}
+              </td>
 
-                        </div>
+              <!-- FOTO PRODUK -->
+              <td class="px-4 py-3">
+                <div
+                  v-if="Array.isArray(produk.foto) && produk.foto.length > 0"
+                  class="overflow-x-auto"
+                >
+                  <div class="flex gap-2 w-max">
+                    <div
+                      v-for="(item, index) in produk.foto"
+                      :key="item.id"
+                      class="relative flex-shrink-0"
+                    >
+                      <img
+                        :src="item.foto"
+                        alt="foto produk"
+                        class="w-16 h-16 md:w-20 md:h-20 object-cover rounded cursor-pointer border"
+                        @click="toggleMenu(produk.id, index)"
+                      />
+
+                      <!-- MENU AKSI -->
+                      <div
+                        v-if="openMenuIndex === `${produk.id}-${index}`"
+                        class="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-white border shadow-lg rounded-md p-2 space-y-1 z-20 min-w-[100px]"
+                      >
+                        <router-link
+                          :to="`/edit-foto-product/${item.id}`"
+                          class="block text-xs md:text-sm text-yellow-600 hover:underline inter-font"
+                        >
+                          Edit
+                        </router-link>
+                        <button
+                          @click="deleteFoto(item.id)"
+                          class="block text-xs md:text-sm text-red-600 hover:underline inter-font"
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </div>
+                  </div>
                 </div>
+
                 <div v-else>
-                    <p class="text-sm text-gray-500">Tidak ada foto</p>
+                  <p class="text-xs md:text-sm text-gray-500">
+                    Tidak ada foto
+                  </p>
                 </div>
-            </td>
+              </td>
             </tr>
-            </tbody>
-            </table>
-              <div class="flex justify-center mt-4 space-x-2 mb-4">
-                <button
-                  @click="changePage(currentPage - 1)"
-                  :disabled="currentPage === 1"
-                  class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-                >
-                  Previous
-                </button>
+          </tbody>
+        </table>
 
-                <button
-                  v-for="page in lastPage"
-                  :key="page"
-                  @click="changePage(page)"
-                  :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
-                >
-                  {{ page }}
-                </button>
+        <!-- PAGINATION -->
+        <div
+          class="flex flex-wrap justify-center items-center gap-2 mt-4 mb-4 px-2"
+        >
+          <button
+            @click="changePage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
 
-                <button
-                  @click="changePage(currentPage + 1)"
-                  :disabled="currentPage === lastPage"
-                  class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
+          <button
+            v-for="page in lastPage"
+            :key="page"
+            @click="changePage(page)"
+            :class="[
+              'px-3 py-1 text-xs md:text-sm rounded',
+              page === currentPage
+                ? 'bg-[#7D0A0A] text-white'
+                : 'bg-gray-200 text-gray-700'
+            ]"
+          >
+            {{ page }}
+          </button>
+
+          <button
+            @click="changePage(currentPage + 1)"
+            :disabled="currentPage === lastPage"
+            class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
+    </div>
   </sellerside>
 </template>
 
