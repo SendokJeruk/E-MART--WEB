@@ -1,69 +1,52 @@
 <template>
   <adminside>
-    <div class="p-6 overflow-x-auto">
+    <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
 
       <!-- HEADER -->
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl navbar-font">Manage User</h1>
-
-        <!-- Header Skeleton saat loading -->
-        <div
-          v-if="isLoading"
-          class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
-        >
-          <Skeleton type="circle" size="40px"/>
-
-          <div class="flex-1 space-y-2">
-            <Skeleton height="14px" width="70%"/>
-            <Skeleton height="12px" width="90%"/>
-          </div>
-        </div>
-
-        <!-- Header data user -->
-        <div
-          v-else
-          class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60"
-        >
-          <div class="flex-1">
-            <p class="text-sm font-bold inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-          </div>
-          <img
-            :src="user?.foto_profil || 'https://placehold.co/100'"
-            class="w-10 h-10 bg-gray-300 rounded-full"
-          />
-        </div>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h1 class="text-2xl md:text-3xl navbar-font text-gray-800">
+          Manage User
+        </h1>
       </div>
 
       <!-- SEARCH INPUT -->
-      <!-- Menggunakan debounce agar tidak spam API -->
-      <input
-        v-model="searchQuery"
-        class="w-full p-2 border border-gray-300 rounded-md text-sm mb-4"
-        placeholder="Search..."
-        type="text"
-        @input="handleSearch"
-      />
+      <div class="mb-4">
+        <input
+          v-model="searchQuery"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-xs sm:text-sm focus:ring-2 focus:ring-[#7D0A0A] outline-none"
+          placeholder="Search..."
+          type="text"
+          @input="handleSearch"
+        />
+      </div>
 
       <!-- BUTTON TAMBAH USER -->
-      <router-link
-        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5"
-        to="/create-user"
-      >
-        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
-          Tambah User
-        </span>
-      </router-link>
+      <div class="mb-5">
+        <router-link
+          to="/create-user"
+          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg focus:ring-2 focus:ring-[#BF3131] focus:outline-none"
+        >
+          <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all duration-200 group-hover:h-full"></span>
+          <span class="relative text-xs sm:text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
+            Tambah User
+          </span>
+        </router-link>
+      </div>
 
       <!-- TABLE USER -->
-      <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
-        <table class="min-w-full table-auto divide-y divide-gray-200">
-          <thead class="bg-gray-200">
+      <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+        <table class="min-w-[500px] w-full table-auto divide-y divide-gray-200 text-xs sm:text-sm">
+          <thead class="bg-gray-100">
             <tr>
-              <th class="px-6 py-3 text-left text-sm navbar-font">Name</th>
-              <th class="px-6 py-3 text-left text-sm navbar-font">Email</th>
-              <th class="px-6 py-3 text-left text-sm navbar-font">Action</th>
+              <th class="px-4 py-3 text-left navbar-font text-gray-700 whitespace-nowrap">
+                Name
+              </th>
+              <th class="px-4 py-3 text-left navbar-font text-gray-700 whitespace-nowrap">
+                Email
+              </th>
+              <th class="px-4 py-3 text-left navbar-font text-gray-700 whitespace-nowrap">
+                Action
+              </th>
             </tr>
           </thead>
 
@@ -72,42 +55,58 @@
             <!-- Skeleton saat loading -->
             <template v-if="isLoading">
               <tr v-for="n in 6" :key="n">
-                <td class="px-6 py-4"><Skeleton height="14px" width="80%"/></td>
-                <td class="px-6 py-4"><Skeleton height="14px" width="90%"/></td>
-                <td class="px-6 py-4 flex gap-2">
-                  <Skeleton height="30px" width="60px"/>
-                  <Skeleton height="30px" width="60px"/>
+                <td class="px-4 py-3">
+                  <Skeleton height="14px" width="80%" />
+                </td>
+                <td class="px-4 py-3">
+                  <Skeleton height="14px" width="90%" />
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-wrap gap-2">
+                    <Skeleton height="30px" width="60px" />
+                    <Skeleton height="30px" width="60px" />
+                  </div>
                 </td>
               </tr>
             </template>
 
             <!-- Data user -->
             <template v-else-if="users.length > 0">
-              <tr v-for="user in users" :key="user.id">
-                <td class="px-6 py-4 text-sm font-medium inter-font text-gray-900 ">{{ user.name }}</td>
-                <td class="px-6 py-4 text-sm font-medium inter-font text-gray-900">{{ user.email }}</td>
+              <tr
+                v-for="user in users"
+                :key="user.id"
+                class="hover:bg-gray-50 transition"
+              >
+                <td class="px-4 py-3 font-medium inter-font text-gray-900 whitespace-nowrap">
+                  {{ user.name }}
+                </td>
+                <td class="px-4 py-3 inter-font text-gray-700 break-all">
+                  {{ user.email }}
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      @click="deleteUser(user.id)"
+                      class="px-3 py-1 text-xs sm:text-sm bg-red-500 hover:bg-red-600 text-white rounded navbar-font transition"
+                    >
+                      Hapus
+                    </button>
 
-                <td class="px-6 py-4">
-                  <button
-                    @click="deleteUser(user.id)"
-                    class="bg-red-500 text-white px-3 py-1 rounded mr-2 navbar-font"
-                  >
-                    Hapus
-                  </button>
-
-                  <router-link
-                    :to="`/edit-user/${user.id}`"
-                    class="bg-yellow-500 text-white px-3 py-1 rounded navbar-font"
-                  >
-                    Edit
-                  </router-link>
+                    <router-link
+                      :to="`/edit-user/${user.id}`"
+                      class="px-3 py-1 text-xs sm:text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded navbar-font transition"
+                    >
+                      Edit
+                    </router-link>
+                  </div>
                 </td>
               </tr>
             </template>
-            
+
+            <!-- Empty State -->
             <template v-else>
               <tr>
-                <td colspan="3" class="px-6 py-8 text-center text-gray-500">
+                <td colspan="3" class="px-4 py-8 text-center text-gray-500">
                   Tidak ada data user
                 </td>
               </tr>
@@ -116,41 +115,40 @@
           </tbody>
         </table>
       </div>
+
+      <!-- PAGINATION -->
+      <div class="flex flex-wrap justify-center items-center gap-2 mt-6">
+        <button
+          @click="changePage(pagination.current_page - 1)"
+          :disabled="pagination.current_page === 1"
+          class="px-3 py-1 text-xs sm:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <button
+          v-for="page in pagination.last_page"
+          :key="page"
+          @click="changePage(page)"
+          :class="[
+            'px-3 py-1 text-xs sm:text-sm rounded',
+            page === pagination.current_page
+              ? 'bg-[#7D0A0A] text-white'
+              : 'bg-gray-200 text-gray-700'
+          ]"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          @click="changePage(pagination.current_page + 1)"
+          :disabled="pagination.current_page === pagination.last_page"
+          class="px-3 py-1 text-xs sm:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
-
-    <!-- PAGINATION -->
-    <div class="flex justify-center mt-6 space-x-2">
-      <button
-        @click="changePage(pagination.current_page - 1)"
-        :disabled="pagination.current_page === 1"
-        class="px-4 py-2 bg-gray-300 rounded"
-      >
-        Previous
-      </button>
-
-      <button
-        v-for="page in pagination.last_page"
-        :key="page"
-        @click="changePage(page)"
-        :class="[
-          'px-4 py-2 rounded',
-          page === pagination.current_page
-            ? 'bg-[#7D0A0A] text-white'
-            : 'bg-gray-200'
-        ]"
-      >
-        {{ page }}
-      </button>
-
-      <button
-        @click="changePage(pagination.current_page + 1)"
-        :disabled="pagination.current_page === pagination.last_page"
-        class="px-4 py-2 bg-gray-300 rounded"
-      >
-        Next
-      </button>
-    </div>
-
   </adminside>
 </template>
 
@@ -175,7 +173,6 @@ import Skeleton from '@/components/Skeleton.vue'
   State utama
 */
 const users = ref([])
-const user = ref({})
 const isLoading = ref(true)
 const searchQuery = ref('')
 
@@ -186,18 +183,6 @@ const pagination = ref({
   current_page: 1,
   last_page: 1,
 })
-
-/*
-  Mengambil profil user login
-*/
-const getProfile = async () => {
-  try {
-    const response = await api.get('/profile')
-    user.value = response.data.data
-  } catch (error) {
-    console.error('Gagal mengambil profil:', error)
-  }
-}
 
 /*
   FUNCTION UTAMA
@@ -279,7 +264,6 @@ const deleteUser = async (id) => {
 */
 onMounted(() => {
   fetchUsers(1)
-  getProfile()
 })
 </script>
 

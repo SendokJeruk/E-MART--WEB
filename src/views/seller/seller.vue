@@ -1,137 +1,114 @@
 <template>
   <sellerside>
-    <div class="p-6 bg-[#F9FAFB] min-h-screen">
+    <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
 
       <!-- HEADER -->
-      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+      <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 pb-4 border-b border-gray-200">
 
-        <h1 class="text-2xl font-bold text-gray-800 navbar-font">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 navbar-font">
           Dashboard Seller
         </h1>
-
-        <!-- Header Skeleton -->
-        <div v-if="isLoading"
-        class="bg-white shadow-sm rounded-xl px-4 py-3 flex items-center gap-4 w-72">
-
-          <Skeleton type="circle" size="48px"/>
-
-          <div class="flex-1 space-y-2">
-            <Skeleton height="14px" width="70%"/>
-            <Skeleton height="12px" width="90%"/>
-          </div>
-
-        </div>
-
-        <!-- Header Real -->
-        <div v-else
-        class="bg-white shadow-sm rounded-xl px-4 py-3 flex items-center gap-4 w-72">
-
-          <img
-            :src="user?.foto_profil || 'https://placehold.co/100'"
-            class="w-12 h-12 rounded-full object-cover border"
-          />
-
-          <div class="flex-1">
-            <p class="text-sm font-semibold text-gray-800 inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-500 truncate inter-font">{{ user.email }}</p>
-          </div>
-
-        </div>
-
       </div>
 
-
       <!-- STAT CARDS -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6">
 
-        <!-- Skeleton Cards -->
         <template v-if="isLoading">
-
-          <div v-for="n in 4" :key="n"
-          class="bg-white rounded-xl shadow-sm border p-6">
-
+          <div v-for="n in 4" :key="n" class="bg-white rounded-xl shadow-sm border p-4 md:p-6">
             <Skeleton height="14px" width="60%" class="mx-auto mb-3"/>
-
             <div class="flex justify-center">
               <Skeleton height="28px" width="80px"/>
             </div>
-
           </div>
-
         </template>
 
-
-        <!-- Real Cards -->
         <template v-else>
 
-          <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="navbar-font text-gray-600 mb-2">Total Product</h2>
-            <p class="text-2xl font-bold text-red-700 inter-font">{{ ProductCount }}</p>
+          <div class="bg-white rounded-xl shadow-sm border p-4 md:p-6 text-center">
+            <h2 class="text-sm md:text-base text-gray-600 mb-2">Total Product</h2>
+            <p class="text-xl md:text-2xl font-bold text-red-700">{{ ProductCount }}</p>
           </div>
 
-          <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="navbar-font text-gray-600 mb-2">Total Penjualan</h2>
-            <p class="text-2xl font-bold text-red-700 inter-font">{{ totalPenjualan }}</p>
+          <div class="bg-white rounded-xl shadow-sm border p-4 md:p-6 text-center">
+            <h2 class="text-sm md:text-base text-gray-600 mb-2">Total Penjualan</h2>
+            <p class="text-xl md:text-2xl font-bold text-red-700">{{ totalPenjualan }}</p>
           </div>
 
-          <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="navbar-font text-gray-600 mb-2">Total Income</h2>
-            <p class="text-2xl font-bold text-red-700 inter-font">
+          <div class="bg-white rounded-xl shadow-sm border p-4 md:p-6 text-center">
+            <h2 class="text-sm md:text-base text-gray-600 mb-2">Total Income</h2>
+            <p class="text-xl md:text-2xl font-bold text-red-700">
               Rp. {{ totalIncome.toLocaleString('id-ID') }}
             </p>
           </div>
 
-          <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
-            <h2 class="text-gray-600 mb-2 navbar-font">Total Wallet</h2>
-            <p class="text-2xl font-bold text-red-700 inter-font">
+          <div class="bg-white rounded-xl shadow-sm border p-4 md:p-6 text-center">
+            <h2 class="text-sm md:text-base text-gray-600 mb-2">Total Wallet</h2>
+            <p class="text-xl md:text-2xl font-bold text-red-700">
               Rp. {{ totalWallet.toLocaleString('id-ID') }}
             </p>
           </div>
 
         </template>
-
       </div>
 
       <!-- FILTER & EXPORT -->
-      <div class="mt-8 flex flex-col md:flex-row items-end md:items-center justify-between gap-4">
-        <div class="flex flex-col md:flex-row items-center gap-3">
-          <div>
-            <label class="text-sm font-medium text-gray-600 block mb-1 inter-font">Mulai Tanggal</label>
-            <input type="date" v-model="startDate" class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7D0A0A] outline-none" />
+      <div class="mt-6 flex flex-col lg:flex-row justify-between gap-4">
+
+        <!-- FILTER -->
+        <div class="flex flex-col sm:flex-row gap-3 w-full">
+
+          <div class="w-full">
+            <label class="text-xs text-gray-600 mb-1 block">Mulai</label>
+            <input type="date" v-model="startDate"
+              class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-700 outline-none"/>
           </div>
-          <div>
-            <label class="text-sm font-medium text-gray-600 block mb-1 inter-font">Sampai Tanggal</label>
-            <input type="date" v-model="endDate" class="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7D0A0A] outline-none" />
+
+          <div class="w-full">
+            <label class="text-xs text-gray-600 mb-1 block">Sampai</label>
+            <input type="date" v-model="endDate"
+              class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-700 outline-none"/>
           </div>
-          <button @click="applyFilter" class="mt-auto px-4 py-2 bg-[#7D0A0A] text-white text-sm rounded-lg hover:bg-[#BF3131] transition navbar-font">Filter</button>
+
+          <button
+            @click="applyFilter"
+            class="w-full sm:w-auto px-5 py-2.5 bg-red-700 text-white text-sm rounded-lg font-semibold shadow-md hover:bg-red-800 active:scale-95 transition"
+          >
+            Filter
+          </button>
+
         </div>
-        <button @click="exportExcel" class="mt-auto px-4 py-2 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 transition navbar-font">
-          Export Excel
+
+        <!-- EXPORT -->
+        <button
+          @click="exportExcel"
+          class="w-full sm:w-auto px-5 py-2.5 bg-green-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-green-700 active:scale-95 transition"
+        >
+         Export Excel
         </button>
+
       </div>
 
-      <!-- CHARTS -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <!-- CHART -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mt-6">
 
-        <!-- Line Chart -->
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-          <h2 class="text-lg navbar-font text-gray-700 mb-4">Tren Penjualan</h2>
-          <div v-if="isLoading">
-            <Skeleton height="300px"/>
-          </div>
-          <apexchart v-else type="line" height="300" class="w-full" :options="lineOptions" :series="lineSeries" />
+        <div class="bg-white rounded-xl shadow-sm border p-4 md:p-6">
+          <h2 class="text-base md:text-lg text-gray-700 mb-4">Tren Penjualan</h2>
+          <Skeleton v-if="isLoading" height="300px"/>
+          <apexchart v-else type="line" height="300" :options="lineOptions" :series="lineSeries"/>
         </div>
 
-        <!-- Doughnut Chart -->
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-          <h2 class="text-lg font-semibold text-gray-700 mb-4">5 Produk Terlaris</h2>
-          <div v-if="isLoading">
-            <Skeleton height="300px"/>
-          </div>
-          <div v-else-if="doughnutSeries.length === 0" class="h-[300px] flex items-center justify-center text-gray-500">
+        <div class="bg-white rounded-xl shadow-sm border p-4 md:p-6">
+          <h2 class="text-base md:text-lg text-gray-700 mb-4">5 Produk Terlaris</h2>
+          <Skeleton v-if="isLoading" height="300px"/>
+
+          <div v-else-if="doughnutSeries.length === 0"
+            class="h-[300px] flex items-center justify-center text-gray-500">
             Tidak ada produk terjual
           </div>
-          <apexchart v-else type="donut" height="300" class="w-full" :options="doughnutOptions" :series="doughnutSeries" />
+
+          <apexchart v-else type="donut" height="300"
+            :options="doughnutOptions"
+            :series="doughnutSeries"/>
         </div>
 
       </div>

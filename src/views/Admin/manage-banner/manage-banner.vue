@@ -1,90 +1,102 @@
 <template>
   <AdminSide>
-    <div class="p-6">
+    <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
 
       <!-- HEADER -->
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl navbar-font">Manage Banner</h1>
-
-        <!-- PROFILE -->
-        <div v-if="isProfileLoading" class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-          <Skeleton type="circle" size="40px" />
-          <div class="flex-1 space-y-2">
-            <Skeleton height="14px" width="70%" />
-            <Skeleton height="12px" width="90%" />
-          </div>
-        </div>
-
-        <div v-else class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
-          <div class="flex-1">
-            <p class="text-sm inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-600 inter-font">{{ user.email }}</p>
-          </div>
-          <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 rounded-full" />
-        </div>
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <h1 class="text-xl sm:text-2xl md:text-3xl navbar-font text-gray-800">
+          Manage Banner
+        </h1>
       </div>
 
-      <!-- BUTTON -->
-      <button @click="openCreate"
-        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-6">
-        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm text-[#7D0A0A] group-hover:text-white navbar-font">
-          Tambah Banner
-        </span>
-      </button>
+      <!-- BUTTON TAMBAH BANNER -->
+      <div class="mb-6">
+        <button
+          @click="openCreate"
+          class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg focus:ring-2 focus:ring-[#BF3131] focus:outline-none"
+        >
+          <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all duration-200 group-hover:h-full"></span>
+          <span class="relative text-xs sm:text-sm font-medium text-[#7D0A0A] group-hover:text-white navbar-font">
+            Tambah Banner
+          </span>
+        </button>
+      </div>
 
       <!-- TABLE -->
-      <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
-        <table class="min-w-full table-fixed">
-
-          <thead class="bg-gray-200">
+      <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
+        <table class="min-w-[500px] w-full table-auto text-xs sm:text-sm">
+          <thead class="bg-gray-100">
             <tr>
-              <th class="px-4 py-2 navbar-font">Section</th>
-              <th class="px-4 py-2 navbar-font">Gambar</th>
-              <th class="px-4 py-2 navbar-font">Action</th>
+              <th class="px-4 py-3 text-left navbar-font text-gray-700 whitespace-nowrap">
+                Section
+              </th>
+              <th class="px-4 py-3 text-center navbar-font text-gray-700 whitespace-nowrap">
+                Gambar
+              </th>
+              <th class="px-4 py-3 text-center navbar-font text-gray-700 whitespace-nowrap">
+                Action
+              </th>
             </tr>
           </thead>
 
           <!-- LOADING -->
-          <tbody v-if="isLoading">
-            <tr v-for="n in 5" :key="n" class="border-t">
+          <tbody v-if="isLoading" class="divide-y divide-gray-200">
+            <tr v-for="n in 5" :key="n">
               <td class="px-4 py-3">
                 <Skeleton width="80px" />
               </td>
-              <td class="px-4 py-3">
+              <td class="px-4 py-3 text-center">
                 <Skeleton width="100px" height="60px" />
               </td>
-              <td class="px-4 py-3 flex gap-2">
-                <Skeleton width="60px" height="30px" />
-                <Skeleton width="60px" height="30px" />
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap justify-center gap-2">
+                  <Skeleton width="60px" height="30px" />
+                  <Skeleton width="60px" height="30px" />
+                </div>
               </td>
             </tr>
           </tbody>
 
           <!-- DATA -->
-          <tbody v-else-if="banners.length > 0">
-            <tr v-for="banner in banners" :key="banner.id" class="border-t">
-              <td class="px-4 py-2 text-center inter-font text-sm">{{ banner.section }}</td>
-
-              <td class="px-4 py-2 flex justify-center">
-                <img :src="banner.image" class="w-24 h-16 object-cover rounded" />
+          <tbody v-else-if="banners.length > 0" class="divide-y divide-gray-200">
+            <tr
+              v-for="banner in banners"
+              :key="banner.id"
+              class="hover:bg-gray-50 transition"
+            >
+              <td class="px-4 py-3 inter-font text-gray-900 whitespace-nowrap">
+                {{ banner.section }}
               </td>
 
-              <td class="px-4 py-2">
-                <div class="flex justify-center gap-2">
-                  <button @click="openEdit(banner)"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded navbar-font">
+              <td class="px-4 py-3 text-center">
+                <img
+                  :src="banner.image"
+                  class="w-20 h-14 sm:w-24 sm:h-16 object-cover rounded mx-auto"
+                  alt="Banner"
+                />
+              </td>
+
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap justify-center gap-2">
+                  <button
+                    @click="openEdit(banner)"
+                    class="px-3 py-1 text-xs sm:text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded navbar-font transition"
+                  >
                     Edit
                   </button>
 
-                  <button @click="deleteBanner(banner.id)"
-                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded navbar-font">
+                  <button
+                    @click="deleteBanner(banner.id)"
+                    class="px-3 py-1 text-xs sm:text-sm bg-red-500 hover:bg-red-600 text-white rounded navbar-font transition"
+                  >
                     Hapus
                   </button>
                 </div>
               </td>
             </tr>
           </tbody>
+
+          <!-- EMPTY STATE -->
           <tbody v-else>
             <tr>
               <td colspan="3" class="px-4 py-6 text-center text-gray-500">
@@ -92,18 +104,18 @@
               </td>
             </tr>
           </tbody>
-
         </table>
       </div>
 
+      <!-- PAGINATION -->
       <div
         v-if="pagination.last_page > 1"
-        class="flex justify-center mt-6 space-x-2"
+        class="flex flex-wrap justify-center items-center gap-2 mt-6"
       >
         <button
           @click="changePage(pagination.current_page - 1)"
           :disabled="pagination.current_page === 1"
-          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          class="px-3 py-1 text-xs sm:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
         >
           Previous
         </button>
@@ -113,7 +125,7 @@
           :key="page"
           @click="changePage(page)"
           :class="[
-            'px-4 py-2 rounded',
+            'px-3 py-1 text-xs sm:text-sm rounded',
             page === pagination.current_page
               ? 'bg-[#7D0A0A] text-white'
               : 'bg-gray-200 text-gray-700'
@@ -125,53 +137,76 @@
         <button
           @click="changePage(pagination.current_page + 1)"
           :disabled="pagination.current_page === pagination.last_page"
-          class="px-4 py-2 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          class="px-3 py-1 text-xs sm:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
 
       <!-- MODAL -->
-      <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white w-[400px] rounded-lg shadow-lg p-6">
-
-          <h2 class="text-xl font-bold mb-4 navbar-font">
+      <div
+        v-if="showModal"
+        class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      >
+        <div
+          class="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto rounded-lg shadow-lg p-4 sm:p-6"
+        >
+          <h2 class="text-lg sm:text-xl font-bold mb-4 navbar-font text-gray-800">
             {{ isEdit ? 'Edit Banner' : 'Tambah Banner' }}
           </h2>
 
           <!-- SECTION -->
           <div class="mb-4">
-            <label class="block text-sm mb-1 navbar-font">Section</label>
-              <select 
-                v-model="form.section" 
-                class="w-full border px-2 py-1 rounded text-sm inter-font"
-              >
-                <option disabled value="">Pilih Section</option>
-                <option value="login">Login</option>
-                <option value="dashboard">Dashboard</option>
-              </select>          
+            <label class="block text-xs sm:text-sm mb-1 navbar-font">
+              Section
+            </label>
+            <select
+              v-model="form.section"
+              class="w-full border px-3 py-2 rounded text-xs sm:text-sm inter-font focus:ring-2 focus:ring-[#7D0A0A] outline-none"
+            >
+              <option disabled value="">Pilih Section</option>
+              <option value="login">Login</option>
+              <option value="dashboard">Dashboard</option>
+            </select>
           </div>
 
           <!-- FILE -->
           <div class="mb-4">
-            <label class="block text-sm mb-1 navbar-font">Upload Gambar</label>
-            <input type="file" @change="handleFile" class="w-full border px-3 py-2 rounded" />
+            <label class="block text-xs sm:text-sm mb-1 navbar-font">
+              Upload Gambar
+            </label>
+            <input
+              type="file"
+              @change="handleFile"
+              class="w-full border px-3 py-2 rounded text-xs sm:text-sm"
+            />
           </div>
 
           <!-- PREVIEW -->
           <div v-if="form.preview" class="mb-4">
-            <img :src="form.preview" class="w-full h-40 object-cover rounded" />
+            <img
+              :src="form.preview"
+              class="w-full h-40 object-cover rounded"
+              alt="Preview"
+            />
           </div>
 
           <!-- ACTION -->
-          <div class="flex justify-end gap-2">
-            <button @click="closeModal" class="px-4 py-2 border rounded navbar-font">Batal</button>
+          <div class="flex flex-col sm:flex-row justify-end gap-2">
+            <button
+              @click="closeModal"
+              class="w-full sm:w-auto px-4 py-2 border rounded navbar-font hover:bg-gray-100 transition"
+            >
+              Batal
+            </button>
 
-            <button @click="isEdit ? updateBanner() : submitForm()" class="px-4 py-2 bg-[#7D0A0A] text-white rounded navbar-font">
+            <button
+              @click="isEdit ? updateBanner() : submitForm()"
+              class="w-full sm:w-auto px-4 py-2 bg-[#7D0A0A] text-white rounded navbar-font hover:bg-[#BF3131] transition"
+            >
               Simpan
             </button>
           </div>
-
         </div>
       </div>
 
@@ -187,7 +222,6 @@ import { showSuccess, showError, showConfirm } from '@/utils/alert'
 import { ref, onMounted } from 'vue'
 
 const banners = ref([])
-const user = ref({})
 
 const isLoading = ref(true)
 const isProfileLoading = ref(true)
@@ -351,15 +385,6 @@ const changePage = async (page) => {
   await getBanners(page);
 };
 
-const getProfile = async () => {
-  try {
-    const res = await api.get('/profile')
-    user.value = res.data.data
-  } finally {
-    isProfileLoading.value = false
-  }
-}
-
 /* ================= MODAL ================= */
 const openCreate = () => {
   isEdit.value = false
@@ -375,6 +400,5 @@ const closeModal = () => {
 /* ================= INIT ================= */
 onMounted(() => {
   getBanners()
-  getProfile()
 })
 </script>

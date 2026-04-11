@@ -165,8 +165,6 @@ const districts = ref([]);
 const subdistricts = ref([]);
 const searchResults = ref([]);
 const showKodeDomestik = ref(false);
-const errorMessages = ref(null);
-const successMessage = ref(null);
 
 // Form
 const form = ref({

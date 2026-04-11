@@ -1,255 +1,291 @@
 <template>
   <Navbar />
 
-  <div v-if="isLoading" class="max-w-6xl mx-auto px-4 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-      <!-- Skeleton Gambar -->
+  <!-- Loading State -->
+  <div v-if="isLoading" class="max-w-5xl mx-auto px-4 py-6">
+    <div class="flex flex-col lg:grid lg:grid-cols-2 gap-6">
+      <div class="space-y-3">
+        <Skeleton width="100%" height="360px" class="rounded-xl" />
+        <div class="flex gap-2">
+          <Skeleton v-for="n in 4" :key="n" width="64px" height="64px" class="rounded-lg" />
+        </div>
+      </div>
       <div class="space-y-4">
-        <Skeleton width="100%" height="450px" />
-
-        <div class="flex gap-3">
-          <Skeleton v-for="n in 4" :key="n" width="80px" height="80px" />
-        </div>
+        <Skeleton width="70%" height="24px" />
+        <Skeleton width="45%" height="16px" />
+        <Skeleton width="35%" height="28px" />
+        <Skeleton width="100%" height="44px" />
+        <Skeleton width="100%" height="80px" />
       </div>
-
-      <!-- Skeleton Detail -->
-      <div class="flex flex-col space-y-6">
-
-        <div>
-          <Skeleton width="60%" height="28px" class="mb-2" />
-          <Skeleton width="40%" height="18px" class="mb-2" />
-          <Skeleton width="30%" height="26px" />
-        </div>
-
-        <Skeleton width="120px" height="16px" />
-
-        <div class="flex gap-4">
-          <Skeleton width="140px" height="40px" />
-          <Skeleton width="140px" height="40px" />
-          <Skeleton width="120px" height="40px" />
-        </div>
-
-        <div>
-          <Skeleton width="180px" height="20px" class="mb-2" />
-          <Skeleton width="100%" height="14px" />
-          <Skeleton width="100%" height="14px" />
-          <Skeleton width="80%" height="14px" />
-        </div>
-
-      </div>
-
     </div>
   </div>
 
-  <div class="max-w-6xl mx-auto px-4 py-8" v-else-if="produk">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-      <!-- Gambar Produk -->
-      <div class="space-y-4">
-        <div
-          class="w-full aspect-square bg-white border rounded-xl shadow-sm flex items-center justify-center overflow-hidden"
-        >
+  <!-- Product Detail -->
+  <div v-else-if="produk" class="max-w-5xl mx-auto pb-24 lg:pb-8">
+
+    <!-- Gambar Produk -->
+    <div class="lg:grid lg:grid-cols-2 lg:gap-10 lg:px-4 lg:py-8">
+
+      <div class="space-y-3">
+        <!-- Gambar Utama -->
+        <div class="w-full aspect-square bg-gray-50 lg:rounded-xl overflow-hidden border-b lg:border border-gray-100">
           <img
             :src="produk.selectedImage"
-            alt="Produk"
+            alt="Foto produk"
             class="w-full h-full object-contain"
-            @error="(e) => e.target.src = 'https://placehold.co/800x800?text=Image+Not+Found'"
+            @error="(e) => e.target.src = 'https://placehold.co/800x800?text=Gambar+Tidak+Tersedia'"
           />
         </div>
 
+        <!-- Thumbnail -->
         <div
           v-if="produk.foto && produk.foto.length"
-          class="flex gap-3 flex-wrap"
+          class="flex gap-2 px-4 lg:px-0 overflow-x-auto pb-1"
         >
-          <img
-            :src="produk.foto_cover"
-            alt="Cover"
-            class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
+          <button
+            class="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-lg border-2 overflow-hidden transition-all"
+            :class="produk.selectedImage === produk.foto_cover ? 'border-[#7D0A0A]' : 'border-gray-200 hover:border-gray-400'"
             @click="changeMainImage(produk.foto_cover)"
-            @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
-          />
+          >
+            <img
+              :src="produk.foto_cover"
+              alt="Cover"
+              class="w-full h-full object-cover"
+              @error="(e) => e.target.src = 'https://placehold.co/200x200?text=?'"
+            />
+          </button>
 
-          <img
+          <button
             v-for="(foto, index) in produk.foto"
             :key="index"
-            :src="foto.foto"
-            alt="Foto Tambahan"
-            class="w-20 aspect-square object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
+            class="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-lg border-2 overflow-hidden transition-all"
+            :class="produk.selectedImage === foto.foto ? 'border-[#7D0A0A]' : 'border-gray-200 hover:border-gray-400'"
             @click="changeMainImage(foto.foto)"
-            @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
-          />
+          >
+            <img
+              :src="foto.foto"
+              alt="Foto tambahan"
+              class="w-full h-full object-cover"
+              @error="(e) => e.target.src = 'https://placehold.co/200x200?text=?'"
+            />
+          </button>
         </div>
       </div>
 
       <!-- Detail Produk -->
-      <div class="flex flex-col space-y-6">
+      <div class="px-4 pt-4 lg:px-0 lg:pt-0 flex flex-col gap-5">
+
+        <!-- Nama, Toko, Harga -->
         <div>
-          <h1 class="text-3xl font-bold text-[#7D0A0A] mb-1 navbar-font">
-            {{ produk.nama_product }}
-          </h1>
           <router-link
-            :to="{
-              name: 'toko',
-              query: { nama_toko: produk.user.toko.nama_toko }
-            }"
-            class="text-sm text-[#7D0A0A] mb-2 hover:underline cursor-pointer navbar-font"
+            :to="{ name: 'toko', query: { nama_toko: produk.user.toko.nama_toko } }"
+            class="inline-flex items-center gap-1 text-xs text-[#7D0A0A] hover:underline mb-2 navbar-font"
           >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
             {{ produk.user.toko.nama_toko }}
           </router-link>
+
+          <h1 class="text-xl lg:text-3xl font-bold text-gray-900 leading-tight mb-2 navbar-font">
+            {{ produk.nama_product }}
+          </h1>
+
           <p class="text-2xl font-bold text-[#7D0A0A] navbar-font">
             Rp {{ formatRupiah(produk.harga) }}
           </p>
         </div>
 
-        <div class="text-sm text-yellow-700 font-medium inter-font">
+        <!-- Stok -->
+        <div class="inline-flex items-center gap-1.5 bg-yellow-50 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-full border border-yellow-200 w-fit inter-font">
+          <span class="w-2 h-2 rounded-full bg-yellow-500 inline-block"></span>
           Stok tersedia: {{ produk.stock }}
         </div>
 
-        <div class="flex items-center flex-wrap gap-4">
-          <form @submit.prevent="formTransaction">
+        <!-- Quantity + Tombol -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                class="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-700 hover:bg-gray-100 text-xl font-light transition"
+                @click="decreaseQuantity"
+              >−</button>
+              <input
+                type="number"
+                min="1"
+                :max="produk.stock"
+                v-model="produk.quantity"
+                class="w-14 h-10 text-center text-sm font-medium border-x border-gray-200 focus:outline-none inter-font"
+              />
+              <button
+                class="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-700 hover:bg-gray-100 text-xl font-light transition disabled:opacity-40 disabled:cursor-not-allowed"
+                :disabled="produk.quantity >= produk.stock"
+                @click="increaseQuantity"
+              >+</button>
+            </div>
+            <span class="text-xs text-gray-400 inter-font">Maks. {{ produk.stock }} pcs</span>
+          </div>
+
+          <!-- Tombol Beli & Keranjang (desktop) -->
+          <div class="hidden lg:flex gap-3">
+            <form @submit.prevent="formTransaction" class="flex-1">
+              <button
+                type="submit"
+                class="w-full bg-[#7D0A0A] text-white py-3 rounded-xl hover:bg-red-900 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed inter-font"
+                :disabled="isFetching"
+              >
+                <span v-if="isFetching">Memproses...</span>
+                <span v-else>Beli Sekarang</span>
+              </button>
+            </form>
+
             <button
-              class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed inter-font"
-              :disabled="isFetching">
-              <span v-if="isFetching">Loading...</span>
-              <span v-else>Beli Sekarang</span>
-            </button>
-          </form>
-
-          <button
-            class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition inter-font"
-            @click="handleAddToCart"
-          >
-            + Keranjang
-          </button>
-
-          <div class="flex items-center gap-2 rounded-lg px-3 py-1">
-            <button class="text-xl font-bold" @click="decreaseQuantity">
-              -
-            </button>
-            <input
-              type="number"
-              min="1"
-              v-model="produk.quantity"
-              class="text-lg font-semibold border rounded px-2 py-1 w-20"
-            />
-            <button class="text-xl font-bold " :disabled="produk.quantity >= produk.stock"  @click="increaseQuantity">
-              +
+              class="flex-1 border-2 border-[#7D0A0A] text-[#7D0A0A] py-3 rounded-xl hover:bg-red-50 transition font-medium inter-font"
+              @click="handleAddToCart"
+            >
+              + Keranjang
             </button>
           </div>
         </div>
 
-        <div>
-          <h2 class="text-lg font-semibold text-[#7D0A0A] mb-2 navbar-font">
-            Deskripsi Produk
-          </h2>
-          <p class="text-gray-700 text-sm whitespace-pre-wrap inter-font">
-            <span v-if="!readMore">
-              {{ produk.deskripsi.slice(0, 100) }}...
-              <br />
-              <button
-                @click="readMore = true"
-                class="text-[#7D0A0A] underline mt-2"
-              >
-                Baca selengkapnya
-              </button>
+        <!-- Deskripsi -->
+        <div class="border-t border-gray-100 pt-4">
+          <h2 class="text-base font-semibold text-gray-800 mb-2 navbar-font">Deskripsi Produk</h2>
+          <p class="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed inter-font">
+            <span v-if="produk.deskripsi.length <= 150">
+              {{ produk.deskripsi }}
             </span>
             <span v-else>
-              {{ produk.deskripsi }}
-              <br />
-              <button
-                @click="readMore = false"
-                class="text-[#7D0A0A] underline mt-2"
-              >
-                Tutup
-              </button>
+              <span v-if="!readMore">
+                {{ produk.deskripsi.slice(0, 150) }}...
+                <button @click="readMore = true" class="text-[#7D0A0A] underline ml-1 font-medium">
+                  Baca selengkapnya
+                </button>
+              </span>
+              <span v-else>
+                {{ produk.deskripsi }}
+                <button @click="readMore = false" class="text-[#7D0A0A] underline ml-1 font-medium">
+                  Tutup
+                </button>
+              </span>
             </span>
           </p>
         </div>
 
-        <!-- Tombol Rating -->
-        <div>
-          <button
-            class="text-sm text-[#7D0A0A] underline hover:text-red-800"
-            @click="openModal"
-          >
-            Lihat Rating & Review
-          </button>
-        </div>
+        <!-- Rating Link -->
+        <button
+          class="flex items-center gap-1.5 text-sm text-[#7D0A0A] hover:text-red-900 font-medium inter-font"
+          @click="openModal"
+        >
+          Lihat Rating & Review
+        </button>
+
       </div>
     </div>
-  </div>
 
-  <!-- Produk Lain -->
-  <div class="grid grid-cols-2 md:grid-cols-6 gap-4 p-4">
-
-    <template v-if="isLoading">
-
-      <div v-for="n in 6" :key="n">
-        <Skeleton height="180px"/>
-        <Skeleton class="mt-3" height="18px" width="70%"/>
-        <Skeleton class="mt-3" height="18px" width="40%"/>
+    <!-- Produk Lain -->
+    <div class="mt-4 lg:mt-8 border-t-8 border-gray-100 lg:border-0">
+      <div class="px-4 pt-4 pb-2">
+        <h2 class="text-base font-semibold text-gray-800 navbar-font">Produk Lainnya</h2>
       </div>
-
-    </template>
-
-    <template v-else>
-
-      <product
-        v-for="product in products"
-        :key="product.id"
-        :product="product"
-        @click="goToProduct(product.id)"
-        class="cursor-pointer"
-        :namaToko="getNamaToko(product)"
-      />
-
-    </template>
+      <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 px-4 pb-4">
+        <template v-if="isLoading">
+          <div v-for="n in 6" :key="n">
+            <Skeleton height="120px" class="rounded-lg" />
+            <Skeleton class="mt-2" height="14px" width="80%" />
+            <Skeleton class="mt-1" height="14px" width="50%" />
+          </div>
+        </template>
+        <template v-else>
+          <Product
+            v-for="product in products"
+            :key="product.id"
+            :product="product"
+            :namaToko="getNamaToko(product)"
+            @click="goToProduct(product.id)"
+            class="cursor-pointer"
+          />
+        </template>
+      </div>
+    </div>
 
   </div>
 
+  <!-- Bottom Bar Mobile (Fixed) -->
+  <div v-if="produk && !isLoading" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 flex gap-3 lg:hidden z-40">
+    <button
+      class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded-xl text-[#7D0A0A] hover:bg-red-50 transition flex-shrink-0"
+      @click="handleAddToCart"
+      aria-label="Tambah ke keranjang"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.66a2 2 0 001.98-1.71l1.67-9.28H6"/>
+      </svg>
+    </button>
+
+    <form @submit.prevent="formTransaction" class="flex-1">
+      <button
+        type="submit"
+        class="w-full h-12 bg-[#7D0A0A] text-white rounded-xl font-medium hover:bg-red-900 transition disabled:opacity-50 disabled:cursor-not-allowed inter-font"
+        :disabled="isFetching"
+      >
+        <span v-if="isFetching">Memproses...</span>
+        <span v-else>Beli Sekarang</span>
+      </button>
+    </form>
+  </div>
 
   <!-- Modal Rating -->
   <transition name="fade-scale">
     <div
       v-if="showModal"
-      class="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black/50 flex items-end lg:items-center justify-center z-50 px-0 lg:px-4"
+      @click.self="showModal = false"
     >
-      <div class="bg-white w-full max-w-lg rounded-2xl shadow-lg p-6 relative">
-        <h2 class="text-xl font-bold text-[#7D0A0A] mb-4">Rating & Review</h2>
-
-        <!-- Scrollable dengan padding kanan -->
-        <div v-if="ratings.length" class="space-y-4 max-h-96 overflow-y-auto pr-3">
-          <div
-            v-for="(rating, index) in ratings"
-            :key="index"
-            class="border rounded-lg p-3 space-y-2"
-          >
-            <p class="font-semibold text-yellow-600">★ {{ rating.bintang }}/5</p>
-            <p class="text-gray-700 text-sm">{{ rating.komentar }}</p>
-            <p class="text-xs text-gray-500">oleh {{ rating.user }}</p>
-
-            <!-- Foto Review -->
-            <div v-if="rating.foto && rating.foto.length" class="grid grid-cols-3 gap-2 mt-2">
-              <img
-                v-for="(foto, fIndex) in rating.foto"
-                :key="fIndex"
-                :src="foto"
-                class="w-full h-24 object-cover rounded-lg border hover:scale-105 transition cursor-pointer"
-                alt="Foto review"
-                @click="openImage(foto)"
-              />
-            </div>
-          </div>
+      <div class="bg-white w-full lg:max-w-lg rounded-t-2xl lg:rounded-2xl shadow-xl max-h-[85vh] flex flex-col">
+        <!-- Header Modal -->
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-[#7D0A0A] navbar-font">Rating & Review</h2>
+          <button class="text-gray-400 hover:text-gray-600 text-xl" @click="showModal = false">✕</button>
         </div>
-        <div v-else class="text-gray-500">Belum ada rating.</div>
 
-        <!-- Tombol Close -->
-        <button
-          class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-          @click="showModal = false"
-        >
-          ✕
-        </button>
+        <!-- Isi Modal -->
+        <div class="overflow-y-auto flex-1 px-5 py-4 space-y-4">
+          <template v-if="ratings.length">
+            <div
+              v-for="(rating, index) in ratings"
+              :key="index"
+              class="border border-gray-100 rounded-xl p-4 space-y-2"
+            >
+              <div class="flex items-center gap-2">
+                <div class="flex">
+                  <span
+                    v-for="n in 5"
+                    :key="n"
+                    class="text-sm"
+                    :class="n <= rating.bintang ? 'text-yellow-400' : 'text-gray-200'"
+                  >★</span>
+                </div>
+                <span class="text-xs font-medium text-yellow-700">{{ rating.bintang }}/5</span>
+              </div>
+              <p class="text-sm text-gray-700 inter-font">{{ rating.komentar }}</p>
+              <p class="text-xs text-gray-400 inter-font">oleh {{ rating.user }}</p>
+
+              <div v-if="rating.foto && rating.foto.length" class="grid grid-cols-3 gap-2 mt-2">
+                <img
+                  v-for="(foto, fIndex) in rating.foto"
+                  :key="fIndex"
+                  :src="foto"
+                  class="w-full aspect-square object-cover rounded-lg border border-gray-100 cursor-pointer hover:opacity-90 transition"
+                  alt="Foto review"
+                  @click="openImage(foto)"
+                />
+              </div>
+            </div>
+          </template>
+          <div v-else class="text-center py-10 text-gray-400 inter-font">Belum ada review.</div>
+        </div>
       </div>
     </div>
   </transition>
@@ -258,13 +294,13 @@
   <transition name="fade-scale">
     <div
       v-if="selectedImage"
-      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black/75 flex items-center justify-center z-50 p-4"
       @click="closeImage"
     >
       <img
         :src="selectedImage"
-        class="max-h-[90%] max-w-[90%] rounded-lg shadow-lg"
-        alt="Preview"
+        class="max-h-full max-w-full rounded-xl object-contain"
+        alt="Preview foto"
       />
     </div>
   </transition>
@@ -272,7 +308,7 @@
 
 <script setup>
 import Navbar from '@/components/navbar/navbar.vue';
-import product from '@/components/card/product.vue';
+import Product from '@/components/card/product.vue';
 import { ref, onMounted, watch } from 'vue';
 import { showError,showSuccess } from '@/utils/alert';
 import { useRoute, useRouter } from 'vue-router';
@@ -319,13 +355,6 @@ watch(
     }
   }
 ); //? ANE NAMBAH INI BUAT BIAR DOUBLE SAFETY STOCK
-
-const toSlug = (text) => {
-  return text
-    .toLowerCase()
-    .replace(/ /g, '-')       
-    .replace(/[^\w-]+/g, ''); 
-}
 
 const getNamaToko = (product) => {
   return product.user?.toko?.nama_toko || 'Nama Seller'

@@ -31,19 +31,36 @@
             </p>
           </div>
 
-          <button type="submit" :disabled="isLoading || unmetRequirements.length > 0" :class="[
-            'w-full p-3 border-2 rounded font-bold transition oswald-font flex justify-center items-center',
-            (isLoading || unmetRequirements.length > 0)
-              ? 'bg-gray-400 border-gray-400 text-gray-200 cursor-not-allowed'
-              : 'bg-white text-[#7d0a0a] border-[#bf3131] hover:bg-[#bf3131] hover:text-white hover:border-[#7d0a0a]'
-          ]">
+          <button
+            type="submit"
+            :disabled="isLoading || unmetRequirements.length > 0"
+            :class="[
+              'w-full p-3 border-2 rounded-lg font-bold transition-all duration-200 oswald-font flex justify-center items-center shadow-md',
+              (isLoading || unmetRequirements.length > 0)
+                ? 'bg-gray-400 border-gray-400 text-gray-200 cursor-not-allowed shadow-none'
+                : 'bg-white text-[#7d0a0a] border-[#bf3131] hover:bg-[#bf3131] hover:text-white hover:border-[#7d0a0a] hover:shadow-lg active:scale-95'
+            ]"
+          >
             <span v-if="isLoading" class="flex items-center">
-              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                </path>
+              <svg
+                class="animate-spin -ml-1 mr-3 h-5 w-5 text-current"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
               Memproses...
             </span>

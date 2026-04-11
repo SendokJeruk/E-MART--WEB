@@ -82,7 +82,7 @@
 
                     <button
                       @click="enableEdit(item.id)"
-                      class="px-3 py-1 text-xs bg-blue-500 text-white rounded navbar-font"
+                      class="px-3 py-1 text-xs bg-blue-500 text-white rounded navbar-font mt-4"
                     >
                       Edit
                     </button>

@@ -1,49 +1,35 @@
 <template>
   <SellerSide>
-    <div class="p-6">
+    <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
 
       <!-- HEADER -->
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl navbar-font text-gray-800">
+      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+        <h1 class="text-2xl md:text-3xl navbar-font text-gray-800">
           Manage Pengiriman
         </h1>
-
-        <div class="bg-white shadow-md rounded-xl px-4 py-2 flex items-center gap-3 w-64">
-          <img
-            :src="user?.foto_profil || 'https://placehold.co/100'"
-            class="w-10 h-10 rounded-full object-cover border"
-          />
-          <div>
-            <p class="text-sm font-semibold text-gray-800 inter-font">{{ user.name }}</p>
-            <p class="text-xs text-gray-500 inter-font">{{ user.email }}</p>
-          </div>
-        </div>
       </div>
 
       <!-- TABLE -->
-      <div class="bg-white shadow-xl rounded-xl overflow-hidden border">
-
-        <table class="min-w-full text-sm">
+      <div class="bg-white shadow-xl rounded-xl border overflow-x-auto">
+        <table class="min-w-[900px] w-full text-xs md:text-sm">
           <thead class="bg-gray-100 text-gray-700">
             <tr>
-              <th class="px-4 py-3 text-left navbar-font">Kode Transaksi</th>
-              <th class="px-4 py-3 text-left navbar-font">Kurir</th>
-              <th class="px-4 py-3 text-left navbar-font">Kode Resi</th>
-              <th class="px-4 py-3 text-left navbar-font">Status</th>
-              <th class="px-4 py-3 text-left navbar-font">Aksi</th>
+              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Kode Transaksi</th>
+              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Kurir</th>
+              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Kode Resi</th>
+              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Status</th>
+              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Aksi</th>
             </tr>
           </thead>
 
           <!-- SKELETON -->
           <tbody v-if="isLoading">
             <tr v-for="i in 5" :key="i">
-              <td class="px-4 py-3"><Skeleton height="16px" width="60px"/></td>
+              <td class="px-4 py-3"><Skeleton height="16px" width="80px"/></td>
               <td class="px-4 py-3"><Skeleton height="16px" width="120px"/></td>
-              <td class="px-4 py-3"><Skeleton height="16px" width="90px"/></td>
-              <td class="px-4 py-3"><Skeleton height="16px" width="120px"/></td>
-              <td class="px-4 py-3"><Skeleton height="30px" width="120px"/></td>
               <td class="px-4 py-3"><Skeleton height="16px" width="100px"/></td>
-              <td class="px-4 py-3"><Skeleton height="32px" width="70px"/></td>
+              <td class="px-4 py-3"><Skeleton height="16px" width="120px"/></td>
+              <td class="px-4 py-3"><Skeleton height="30px" width="140px"/></td>
             </tr>
           </tbody>
 
@@ -54,31 +40,32 @@
               :key="item.id"
               class="hover:bg-gray-50 transition"
             >
-
-              <td class="px-4 py-3 inter-font">
+              <!-- Kode Transaksi -->
+              <td class="px-4 py-3 inter-font whitespace-nowrap">
                 {{ item.kode_transaksi }}
               </td>
 
-              <td class="px-4 py-3 inter-font">
+              <!-- Kurir -->
+              <td class="px-4 py-3 inter-font whitespace-nowrap">
                 {{ item.kurir || '-' }}
               </td>
 
-              <!-- INPUT RESI -->
+              <!-- Input Resi -->
               <td class="px-4 py-3">
                 <input
                   v-model="item.kode_resi"
                   type="text"
                   placeholder="Masukkan resi"
-                  class="border rounded px-2 py-1 text-sm w-32 inter-font"
+                  class="border rounded-lg px-3 py-1 text-xs md:text-sm w-full max-w-[150px] inter-font"
                 />
               </td>
 
-              <!-- STATUS -->
-              <td class="px-4 py-3 inter-font">
+              <!-- Status -->
+              <td class="px-4 py-3">
                 <select
                   v-model="item.status_pengiriman"
                   @change="updateStatus(item)"
-                  class="border rounded-lg px-3 py-1 text-sm"
+                  class="border rounded-lg px-3 py-1 text-xs md:text-sm w-full max-w-[170px]"
                   :disabled="isFinalStatus(item.status_pengiriman)"
                 >
                   <option
@@ -91,42 +78,43 @@
                 </select>
               </td>
 
+              <!-- Aksi -->
               <td class="px-4 py-3">
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                   <button
                     @click="openDetailModal(item)"
-                    class="px-3 py-1 rounded-lg text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white navbar-font"
+                    class="px-3 py-1 text-xs md:text-sm rounded-lg font-medium bg-blue-500 hover:bg-blue-600 text-white navbar-font"
                   >
                     Detail
                   </button>
                   <button
                     @click="cetakStruk(item.id)"
-                    class="px-3 py-1 rounded-lg text-sm font-medium border border-gray-600 text-gray-700 hover:bg-gray-100 navbar-font"
+                    class="px-3 py-1 text-xs md:text-sm rounded-lg font-medium border border-gray-600 text-gray-700 hover:bg-gray-100 navbar-font"
                   >
                     Cetak Struk
                   </button>
                 </div>
               </td>
-
             </tr>
 
             <tr v-if="pengiriman.length === 0">
-              <td colspan="7" class="text-center py-10 text-gray-500">
+              <td colspan="5" class="text-center py-10 text-gray-500">
                 Belum ada data pengiriman
               </td>
             </tr>
-
           </tbody>
         </table>
-
       </div>
 
       <!-- PAGINATION -->
-      <div v-if="lastPage > 1" class="flex justify-center mt-4 space-x-2 mb-4">
+      <div
+        v-if="lastPage > 1"
+        class="flex flex-wrap justify-center items-center gap-2 mt-4 mb-4"
+      >
         <button
           @click="changePage(currentPage - 1)"
           :disabled="currentPage === 1"
-          class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
         >
           Previous
         </button>
@@ -135,7 +123,12 @@
           v-for="page in lastPage"
           :key="page"
           @click="changePage(page)"
-          :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+          :class="[
+            'px-3 py-1 text-xs md:text-sm rounded',
+            page === currentPage
+              ? 'bg-[#7D0A0A] text-white'
+              : 'bg-gray-200 text-gray-700'
+          ]"
         >
           {{ page }}
         </button>
@@ -143,92 +136,135 @@
         <button
           @click="changePage(currentPage + 1)"
           :disabled="currentPage === lastPage"
-          class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+          class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
-
     </div>
 
     <!-- MODAL DETAIL -->
     <transition name="fade">
-      <div v-if="selectedPengiriman" class="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col relative">
-          <div class="p-5 border-b sticky top-0 bg-white z-10 rounded-t-xl flex justify-between items-center">
-            <h2 class="text-xl navbar-font text-gray-800">Detail Pengiriman</h2>
-            <button @click="closeDetailModal" class="text-gray-500 hover:text-gray-800">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+      <div
+        v-if="selectedPengiriman"
+        class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 p-4"
+      >
+        <div
+          class="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col"
+        >
+          <!-- Header -->
+          <div class="p-4 md:p-5 border-b flex justify-between items-center">
+            <h2 class="text-lg md:text-xl navbar-font text-gray-800">
+              Detail Pengiriman
+            </h2>
+            <button
+              @click="closeDetailModal"
+              class="text-gray-500 hover:text-gray-800"
+            >
+              ✕
             </button>
           </div>
 
-          <div class="p-6 overflow-y-auto flex-1 space-y-6">
-            <!-- Info Transaksi -->
+          <!-- Content -->
+          <div class="p-4 md:p-6 overflow-y-auto space-y-6 text-xs md:text-sm">
+            <!-- Informasi Transaksi -->
             <div>
-              <h3 class="text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">Informasi Transaksi</h3>
-              <div class="grid grid-cols-2 gap-y-2 text-sm">
+              <h3 class="text-base md:text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">
+                Informasi Transaksi
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
                 <p class="text-gray-600 navbar-font">Kode Transaksi</p>
                 <p class="inter-font">: {{ selectedPengiriman.kode_transaksi }}</p>
+
                 <p class="text-gray-600 navbar-font">Tanggal Transaksi</p>
                 <p class="inter-font">: {{ selectedPengiriman.transaction?.tanggal_transaksi }}</p>
+
                 <p class="text-gray-600 navbar-font">Total Harga Barang</p>
-                <p class="inter-font text-red-600">: Rp {{ Number(selectedPengiriman.transaction?.total_harga || 0).toLocaleString('id-ID') }}</p>
+                <p class="inter-font text-red-600">
+                  : Rp {{ Number(selectedPengiriman.transaction?.total_harga || 0).toLocaleString('id-ID') }}
+                </p>
+
                 <p class="text-gray-600 navbar-font">Ongkos Kirim</p>
-                <p class="inter-font text-red-600">: Rp {{ Number(selectedPengiriman.ongkir || 0).toLocaleString('id-ID') }}</p>
+                <p class="inter-font text-red-600">
+                  : Rp {{ Number(selectedPengiriman.ongkir || 0).toLocaleString('id-ID') }}
+                </p>
+
                 <p class="text-gray-600 navbar-font">Total Berat</p>
-                <p class="inter-font">: {{ selectedPengiriman.transaction?.total_berat }} gr</p>
+                <p class="inter-font">
+                  : {{ selectedPengiriman.transaction?.total_berat }} gr
+                </p>
               </div>
             </div>
 
-            <!-- Info Pembeli & Tujuan -->
+            <!-- Tujuan Pengiriman -->
             <div>
-              <h3 class="text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">Tujuan Pengiriman</h3>
-              <div class="grid grid-cols-1 gap-y-2 text-sm bg-gray-50 p-4 rounded-lg border">
-                <p><span class="inter-font text-gray-700">Penerima:</span> {{ selectedPengiriman.alamat?.nama_penerima }}</p>
-                <p><span class="inter-font text-gray-700">No. Telp Pembeli:</span> {{ selectedPengiriman.transaction?.user?.no_telp || '-' }}</p>
-                <p><span class="inter-font text-gray-700">Alamat Lengkap:</span></p>
-                <p class="text-gray-600 leading-relaxed inter-font font-bold">
-                  {{ selectedPengiriman.alamat?.detail_alamat }}<br/>
-                  {{ selectedPengiriman.alamat?.subdistrict_name }}, {{ selectedPengiriman.alamat?.district_name }}<br/>
-                  {{ selectedPengiriman.alamat?.city_name }}, {{ selectedPengiriman.alamat?.province_name }}<br/>
+              <h3 class="text-base md:text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">
+                Tujuan Pengiriman
+              </h3>
+              <div class="bg-gray-50 p-4 rounded-lg border space-y-1">
+                <p><strong>Penerima:</strong> {{ selectedPengiriman.alamat?.nama_penerima }}</p>
+                <p><strong>No. Telp:</strong> {{ selectedPengiriman.transaction?.user?.no_telp || '-' }}</p>
+                <p class="text-gray-600 leading-relaxed">
+                  {{ selectedPengiriman.alamat?.detail_alamat }}<br />
+                  {{ selectedPengiriman.alamat?.subdistrict_name }},
+                  {{ selectedPengiriman.alamat?.district_name }}<br />
+                  {{ selectedPengiriman.alamat?.city_name }},
+                  {{ selectedPengiriman.alamat?.province_name }}<br />
                   Kode Pos: {{ selectedPengiriman.alamat?.zip_code }}
                 </p>
               </div>
             </div>
 
-            <!-- Info Barang -->
+            <!-- Daftar Barang -->
             <div>
-              <h3 class="text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">Daftar Barang</h3>
+              <h3 class="text-base md:text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">
+                Daftar Barang
+              </h3>
               <div class="space-y-3">
-                <div v-for="detail in selectedPengiriman.detail_shipments" :key="detail.id" class="flex gap-4 border rounded-lg p-3 items-center">
-                  <img 
-                    :src="detail.detail_transaction?.product?.foto_cover" 
+                <div
+                  v-for="detail in selectedPengiriman.detail_shipments"
+                  :key="detail.id"
+                  class="flex flex-col sm:flex-row gap-3 border rounded-lg p-3"
+                >
+                  <img
+                    :src="detail.detail_transaction?.product?.foto_cover"
                     class="w-16 h-16 object-cover rounded border"
                     @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
                   />
                   <div class="flex-1">
-                    <p class="navbar-font text-gray-800">{{ detail.detail_transaction?.product?.nama_product }}</p>
-                    <p class="text-xs text-gray-500 line-clamp-1 inter-font">{{ detail.detail_transaction?.product?.deskripsi }}</p>
-                    <div class="flex justify-between items-center mt-2">
-                      <p class="text-sm font-bold inter-font text-gray-700">{{ detail.detail_transaction?.jumlah }}x @ Rp {{ Number(detail.detail_transaction?.harga || 0).toLocaleString('id-ID') }}</p>
-                      <p class="text-sm navbar-font text-red-600">Rp {{ Number(detail.detail_transaction?.subtotal || 0).toLocaleString('id-ID') }}</p>
+                    <p class="navbar-font text-gray-800">
+                      {{ detail.detail_transaction?.product?.nama_product }}
+                    </p>
+                    <p class="text-gray-500 line-clamp-1 inter-font">
+                      {{ detail.detail_transaction?.product?.deskripsi }}
+                    </p>
+                    <div class="flex justify-between mt-2">
+                      <p class="font-bold inter-font">
+                        {{ detail.detail_transaction?.jumlah }}x @ Rp
+                        {{ Number(detail.detail_transaction?.harga || 0).toLocaleString('id-ID') }}
+                      </p>
+                      <p class="navbar-font text-red-600">
+                        Rp {{ Number(detail.detail_transaction?.subtotal || 0).toLocaleString('id-ID') }}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          
-          <!-- Modal Footer -->
-          <div class="p-4 border-t sticky bottom-0 bg-white z-10 rounded-b-xl flex justify-end">
-            <button @click="closeDetailModal" class="px-6 py-2 bg-gray-200 text-gray-800 navbar-font rounded-lg hover:bg-gray-300 transition">Tutup</button>
+
+          <!-- Footer -->
+          <div class="p-4 border-t flex justify-end">
+            <button
+              @click="closeDetailModal"
+              class="px-5 py-2 bg-gray-200 text-gray-800 navbar-font rounded-lg hover:bg-gray-300 transition"
+            >
+              Tutup
+            </button>
           </div>
         </div>
       </div>
     </transition>
-
   </SellerSide>
 </template>
 
@@ -239,7 +275,6 @@ import api from '@/plugins/axios'
 import { showConfirm, showError, showSuccess } from '@/utils/alert'
 import { onMounted, ref } from 'vue'
 
-const user = ref({})
 const pengiriman = ref([])
 const isLoading = ref(true)
 const selectedPengiriman = ref(null)
@@ -265,16 +300,6 @@ const getAvailableStatuses = (current) => {
 
 const isFinalStatus = (status) => {
   return status === "diterima" || status === "batal"
-}
-
-// Ambil profile
-const getProfile = async () => {
-  try {
-    const response = await api.get('/profile')
-    user.value = response.data.data
-  } catch (error) {
-    console.log(error)
-  }
 }
 
 // Ambil data pengiriman dengan pagination
@@ -369,7 +394,6 @@ const changePage = async (page) => {
 }
 
 onMounted(() => {
-  getProfile()
   getPengiriman()
 })
 </script>
