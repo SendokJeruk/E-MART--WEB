@@ -72,6 +72,14 @@
         <!-- Right Icons -->
         <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
 
+          <div
+            v-if="!isLoggedIn"
+            class="hidden md:flex items-center gap-2"
+          >
+            <buttonred label="Login" to="/login" />
+            <buttonred label="Register" to="/register" />
+          </div>
+
           <!-- Cart Icon -->
           <router-link
             v-if="isLoggedIn"
