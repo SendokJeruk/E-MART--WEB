@@ -118,7 +118,7 @@ import { ref, onMounted } from 'vue';
 import Navbar from '@/components/navbar/navbar.vue';
 import Skeleton from "@/components/Skeleton.vue"
 import api from '@/plugins/axios';
-import { showConfirm } from '@/utils/alert';
+import { showConfirm,showError,showSuccess } from '@/utils/alert';
 
 const user = ref(null);
 const userRole = ref('');

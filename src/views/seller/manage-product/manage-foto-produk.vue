@@ -1,14 +1,14 @@
 <template>
   <sellerside>
     <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
-
+ 
       <!-- HEADER -->
       <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
         <h1 class="text-2xl md:text-3xl navbar-font text-gray-800">
           Manage Foto Produk
         </h1>
       </div>
-
+ 
       <!-- NAVIGATION BUTTONS -->
       <div class="flex flex-wrap gap-3 mb-5">
         <router-link
@@ -24,7 +24,7 @@
             Tambah Foto Produk
           </span>
         </router-link>
-
+ 
         <router-link
           to="/manage-produk"
           class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-5 py-2 rounded-lg focus:ring-2 focus:ring-[#BF3131] focus:outline-none"
@@ -39,7 +39,7 @@
           </span>
         </router-link>
       </div>
-
+ 
       <!-- TABLE -->
       <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
         <table class="min-w-[600px] w-full table-auto divide-y divide-gray-200">
@@ -53,7 +53,7 @@
               </th>
             </tr>
           </thead>
-
+ 
           <tbody class="divide-y divide-gray-200">
             <tr
               v-for="produk in ProductSeller"
@@ -64,7 +64,7 @@
               <td class="px-4 py-3 text-xs md:text-sm text-gray-900 inter-font whitespace-nowrap">
                 {{ produk.nama_product }}
               </td>
-
+ 
               <!-- FOTO PRODUK -->
               <td class="px-4 py-3">
                 <div
@@ -83,21 +83,21 @@
                         class="w-16 h-16 md:w-20 md:h-20 object-cover rounded cursor-pointer border"
                         @click="toggleMenu(produk.id, index)"
                       />
-
-                      <!-- MENU AKSI -->
+ 
+                      <!-- MENU AKSI - HORIZONTAL DI KANAN -->
                       <div
                         v-if="openMenuIndex === `${produk.id}-${index}`"
-                        class="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-white border shadow-lg rounded-md p-2 space-y-1 z-20 min-w-[100px]"
+                        class="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-white border shadow-lg rounded-md p-2 space-x-2 z-20 flex whitespace-nowrap"
                       >
                         <router-link
                           :to="`/edit-foto-product/${item.id}`"
-                          class="block text-xs md:text-sm text-yellow-600 hover:underline inter-font"
+                          class="text-xs md:text-sm text-yellow-600 hover:underline inter-font px-2 py-1"
                         >
                           Edit
                         </router-link>
                         <button
                           @click="deleteFoto(item.id)"
-                          class="block text-xs md:text-sm text-red-600 hover:underline inter-font"
+                          class="text-xs md:text-sm text-red-600 hover:underline inter-font px-2 py-1"
                         >
                           Hapus
                         </button>
@@ -105,7 +105,7 @@
                     </div>
                   </div>
                 </div>
-
+ 
                 <div v-else>
                   <p class="text-xs md:text-sm text-gray-500">
                     Tidak ada foto
@@ -115,7 +115,7 @@
             </tr>
           </tbody>
         </table>
-
+ 
         <!-- PAGINATION -->
         <div
           class="flex flex-wrap justify-center items-center gap-2 mt-4 mb-4 px-2"
@@ -127,7 +127,7 @@
           >
             Previous
           </button>
-
+ 
           <button
             v-for="page in lastPage"
             :key="page"
@@ -141,7 +141,7 @@
           >
             {{ page }}
           </button>
-
+ 
           <button
             @click="changePage(currentPage + 1)"
             :disabled="currentPage === lastPage"
