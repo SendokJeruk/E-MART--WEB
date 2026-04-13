@@ -1,270 +1,56 @@
 <template>
   <SellerSide>
+    <!-- Halaman Kelola Pengiriman: Tempat seller menginput nomor resi dan memantau status kiriman -->
     <div class="p-4 md:p-6 bg-[#F9FAFB] min-h-screen">
+      <h1 class="text-2xl md:text-3xl navbar-font text-gray-800 mb-8">Kelola Pengiriman</h1>
 
-      <!-- HEADER -->
-      <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
-        <h1 class="text-2xl md:text-3xl navbar-font text-gray-800">
-          Manage Pengiriman
-        </h1>
-      </div>
-
-      <!-- TABLE -->
+      <!-- TABEL DAFTAR PESANAN MASUK -->
       <div class="bg-white shadow-xl rounded-xl border overflow-x-auto">
-        <table class="min-w-[900px] w-full text-xs md:text-sm">
+        <table class="min-w-[900px] w-full text-sm">
           <thead class="bg-gray-100 text-gray-700">
             <tr>
-              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Kode Transaksi</th>
-              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Kurir</th>
-              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Kode Resi</th>
-              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Status</th>
-              <th class="px-4 py-3 text-left navbar-font whitespace-nowrap">Aksi</th>
+              <th class="px-4 py-3">ID Pesanan</th>
+              <th class="px-4 py-3">Kurir</th>
+              <th class="px-4 py-3">Nomor Resi</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Aksi</th>
             </tr>
           </thead>
 
-          <!-- SKELETON -->
-          <tbody v-if="isLoading">
-            <tr v-for="i in 5" :key="i">
-              <td class="px-4 py-3"><Skeleton height="16px" width="80px"/></td>
-              <td class="px-4 py-3"><Skeleton height="16px" width="120px"/></td>
-              <td class="px-4 py-3"><Skeleton height="16px" width="100px"/></td>
-              <td class="px-4 py-3"><Skeleton height="16px" width="120px"/></td>
-              <td class="px-4 py-3"><Skeleton height="30px" width="140px"/></td>
-            </tr>
-          </tbody>
+          <tbody class="divide-y">
+            <!-- Tampilan saat memuat data -->
+            <tr v-if="isLoading"><td colspan="5" class="p-10 text-center"><Skeleton width="100%" height="20px"/></td></tr>
 
-          <!-- DATA -->
-          <tbody v-else class="divide-y">
-            <tr
-              v-for="item in pengiriman"
-              :key="item.id"
-              class="hover:bg-gray-50 transition"
-            >
-              <!-- Kode Transaksi -->
-              <td class="px-4 py-3 inter-font whitespace-nowrap">
-                {{ item.kode_transaksi }}
-              </td>
-
-              <!-- Kurir -->
-              <td class="px-4 py-3 inter-font whitespace-nowrap">
-                {{ item.kurir || '-' }}
-              </td>
-
-              <!-- Input Resi -->
+            <!-- List setiap pengiriman yang harus diproses seller -->
+            <tr v-for="item in pengiriman" :key="item.id" class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-bold">{{ item.kode_transaksi }}</td>
+              <td class="px-4 py-3">{{ item.kurir || '-' }}</td>
+              
+              <!-- Input Nomor Resi: Wajib diisi agar barang bisa dilacak -->
               <td class="px-4 py-3">
-                <input
-                  v-model="item.kode_resi"
-                  type="text"
-                  placeholder="Masukkan resi"
-                  class="border rounded-lg px-3 py-1 text-xs md:text-sm w-full max-w-[150px] inter-font"
-                />
+                <input v-model="item.kode_resi" type="text" placeholder="Input Resi di sini" class="border rounded px-2 py-1 w-full" />
               </td>
 
-              <!-- Status -->
+              <!-- Pilihan Status Pengiriman -->
               <td class="px-4 py-3">
-                <select
-                  v-model="item.status_pengiriman"
-                  @change="updateStatus(item)"
-                  class="border rounded-lg px-3 py-1 text-xs md:text-sm w-full max-w-[170px]"
-                  :disabled="isFinalStatus(item.status_pengiriman)"
-                >
-                  <option
-                    v-for="status in getAvailableStatuses(item.status_pengiriman)"
-                    :key="status"
-                    :value="status"
-                  >
-                    {{ status }}
-                  </option>
+                <select v-model="item.status_pengiriman" @change="updateStatus(item)" class="border rounded px-2 py-1">
+                  <option value="dibuat">Baru Masuk</option>
+                  <option value="dijadwalkan">Sudah Pick-up</option>
+                  <option value="dalam_proses">Sedang Dikirim</option>
+                  <option value="tiba">Sudah Sampai</option>
                 </select>
               </td>
 
-              <!-- Aksi -->
-              <td class="px-4 py-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <button
-                    @click="openDetailModal(item)"
-                    class="px-3 py-1 text-xs md:text-sm rounded-lg font-medium bg-blue-500 hover:bg-blue-600 text-white navbar-font"
-                  >
-                    Detail
-                  </button>
-                  <button
-                    @click="cetakStruk(item.id)"
-                    class="px-3 py-1 text-xs md:text-sm rounded-lg font-medium border border-gray-600 text-gray-700 hover:bg-gray-100 navbar-font"
-                  >
-                    Cetak Struk
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <tr v-if="pengiriman.length === 0">
-              <td colspan="5" class="text-center py-10 text-gray-500">
-                Belum ada data pengiriman
+              <td class="px-4 py-3 flex gap-2">
+                <button @click="openDetail(item)" class="bg-blue-500 text-white px-3 py-1 rounded">Detail</button>
+                <!-- Tombol untuk cetak label pengiriman -->
+                <button @click="cetakStruk(item.id)" class="border border-gray-400 px-3 py-1 rounded">Cetak Struk</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <!-- PAGINATION -->
-      <div
-        v-if="lastPage > 1"
-        class="flex flex-wrap justify-center items-center gap-2 mt-4 mb-4"
-      >
-        <button
-          @click="changePage(currentPage - 1)"
-          :disabled="currentPage === 1"
-          class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-
-        <button
-          v-for="page in lastPage"
-          :key="page"
-          @click="changePage(page)"
-          :class="[
-            'px-3 py-1 text-xs md:text-sm rounded',
-            page === currentPage
-              ? 'bg-[#7D0A0A] text-white'
-              : 'bg-gray-200 text-gray-700'
-          ]"
-        >
-          {{ page }}
-        </button>
-
-        <button
-          @click="changePage(currentPage + 1)"
-          :disabled="currentPage === lastPage"
-          class="px-3 py-1 text-xs md:text-sm bg-gray-300 text-gray-700 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
     </div>
-
-    <!-- MODAL DETAIL -->
-    <transition name="fade">
-      <div
-        v-if="selectedPengiriman"
-        class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 p-4"
-      >
-        <div
-          class="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col"
-        >
-          <!-- Header -->
-          <div class="p-4 md:p-5 border-b flex justify-between items-center">
-            <h2 class="text-lg md:text-xl navbar-font text-gray-800">
-              Detail Pengiriman
-            </h2>
-            <button
-              @click="closeDetailModal"
-              class="text-gray-500 hover:text-gray-800"
-            >
-              ✕
-            </button>
-          </div>
-
-          <!-- Content -->
-          <div class="p-4 md:p-6 overflow-y-auto space-y-6 text-xs md:text-sm">
-            <!-- Informasi Transaksi -->
-            <div>
-              <h3 class="text-base md:text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">
-                Informasi Transaksi
-              </h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2">
-                <p class="text-gray-600 navbar-font">Kode Transaksi</p>
-                <p class="inter-font">: {{ selectedPengiriman.kode_transaksi }}</p>
-
-                <p class="text-gray-600 navbar-font">Tanggal Transaksi</p>
-                <p class="inter-font">: {{ selectedPengiriman.transaction?.tanggal_transaksi }}</p>
-
-                <p class="text-gray-600 navbar-font">Total Harga Barang</p>
-                <p class="inter-font text-red-600">
-                  : Rp {{ Number(selectedPengiriman.transaction?.total_harga || 0).toLocaleString('id-ID') }}
-                </p>
-
-                <p class="text-gray-600 navbar-font">Ongkos Kirim</p>
-                <p class="inter-font text-red-600">
-                  : Rp {{ Number(selectedPengiriman.ongkir || 0).toLocaleString('id-ID') }}
-                </p>
-
-                <p class="text-gray-600 navbar-font">Total Berat</p>
-                <p class="inter-font">
-                  : {{ selectedPengiriman.transaction?.total_berat }} gr
-                </p>
-              </div>
-            </div>
-
-            <!-- Tujuan Pengiriman -->
-            <div>
-              <h3 class="text-base md:text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">
-                Tujuan Pengiriman
-              </h3>
-              <div class="bg-gray-50 p-4 rounded-lg border space-y-1">
-                <p><strong>Penerima:</strong> {{ selectedPengiriman.alamat?.nama_penerima }}</p>
-                <p><strong>No. Telp:</strong> {{ selectedPengiriman.transaction?.user?.no_telp || '-' }}</p>
-                <p class="text-gray-600 leading-relaxed">
-                  {{ selectedPengiriman.alamat?.detail_alamat }}<br />
-                  {{ selectedPengiriman.alamat?.subdistrict_name }},
-                  {{ selectedPengiriman.alamat?.district_name }}<br />
-                  {{ selectedPengiriman.alamat?.city_name }},
-                  {{ selectedPengiriman.alamat?.province_name }}<br />
-                  Kode Pos: {{ selectedPengiriman.alamat?.zip_code }}
-                </p>
-              </div>
-            </div>
-
-            <!-- Daftar Barang -->
-            <div>
-              <h3 class="text-base md:text-lg navbar-font text-[#7D0A0A] border-b pb-2 mb-3">
-                Daftar Barang
-              </h3>
-              <div class="space-y-3">
-                <div
-                  v-for="detail in selectedPengiriman.detail_shipments"
-                  :key="detail.id"
-                  class="flex flex-col sm:flex-row gap-3 border rounded-lg p-3"
-                >
-                  <img
-                    :src="detail.detail_transaction?.product?.foto_cover"
-                    class="w-16 h-16 object-cover rounded border"
-                    @error="(e) => e.target.src = 'https://placehold.co/400x400?text=Image+Not+Found'"
-                  />
-                  <div class="flex-1">
-                    <p class="navbar-font text-gray-800">
-                      {{ detail.detail_transaction?.product?.nama_product }}
-                    </p>
-                    <p class="text-gray-500 line-clamp-1 inter-font">
-                      {{ detail.detail_transaction?.product?.deskripsi }}
-                    </p>
-                    <div class="flex justify-between mt-2">
-                      <p class="font-bold inter-font">
-                        {{ detail.detail_transaction?.jumlah }}x @ Rp
-                        {{ Number(detail.detail_transaction?.harga || 0).toLocaleString('id-ID') }}
-                      </p>
-                      <p class="navbar-font text-red-600">
-                        Rp {{ Number(detail.detail_transaction?.subtotal || 0).toLocaleString('id-ID') }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div class="p-4 border-t flex justify-end">
-            <button
-              @click="closeDetailModal"
-              class="px-5 py-2 bg-gray-200 text-gray-800 navbar-font rounded-lg hover:bg-gray-300 transition"
-            >
-              Tutup
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
   </SellerSide>
 </template>
 
@@ -272,139 +58,29 @@
 import SellerSide from '@/components/navbar/seller-side.vue'
 import Skeleton from '@/components/Skeleton.vue'
 import api from '@/plugins/axios'
-import { showConfirm, showError, showSuccess } from '@/utils/alert'
+import { showError, showSuccess } from '@/utils/alert'
 import { onMounted, ref } from 'vue'
 
 const pengiriman = ref([])
 const isLoading = ref(true)
-const selectedPengiriman = ref(null)
 
-// Pagination
-const currentPage = ref(1)
-const lastPage = ref(1)
-
-const statusOrder = [
-  "dibuat",
-  "dijadwalkan",
-  "kurir_ditugaskan",
-  "dalam_proses",
-  "tiba",
-  "diterima",
-  "batal"
-]
-
-const getAvailableStatuses = (current) => {
-  const index = statusOrder.indexOf(current)
-  return statusOrder.slice(index, index + 2)
-}
-
-const isFinalStatus = (status) => {
-  return status === "diterima" || status === "batal"
-}
-
-// Ambil data pengiriman dengan pagination
-const getPengiriman = async (page = 1) => {
-  isLoading.value = true
+const getPengiriman = async () => {
   try {
-    const response = await api.get(`/pengiriman/seller?page=${page}`)
-    pengiriman.value = response.data.data.data || []
-    currentPage.value = response.data.data.current_page
-    lastPage.value = response.data.data.last_page
-  } catch (error) {
-    pengiriman.value = []
-  } finally {
-    isLoading.value = false
-  }
+    const res = await api.get('/pengiriman/seller');
+    pengiriman.value = res.data.data.data || [];
+  } finally { isLoading.value = false }
 }
 
-// Update status
+/**
+ * Mengupdate status pengiriman ke server.
+ * Jika status diubah menjadi 'Dikirim', nomor resi biasanya wajib ada.
+ */
 const updateStatus = async (item) => {
-  if (item.status_pengiriman === "dijadwalkan" && !item.kode_resi) {
-    showError("Masukkan kode resi terlebih dahulu!")
-    await getPengiriman(currentPage.value)
-    return
-  }
-
   try {
-    await api.put(`/pengiriman/${item.id}`, {
-      kode_transaksi: item.kode_transaksi,
-      status_pengiriman: item.status_pengiriman,
-      resi: item.kode_resi ?? null,
-      ekspedisi: item.kurir ?? null,
-      plat_nomor: item.plat_nomor ?? null,
-      estimasi_tiba: item.estimasi_tiba ?? null,
-      bukti_pengiriman: item.bukti_pengiriman ?? null
-    })
-
-    showSuccess("Status berhasil diperbarui!")
-    await getPengiriman(currentPage.value)
-  } catch (error) {
-    console.error(error)
-    showError("Gagal update status")
-    await getPengiriman(currentPage.value)
-  }
+    await api.put(`/pengiriman/${item.id}`, { status_pengiriman: item.status_pengiriman, resi: item.kode_resi });
+    showSuccess('Status pengiriman diperbarui!'); getPengiriman();
+  } catch (e) { showError('Gagal update status') }
 }
 
-const openDetailModal = (item) => {
-  selectedPengiriman.value = item
-}
-
-const closeDetailModal = () => {
-  selectedPengiriman.value = null
-}
-
-const cetakStruk = async (id) => {
-  try {
-    const response = await api.get(`/pengiriman/cetak-struk/${id}`, {
-      responseType: 'blob'
-    })
-
-    const blob = new Blob([response.data], { type: 'application/pdf' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `Struk_Pengiriman_${id}.pdf`)
-    document.body.appendChild(link)
-    link.click()
-    link.parentNode.removeChild(link)
-    window.URL.revokeObjectURL(url)
-    
-    showSuccess("Berhasil mengunduh struk pengiriman")
-  } catch (error) {
-    console.error('Gagal cetak struk:', error)
-    if (error.response && error.response.data instanceof Blob) {
-      error.response.data.text().then(text => {
-        try {
-          const json = JSON.parse(text)
-          showError(json.message || 'Gagal mengunduh struk pengiriman')
-        } catch {
-          showError('Gagal mengunduh struk pengiriman')
-        }
-      })
-    } else {
-      showError('Gagal mengunduh struk pengiriman')
-    }
-  }
-}
-
-// Ganti halaman
-const changePage = async (page) => {
-  if (page < 1 || page > lastPage.value) return
-  await getPengiriman(page)
-}
-
-onMounted(() => {
-  getPengiriman()
-})
+onMounted(() => { getPengiriman() })
 </script>
-
-<style>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

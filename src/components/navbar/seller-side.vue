@@ -1,6 +1,8 @@
 <template>
+  <!-- Layout Dashboard untuk Penjual (Seller) -->
   <div class="flex h-screen overflow-hidden">
-    <!-- Overlay Mobile -->
+    
+    <!-- Lapisan Hitam Transparan (Overlay) saat sidebar terbuka di HP -->
     <transition name="fade">
       <div
         v-if="isSidebarOpen"
@@ -9,19 +11,19 @@
       ></div>
     </transition>
 
-    <!-- Sidebar -->
+    <!-- Sidebar: Menu Navigasi Penjual -->
     <aside
       :class="[
         'fixed lg:static z-40 h-full w-64 bg-gradient-to-b from-[#7D0A0A] to-[#5E0A0A] text-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
     >
-      <!-- Logo / Title -->
+      <!-- Judul Dashboard -->
       <div class="px-6 py-6 text-center border-b border-white/10">
         <h1 class="text-xl font-bold tracking-wide navbar-font">Seller Dashboard</h1>
       </div>
 
-      <!-- Menu Navigasi (Tengah) -->
+      <!-- Bagian Tengah (Daftar Menu Navigasi) -->
       <div class="flex-1 flex items-center justify-center">
         <ul class="space-y-3 w-full px-6">
           <li v-for="item in menuItems" :key="item.path">
@@ -37,9 +39,9 @@
         </ul>
       </div>
 
-      <!-- Kotak Profil di Bawah -->
+      <!-- Bagian Bawah (Profil Penjual) -->
       <div class="p-4 border-t border-white/10">
-        <!-- Skeleton Loading -->
+        <!-- Skeleton Loading Profil -->
         <div
           v-if="isLoading"
           class="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/10 animate-pulse"
@@ -49,7 +51,7 @@
           <div class="h-3 w-1/2 bg-white/20 rounded"></div>
         </div>
 
-        <!-- Profil User -->
+        <!-- Informasi Profil Asli -->
         <div
           v-else
           class="flex flex-col items-center text-center p-4 rounded-xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
@@ -67,7 +69,7 @@
             {{ user?.email || 'email@example.com' }}
           </p>
 
-          <!-- Tombol Logout -->
+          <!-- Tombol Keluar (Logout) -->
           <button
             @click="logout"
             class="mt-4 w-full px-4 py-2 text-sm font-medium rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-300"
@@ -78,9 +80,10 @@
       </div>
     </aside>
 
-    <!-- Konten Utama -->
+    <!-- Konten Utama di Sebelah Kanan -->
     <div class="flex-1 flex flex-col bg-gray-100 overflow-auto">
-      <!-- Header Mobile -->
+      
+      <!-- Tombol Menu untuk HP -->
       <header class="lg:hidden p-4 bg-white shadow flex items-center">
         <button
           @click="toggleSidebar"
@@ -90,7 +93,7 @@
         </button>
       </header>
 
-      <!-- Konten Halaman -->
+      <!-- Tempat Konten Halaman Penjual -->
       <main class="flex-1 p-4 lg:p-8">
         <router-view />
         <slot />
@@ -114,6 +117,10 @@ const hasToko = ref(false)
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
+/**
+ * Daftar item menu navigasi penjual.
+ * requiresToko: menentukan menu hanya aktif jika penjual sudah punya toko.
+ */
 const menuItems = [
   { label: 'Home', path: '/seller', requiresToko: true },
   { label: 'Manage Produk', path: '/manage-produk', requiresToko: true },
@@ -124,6 +131,10 @@ const menuItems = [
   { label: 'Kembali', path: '/dashboard', requiresToko: true }
 ]
 
+/**
+ * Menentukan tampilan link menu.
+ * Menu akan terlihat transparan jika user belum membuat toko tapi menu tersebut butuh toko.
+ */
 function linkClass(path, requiresToko) {
   return [
     'text-white',
@@ -146,12 +157,16 @@ function closeSidebar() {
   }
 }
 
+/**
+ * Mengambil data profil user dan mengecek apakah dia seller yang sah.
+ */
 const getProfile = async () => {
   try {
     const res = await api.get('/profile')
     user.value = res.data.data
     const role = user.value.nama_role
 
+    // Mengarahkan ke dashboard yang sesuai berdasarkan role
     if (role === 'admin') return router.push('/admin')
     if (role === 'buyer') return router.push('/dashboard')
     if (role === 'seller') await getToko()
@@ -162,6 +177,10 @@ const getProfile = async () => {
   }
 }
 
+/**
+ * Mengecek apakah penjual ini sudah memiliki toko.
+ * Jika belum punya toko, diarahkan ke halaman buat toko.
+ */
 const getToko = async () => {
   try {
     const res = await api.get('/toko')
@@ -182,14 +201,13 @@ const getToko = async () => {
 const logout = async () => {
   const confirmed = await showConfirm("Anda yakin mau logout ? ")
   if (!confirmed) return
-
   try {
     await api.post('/auth/logout')
     localStorage.removeItem("token")
     user.value = null
     router.push('/login')
   } catch (error) {
-    showError('Logout failed, please try again.')
+    showError('Gagal keluar, silakan coba lagi.')
   }
 }
 

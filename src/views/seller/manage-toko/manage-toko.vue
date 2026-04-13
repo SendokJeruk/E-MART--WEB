@@ -1,132 +1,79 @@
 <template>
   <sellerside>
+    <!-- Halaman Kelola Toko: Tempat penjual mengatur informasi dasar toko mereka -->
     <div class="p-6 overflow-x-auto">
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl navbar-font">Manage Toko</h1>
       </div>
 
+      <!-- Tombol Buat Toko (Hanya muncul jika belum punya toko) -->
       <router-link
         v-if="!isLoading && tokoseller.length === 0"
-        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2 navbar-font"
+        class="inline-block px-8 py-3 bg-[#7D0A0A] text-white rounded-lg mb-5 navbar-font"
         to="/create-toko"
       >
-        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
-        <span class="relative text-sm font-medium text-[#7D0A0A] transition-colors group-hover:text-white navbar-font">
-          Tambah Toko
-        </span>
+        + Buat Toko Baru
       </router-link>
 
       <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
         <table class="min-w-full table-fixed divide-y divide-gray-200">
           <thead class="bg-gray-200">
             <tr>
-              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">Nama Toko</th>
-              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">Deskripsi</th>
-              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">No Telepon</th>
-              <th class="w-1/4 px-4 py-2 text-left text-sm navbar-font text-gray-700">Aksi</th>
+              <th class="px-4 py-2 text-left text-sm navbar-font">Nama Toko</th>
+              <th class="px-4 py-2 text-left text-sm navbar-font">Deskripsi</th>
+              <th class="px-4 py-2 text-left text-sm navbar-font">No Telepon</th>
+              <th class="px-4 py-2 text-left text-sm navbar-font">Aksi</th>
             </tr>
           </thead>
 
-          <!-- SKELETON -->
-          <tbody v-if="isLoading" class="divide-y divide-gray-200">
-            <tr v-for="n in 4" :key="n">
-              <td class="px-4 py-3">
-                <Skeleton width="140px" height="14px" />
-              </td>
-              <td class="px-4 py-3">
-                <Skeleton width="200px" height="14px" />
-              </td>
-              <td class="px-4 py-3">
-                <Skeleton width="120px" height="14px" />
-              </td>
-              <td class="px-4 py-3 flex gap-2">
-                <Skeleton width="60px" height="28px" />
-                <Skeleton width="60px" height="28px" />
-              </td>
-            </tr>
+          <tbody v-if="isLoading" class="divide-y">
+            <tr v-for="n in 2" :key="n"><td colspan="4" class="p-4"><Skeleton width="100%" height="20px"/></td></tr>
           </tbody>
 
-          <!-- DATA -->
-          <tbody v-else class="divide-y divide-gray-200">
+          <tbody v-else class="divide-y">
             <tr v-for="item in tokoseller" :key="item.id">
-              <td class="px-4 py-2 text-sm text-gray-900 inter-font">{{ item.nama_toko }}</td>
-              <td class="px-4 py-2 text-sm text-gray-900 inter-font">{{ item.deskripsi }}</td>
-              <td class="px-4 py-2 text-sm text-gray-900 inter-font">{{ item.no_telp }}</td>
-              <td class="px-4 py-2 text-sm text-gray-900">
-                <button
-                  @click="deleteToko(item.id)"
-                  class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded mb-2 ml-3 navbar-font"
-                >
-                  Hapus
-                </button>
-                <router-link
-                  :to="`/edit-toko/${item.id}`"
-                  class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded mb-2 ml-3 navbar-font"
-                >
-                  Edit
-                </router-link>
+              <td class="px-4 py-2 text-sm font-medium">{{ item.nama_toko }}</td>
+              <td class="px-4 py-2 text-sm text-gray-600">{{ item.deskripsi }}</td>
+              <td class="px-4 py-2 text-sm">{{ item.no_telp }}</td>
+              <td class="px-4 py-2 text-sm flex gap-3">
+                <router-link :to="`/edit-toko/${item.id}`" class="text-yellow-600 font-bold">Edit</router-link>
+                <button @click="deleteToko(item.id)" class="text-red-600 font-bold">Hapus</button>
               </td>
             </tr>
           </tbody>
-
         </table>
       </div>
     </div>
   </sellerside>
 </template>
   
-  <script setup>
-  import sellerside from '@/components/navbar/seller-side.vue';
-  import { ref, onMounted } from 'vue';
-  import api from "@/plugins/axios";
-  import Skeleton from '@/components/Skeleton.vue';
-import { showSuccess,showError } from '@/utils/alert';
+<script setup>
+import sellerside from '@/components/navbar/seller-side.vue';
+import { ref, onMounted } from 'vue';
+import api from "@/plugins/axios";
+import Skeleton from '@/components/Skeleton.vue';
+import { showSuccess, showError, showConfirm } from '@/utils/alert';
 
+const tokoseller = ref([]);
+const isLoading = ref(true);
 
-  const user = ref({});
-  const tokoseller = ref([]);
-  const isLoading = ref(true);
-  
-  const getProfile = async () => {
-  try {
-    const response = await api.get('/profile');
-    user.value = response.data.data;
-  } catch (error) {
-    console.error('Gagal mengambil profil:', error);
-  }
-};
-
+/**
+ * Mengambil data toko milik user yang sedang login.
+ */
 const getToko = async () => {
-    try {
-        const response = await api.get('/toko?self');
-        const alltoko = response.data.data.data;
-        tokoseller.value = alltoko.filter(t => t.user_id === user.value.id);
-    } catch (error) {
-    console.error('Error fetching toko:', error);
-  } finally {
-    isLoading.value = false;
-  }
+  try {
+    const res = await api.get('/toko?self');
+    tokoseller.value = res.data.data.data || [];
+  } finally { isLoading.value = false; }
 }
 
 const deleteToko = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus Toko ini?');
-  if (!konfirmasi) return;
-
+  if (!await showConfirm('Hapus toko ini? Semua produk di dalamnya juga akan terpengaruh.')) return;
   try {
     await api.delete(`/toko/${id}`);
-    tokoseller.value = tokoseller.value.filter(toko => toko.id !== id);
-    showSuccess('toko berhasil dihapus.');
-    await getToko();
-  } catch (error) {
-    console.error('Gagal menghapus toko:', error);
-    showError(error.response?.data?.message || 'Terjadi kesalahan saat menghapus toko.');
-  }
+    showSuccess('Toko berhasil dihapus.'); getToko();
+  } catch (e) { showError('Gagal menghapus toko'); }
 };
 
-onMounted(async () => {
-    await getProfile();
-    await getToko();
-}) 
-  
-  </script>
-  
+onMounted(() => { getToko(); }) 
+</script>

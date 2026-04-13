@@ -1,76 +1,44 @@
 <template>
   <Navbar />
 
+  <!-- Halaman Profil: Menampilkan informasi pribadi pengguna yang sedang login -->
   <div class="w-full px-4 sm:px-6 md:px-0 flex justify-center mt-6">
 
-    <!-- SKELETON PROFILE -->
-    <div
-      v-if="isLoading"
-      class="w-full max-w-sm bg-white rounded-xl shadow p-4 sm:p-6 flex flex-col items-center"
-    >
-      <!-- Avatar -->
+    <!-- SKELETON: Tampilan loading saat data user sedang diambil dari server -->
+    <div v-if="isLoading" class="w-full max-w-sm bg-white rounded-xl shadow p-4 sm:p-6 flex flex-col items-center">
       <Skeleton type="circle" size="100px" />
-
-      <!-- Username -->
-      <div class="mt-3">
-        <Skeleton width="120px" height="20px" />
-      </div>
-
-      <!-- Info Box -->
+      <div class="mt-3"><Skeleton width="120px" height="20px" /></div>
       <div class="w-full bg-gray-100 rounded-lg p-4 mt-4 space-y-3">
-
-        <div class="flex justify-between">
-          <Skeleton width="90px" height="16px" />
-          <Skeleton width="120px" height="16px" />
-        </div>
-
-        <div class="flex justify-between">
-          <Skeleton width="60px" height="16px" />
-          <Skeleton width="160px" height="16px" />
-        </div>
-
-        <div class="flex justify-between">
-          <Skeleton width="90px" height="16px" />
-          <Skeleton width="130px" height="16px" />
-        </div>
-
+        <div class="flex justify-between"><Skeleton width="90px" height="16px" /><Skeleton width="120px" height="16px" /></div>
+        <div class="flex justify-between"><Skeleton width="60px" height="16px" /><Skeleton width="160px" height="16px" /></div>
       </div>
-
-      <!-- Buttons -->
       <Skeleton width="100%" height="40px" class="mt-4" />
-      <Skeleton width="100%" height="40px" class="mt-3" />
-      <Skeleton width="100%" height="40px" class="mt-3" />
     </div>
 
-
-    <!-- PROFILE ASLI -->
-    <div
-      v-else
-      class="w-full max-w-sm bg-white rounded-xl shadow p-4 sm:p-6 flex flex-col items-center"
-    >
+    <!-- TAMPILAN PROFIL ASLI -->
+    <div v-else class="w-full max-w-sm bg-white rounded-xl shadow p-4 sm:p-6 flex flex-col items-center">
+      <!-- Foto Profil -->
       <img
         :src="user?.foto_profil || 'https://placehold.co/100'"
         alt="Foto Profil"
         class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border mb-3"
       />
 
+      <!-- Nama User -->
       <h2 class="text-xl sm:text-2xl mb-4 text-center navbar-font">
         {{ user?.name || 'UserName' }}
       </h2>
 
-      <div
-        class="w-full bg-gray-100 rounded-lg p-4 sm:p-5 text-sm sm:text-base text-gray-800 space-y-2"
-      >
+      <!-- Detail Informasi (Nama Lengkap, Email, HP) -->
+      <div class="w-full bg-gray-100 rounded-lg p-4 sm:p-5 text-sm sm:text-base text-gray-800 space-y-2">
         <div class="flex justify-between border-b pb-1">
           <span class="navbar-font">Full Name</span>
           <span class="text-right inter-font">{{ user?.name }}</span>
         </div>
-
         <div class="flex justify-between border-b pb-1">
           <span class="navbar-font">Email</span>
           <span class="text-right break-all inter-font">{{ user?.email }}</span>
         </div>
-
         <div class="flex justify-between border-b pb-1">
           <span class="navbar-font">No Telepon</span>
           <span class="text-right break-all inter-font">{{ user?.no_telp }}</span>
@@ -79,20 +47,17 @@
 
       <div class="w-full h-0.5 bg-red-600 my-4"></div>
 
-      <button
-        @click="logout"
-        class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3 navbar-font"
-      >
+      <!-- Tombol Logout -->
+      <button @click="logout" class="w-full bg-[#7D0A0A] text-white font-semibold py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3 navbar-font">
         Log Out
       </button>
 
-      <router-link
-        :to="`/edit-profil/${user?.id}`"
-        class="w-full bg-[#7D0A0A] text-white py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3 navbar-font"
-      >
+      <!-- Tombol Edit Profil -->
+      <router-link :to="`/edit-profil/${user?.id}`" class="w-full bg-[#7D0A0A] text-white py-2 rounded-lg transition duration-300 hover:bg-white hover:text-[#7D0A0A] text-center block mt-3 navbar-font">
         Edit Profil
       </router-link>
 
+      <!-- Tombol Khusus Seller: Ke dashboard seller atau buat toko baru -->
       <router-link
         v-if="userRole === 'seller'"
         :to="tokoseller.length > 0 ? '/seller' : '/create-toko'"
@@ -101,6 +66,7 @@
         {{ tokoseller.length > 0 ? 'Seller Dashboard' : 'Buat Toko' }}
       </router-link>
 
+      <!-- Tombol Khusus Buyer: Daftar jadi seller -->
       <router-link
         v-if="userRole === 'buyer'"
         to="/pengajuan-seller"
@@ -118,13 +84,16 @@ import { ref, onMounted } from 'vue';
 import Navbar from '@/components/navbar/navbar.vue';
 import Skeleton from "@/components/Skeleton.vue"
 import api from '@/plugins/axios';
-import { showConfirm,showError,showSuccess } from '@/utils/alert';
+import { showConfirm, showError, showSuccess } from '@/utils/alert';
 
 const user = ref(null);
 const userRole = ref('');
 const isLoading = ref(false);
 const tokoseller = ref([]);
 
+/**
+ * Mengambil data profil lengkap dari server.
+ */
 const getProfile = async () => {
   try {
     isLoading.value = true;
@@ -132,6 +101,7 @@ const getProfile = async () => {
     user.value = response.data.data;
     userRole.value = response.data.data.nama_role;
 
+    // Jika dia seller, ambil juga data tokonya
     if (userRole.value === 'seller') {
       await getToko();
     }
@@ -142,6 +112,9 @@ const getProfile = async () => {
   }
 };
 
+/**
+ * Mengambil informasi toko milik user (jika ada).
+ */
 const getToko = async () => {
   try {
     const response = await api.get('/toko?self');
@@ -155,13 +128,11 @@ const getToko = async () => {
 const logout = async () => {
   const confirmed = await showConfirm("Anda Yakin Mau Logout ?")
   if (!confirmed) return;
-
   try {
     await api.post('/auth/logout');
     showSuccess("Logout Berhasil");
     window.location.href = '/login';
   } catch (error) {
-    console.error('Logout failed:', error);
     showError('Gagal Untuk Logout.');
   }
 };

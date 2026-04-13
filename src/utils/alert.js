@@ -1,5 +1,14 @@
 import Swal from 'sweetalert2'
 
+/**
+ * File Utilitas untuk menampilkan Pesan Alert (Notifikasi).
+ * Menggunakan library SweetAlert2 agar tampilan pesan lebih menarik.
+ */
+
+/**
+ * Menampilkan pesan sukses berwarna hijau.
+ * @param {string} message - Isi pesan yang ingin ditampilkan.
+ */
 export function showSuccess(message) {
   Swal.fire({
     icon: 'success',
@@ -10,6 +19,10 @@ export function showSuccess(message) {
   })
 }
 
+/**
+ * Menampilkan pesan sukses khusus untuk operasi Tambah, Edit, atau Hapus data (CRUD).
+ * @param {string} action - Jenis aksi ('create', 'update', 'delete').
+ */
 export function showCrudSuccess(action) {
   let message = ''
 
@@ -30,6 +43,10 @@ export function showCrudSuccess(action) {
   showSuccess(message)
 }
 
+/**
+ * Menampilkan pesan error berwarna merah.
+ * @param {string} message - Isi pesan kesalahan.
+ */
 export function showError(message) {
   Swal.fire({
     icon: 'error',
@@ -39,6 +56,11 @@ export function showError(message) {
   })
 }
 
+/**
+ * Menampilkan kotak konfirmasi (Ya/Batal) sebelum melakukan aksi penting (seperti menghapus data).
+ * @param {string} message - Pertanyaan konfirmasi.
+ * @returns {Promise<boolean>} - Mengembalikan true jika user memilih 'Ya'.
+ */
 export async function showConfirm(message) {
   const result = await Swal.fire({
     icon: 'warning',

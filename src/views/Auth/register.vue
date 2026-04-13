@@ -1,6 +1,9 @@
 <template>
+  <!-- Halaman Registrasi: Tempat user mendaftarkan akun baru -->
   <div class="flex justify-center items-center min-h-screen bg-[#eeeeee]">
     <div class="flex flex-col md:flex-row bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-4xl">
+      
+      <!-- Bagian Kiri: Banner Gambar -->
       <div v-if="isDesktop" class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4">
         <div class="w-11/12 h-[500px] bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
           <img v-if="images.length" :src="images[currentImage]"
@@ -9,28 +12,35 @@
         </div>
       </div>
 
+      <!-- Bagian Kanan: Formulir Pendaftaran -->
       <div class="w-full md:w-1/2 bg-[#7d0a0a] p-10 text-white text-center flex flex-col justify-center">
         <h2 class="navbar-font text-2xl mb-6">Register ke eleven market</h2>
 
         <form @submit.prevent="registerUser" class="space-y-4 inter-font">
+          <!-- Input Nama Lengkap -->
           <input v-model="form.name" type="text" placeholder="Full Name" required
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black" />
 
+          <!-- Input Email -->
           <input v-model="form.email" type="email" placeholder="Email" required
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black" />
 
+          <!-- Input Nomor Telepon -->
           <input v-model="form.no_telp" type="tel" placeholder="Phone Number" required
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black" />
 
+          <!-- Input Password -->
           <input v-model="form.password" type="password" placeholder="Password" required
             class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black" />
 
+          <!-- Daftar Syarat Keamanan Password (tampil jika belum terpenuhi) -->
           <div v-if="unmetRequirements.length" class="text-xs text-left mt-2 space-y-1">
             <p v-for="(req, i) in unmetRequirements" :key="i" class="text-white">
               • {{ req }}
             </p>
           </div>
 
+          <!-- Tombol Daftar -->
           <button
             type="submit"
             :disabled="isLoading || unmetRequirements.length > 0"
@@ -42,31 +52,16 @@
             ]"
           >
             <span v-if="isLoading" class="flex items-center">
-              <svg
-                class="animate-spin -ml-1 mr-3 h-5 w-5 text-current"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               Memproses...
             </span>
             <span v-else>Register</span>
           </button>
 
+          <!-- Link kembali ke Login -->
           <router-link to="/login" class="block mt-4 text-sm text-[#ead196] hover:underline">
             Have an account? Login
           </router-link>
@@ -83,7 +78,6 @@ import api from '@/plugins/axios'
 import { showSuccess, showError } from '@/utils/alert'
 
 const router = useRouter()
-
 const isLoading = ref(false)
 
 const form = ref({
@@ -91,7 +85,7 @@ const form = ref({
   email: "",
   no_telp: "",
   password: "",
-  role_id: 3,
+  role_id: 3, // Role default sebagai Buyer (Pembeli)
 })
 
 const images = ref([])
@@ -99,6 +93,10 @@ const currentImage = ref(0)
 const isDesktop = ref(window.innerWidth >= 768)
 const intervalId = ref(null)
 
+/**
+ * Aturan validasi password:
+ * Memastikan password user cukup kuat sebelum dikirim ke server.
+ */
 const requirements = [
   { label: "Minimal 8 karakter", test: (pw) => pw.length >= 8 },
   { label: "Huruf besar", test: (pw) => /[A-Z]/.test(pw) },
@@ -107,17 +105,20 @@ const requirements = [
   { label: "Simbol (@, #, $, dll)", test: (pw) => /[!@#$%^&*(),.?":{}|<>]/.test(pw) },
 ]
 
+// Menghitung kriteria mana saja yang belum dipenuhi oleh input user
 const unmetRequirements = computed(() => {
   return requirements
     .filter(rule => !rule.test(form.value.password))
     .map(rule => rule.label)
 })
 
+/**
+ * Fungsi Registrasi:
+ * Mengirim data user baru ke server. Jika berhasil, user diminta mengecek email untuk verifikasi.
+ */
 const registerUser = async () => {
   if (isLoading.value || unmetRequirements.value.length > 0) return
-
   isLoading.value = true
-
   try {
     await api.post("/auth/register", form.value)
     showSuccess("Registrasi Berhasil! Silakan Cek Email Anda Untuk Verifikasi.")
@@ -153,7 +154,6 @@ const getBannerLogin = async () => {
     const response = await api.get("/content?section=login")
     const data = response.data?.data || []
     const fetchedImages = data.map(item => item.image)
-    
     if (fetchedImages.length > 0) {
       images.value = fetchedImages
     } else {

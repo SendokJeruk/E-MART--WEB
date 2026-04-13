@@ -1,4 +1,5 @@
 <template>
+    <!-- Halaman Minta Reset Password: Tempat user meminta link untuk mengatur ulang kata sandi -->
     <div class="flex justify-center items-center min-h-screen bg-[#eeeeee] p-4">
         <div
             class="bg-[#7d0a0a] rounded-xl shadow-lg overflow-hidden w-full max-w-md p-10 text-white text-center flex flex-col justify-center">
@@ -7,6 +8,7 @@
                 Masukkan alamat email yang terdaftar. Kami akan mengirimkan tautan untuk mengatur ulang password Anda.
             </p>
 
+            <!-- Tampilan saat sedang mengirim email -->
             <div v-if="isLoading" class="flex flex-col items-center w-full py-4">
                 <svg class="animate-spin h-12 w-12 text-[#ead196] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
@@ -19,6 +21,7 @@
                 <p class="text-sm text-gray-300 mt-2">Mohon tunggu sebentar.</p>
             </div>
 
+            <!-- Formulir input email -->
             <form v-else @submit.prevent="sendResetLink" class="space-y-4 inter-font">
                 <input v-model="email" type="email" placeholder="Alamat Email" required
                     class="w-full p-3 border-2 border-[#bf3131] rounded focus:outline-none focus:border-[#ead196] bg-white text-black" />
@@ -48,11 +51,13 @@ import { showSuccess, showError } from '@/utils/alert'
 const isLoading = ref(false)
 const email = ref('')
 
+/**
+ * Fungsi untuk meminta tautan reset password.
+ * Server akan mengirimkan email berisi token unik ke alamat user.
+ */
 const sendResetLink = async () => {
     if (!email.value) return
-
     isLoading.value = true
-
     try {
         const response = await api.post("/auth/forgot-password", {
             email: email.value

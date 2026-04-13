@@ -1,4 +1,5 @@
 <template>
+    <!-- Halaman Verifikasi: Ditampilkan saat user mengklik link dari email pendaftaran -->
     <div class="flex justify-center items-center min-h-screen bg-[#eeeeee] p-4">
       <div
         class="bg-[#7d0a0a] rounded-xl shadow-lg overflow-hidden w-full max-w-md p-10 text-white text-center flex flex-col justify-center"
@@ -7,6 +8,7 @@
   
         <div class="space-y-6 inter-font flex flex-col items-center">
           
+          <!-- Kondisi 1: Sedang memproses verifikasi -->
           <div v-if="isLoading" class="flex flex-col items-center w-full">
             <svg class="animate-spin h-12 w-12 text-[#ead196] mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -16,6 +18,7 @@
             <p class="text-sm text-gray-300 mt-2">Mohon tunggu sebentar.</p>
           </div>
   
+          <!-- Kondisi 2: Berhasil verifikasi -->
           <div v-else-if="verificationStatus === 'Success'" class="flex flex-col items-center w-full">
             <svg class="h-16 w-16 text-green-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -31,6 +34,7 @@
             </router-link>
           </div>
   
+          <!-- Kondisi 3: Gagal verifikasi -->
           <div v-else class="flex flex-col items-center w-full">
             <svg class="h-16 w-16 text-[#ead196] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -55,14 +59,16 @@
   import { ref, onMounted } from 'vue'
   import { useRoute } from 'vue-router'
   import api from '@/plugins/axios'
-  import { showSuccess, showError } from '@/utils/alert'
   
   const route = useRoute()
-
   const isLoading = ref(true)
   const verificationStatus = ref(null) 
   const verificationMessage = ref('')
   
+  /**
+   * Fungsi untuk memproses verifikasi akun.
+   * Mengambil token dari parameter URL dan mengirimkannya ke API.
+   */
   const verifyAccount = async () => {
     const token = route.query.token
   
@@ -83,17 +89,13 @@
       if (data.status === "Success") {
         verificationStatus.value = "Success"
         verificationMessage.value = "Verifikasi berhasil!"
-        // showSuccess(verificationMessage.value)
       } else {
         verificationStatus.value = "Failed"
         verificationMessage.value = "Verifikasi gagal."
-        // showError(verificationMessage.value)
       }
     } catch (error) {
       verificationStatus.value = "Failed"
       verificationMessage.value = "Tautan tidak valid, kedaluwarsa, atau terjadi kesalahan sistem."
-    //   showError("Verifikasi Gagal!")
-    //   console.error(error) 
     } finally {
       isLoading.value = false
     }

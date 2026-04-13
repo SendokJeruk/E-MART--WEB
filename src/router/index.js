@@ -48,8 +48,12 @@ import ResetPass from "@/views/Auth/forget-pass.vue";
 import RequestResetPass from "@/views/Auth/request-forget-pass.vue";
 import EditAlamat from "@/views/Alamat/edit-alamat.vue"
 
+/**
+ * Konfigurasi Navigasi Halaman (Routing).
+ * Di sini kita menentukan alamat URL (path) dan halaman mana yang akan ditampilkan.
+ */
 const routes = [
-    // Dashboard
+    // Dashboard - Halaman Utama
     {
         path: '/',
         redirect: '/dashboard' 
@@ -60,15 +64,13 @@ const routes = [
         component: Dashboard
     },
 
-    //Auth
+    // Autentikasi (Masuk, Daftar, Verifikasi, Lupa Password)
     {
-        
         path: '/login',
         name: 'Login',
         component: Login
     },
     {
-        
         path: '/register',
         name: 'Register',
         component: Register
@@ -89,34 +91,28 @@ const routes = [
         component: ResetPass
     },
 
-    // Admin
+    // Bagian Admin (Manajemen User, Kategori, Banner, dll)
     {
         path: '/admin',
         name: 'Admin',
         component: Admin
     },
-
-     //Manage User
-     {
+    {
         path: '/manage-user',
         name: 'ManageUser',
         component: ManageUser
-     },
-
-     {
+    },
+    {
         path: '/create-user',
         name: 'CreateUser',
         component: CreateUser
-     },
-
-     {
+    },
+    {
         path: '/edit-user/:id',
         name: 'EditUser',
         component: EditUser
-     },
-
-     //Kategori Admin
-     {
+    },
+    {
         path: '/kategori',
         name: 'kategori',
         component: Kategori
@@ -132,14 +128,14 @@ const routes = [
         component: EditKategori
     },
 
-    // Detail Produk
+    // Produk & Detail Produk
     {
         path: '/produk/:id',
         name: 'Produk',
         component: Produk
     },
 
-    // Settings
+    // Pengaturan Profil & Alamat
     {
         path: '/settings',
         name: 'Settings',
@@ -171,8 +167,8 @@ const routes = [
         component: EditAlamat
     },
 
-    //Checkout + Cart
-     {
+    // Keranjang & Proses Checkout
+    {
         path: '/checkout/:kode',
         name: 'checkout',
         component: Checkout
@@ -182,7 +178,28 @@ const routes = [
         name: 'cart',
         component: Cart
     },
-    //Kategori Produk
+
+    // Bagian Seller (Penjual) - Manajemen Produk, Toko, Pengiriman, Withdraw
+    {
+        path: '/seller',
+        name: 'seller',
+        component: Seller
+    },
+    {
+        path: '/manage-produk',
+        name: 'product',
+        component: ManageProduk
+    },
+    {
+        path: '/create-produk',
+        name: 'createproduk',
+        component: CreateProduk
+    },
+    {
+        path: '/edit-produk/:id',
+        name: 'editproduk',
+        component: EditProduk
+    },
     {
         path: '/manage-kategori-produk',
         name: 'managekategoriproduct',
@@ -199,28 +216,6 @@ const routes = [
         component: EditKategoriProduk
     },
     {
-        path: '/seller',
-        name: 'seller',
-        component: Seller
-    },
-    //Manage Produk
-    {
-        path: '/manage-produk',
-        name: 'product',
-        component: ManageProduk
-    },
-    {
-        path: '/create-produk',
-        name: 'createproduk',
-        component: CreateProduk
-    },
-    {
-        path: '/edit-produk/:id',
-        name: 'editproduk',
-        component: EditProduk
-    },
-    //Manage Foto Produk
-    {
         path: '/manage-foto-product',
         name: 'manageFotoproduct',
         component: ManageFotoProduk
@@ -235,7 +230,6 @@ const routes = [
         name: 'createfotoproduct',
         component: CreateFotoProduct
     },
-    //Toko
     {
         path: '/manage-toko',
         name: 'managetoko',
@@ -266,13 +260,11 @@ const routes = [
         name: 'historyTransaksi',
         component: History
     },
-    //Toko
     {
         path: '/toko',
         name: 'toko',
         component: Toko
     },
-    //Pengajuan Seller
     {
         path: '/pengajuan-seller',
         name: 'pengajuanSeller',
@@ -298,33 +290,34 @@ const routes = [
         name: 'managePengiriman',
         component: ManagePengiriman
     },
-    //Manage Income
     {
         path: '/manage-income',
         name: 'manageIncome',
         component: ManageIncome
     },
-    //Withdraw
     {
         path: '/withdraw',
         name: 'withdraw',
         component: Withdraw
     },
-    //
     {
         path: '/manage-banner',
         name: 'manageBanner',
         component: ManageBanner
     }
 ]
+
+/**
+ * Membuat instance router dengan mode history untuk URL yang bersih.
+ */
 const router = createRouter({
     history: createWebHistory(),
     routes
   });
   
-  /*
-  Halaman yang boleh diakses tanpa login
-*/
+/**
+ * Daftar alamat halaman yang boleh diakses tanpa harus login (Publik).
+ */
 const publicPages = [
     '/dashboard',
     '/login',
@@ -334,18 +327,17 @@ const publicPages = [
     '/reset-password'
   ]
 
-/*
-  Validasi tambahan untuk route dinamis /produk/:id
-*/
+/**
+ * Mengecek apakah rute produk yang diminta bersifat publik (misalnya detail produk).
+ */
 const isPublicDynamic = (path) => {
   return path.startsWith('/produk/')
 }
 
-/*
-  Global route guard:
-  - cek apakah halaman public
-  - jika tidak dan tidak ada token, redirect ke login
-*/
+/**
+ * Pelindung Rute (Route Guard).
+ * Fungsi ini mengecek apakah user sudah login sebelum masuk ke halaman yang butuh keamanan (seperti Admin/Seller).
+ */
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token")
 
@@ -353,6 +345,7 @@ router.beforeEach((to, from, next) => {
     publicPages.includes(to.path) ||
     isPublicDynamic(to.path)
 
+  // Jika halaman butuh login dan user tidak punya token, arahkan ke halaman Login
   if (!isPublic && !token) {
     return next('/login')
   }
@@ -360,4 +353,4 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-  export default router;
+export default router;

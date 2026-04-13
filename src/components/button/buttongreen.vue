@@ -1,4 +1,5 @@
 <template>
+    <!-- Tombol navigasi berwarna hijau -->
     <a
       @click.prevent="navigate"
       href="#"
@@ -9,8 +10,13 @@
   </template>
   
   <script setup>
+  /**
+   * Komponen Tombol Hijau.
+   * Digunakan untuk aksi yang mengarahkan user ke halaman lain.
+   */
   import { useRouter } from 'vue-router'
   
+  // Properti: label (teks tombol), to (alamat tujuan)
   const props = defineProps({
     label: String,    
     to: String       
@@ -18,8 +24,8 @@
   
   const router = useRouter()
   
+  // Fungsi untuk pindah halaman saat tombol diklik
   const navigate = () => {
     router.push(props.to)
   }
   </script>
-  

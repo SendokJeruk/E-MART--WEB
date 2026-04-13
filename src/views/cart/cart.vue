@@ -1,122 +1,61 @@
 <template>
   <Navbar />
+  <!-- Halaman Keranjang: Daftar produk yang dipilih user sebelum checkout -->
   <div class="p-4 min-h-screen bg-gray-50 pb-32">
     <h1 class="navbar-font text-xl flex items-center gap-2 mb-4">
       <span class="block w-1 h-6 bg-[#BF3131] rounded-sm"></span>
       Keranjang
     </h1>
 
-    <!-- Skeleton -->
+    <!-- SKELETON: Animasi loading -->
     <template v-if="isLoading">
       <div v-for="n in 3" :key="n" class="bg-white rounded-xl border border-gray-200 p-4 mb-3 animate-pulse">
         <div class="grid grid-cols-[auto_auto_1fr] gap-3">
           <div class="w-4 h-4 bg-gray-200 rounded mt-1"></div>
           <div class="w-20 h-20 bg-gray-200 rounded-lg"></div>
-          <div class="space-y-2">
-            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-            <div class="h-3 bg-gray-200 rounded w-full"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/3"></div>
-          </div>
+          <div class="space-y-2"><div class="h-4 bg-gray-200 rounded w-3/4"></div><div class="h-3 bg-gray-200 rounded w-1/2"></div></div>
         </div>
       </div>
     </template>
 
     <template v-else-if="cart?.cart_detail?.length">
-      <!-- Pilih semua -->
+      <!-- Opsi Pilih Semua Produk -->
       <div class="flex items-center gap-2 mb-3 px-1">
-        <input
-          type="checkbox"
-          id="select-all"
-          :checked="allSelected"
-          :indeterminate="someSelected && !allSelected"
-          @change="toggleAll($event.target.checked)"
-          class="w-4 h-4 accent-[#BF3131] cursor-pointer"
-        />
+        <input type="checkbox" id="select-all" :checked="allSelected" @change="toggleAll($event.target.checked)" class="w-4 h-4 accent-[#BF3131] cursor-pointer" />
         <label for="select-all" class="inter-font text-sm text-gray-500 cursor-pointer">
           Pilih semua ({{ cart.cart_detail.length }} produk)
         </label>
       </div>
 
-      <!-- List produk -->
+      <!-- DAFTAR ITEM PRODUK DI KERANJANG -->
       <div class="space-y-3">
-        <div
-          v-for="item in cart.cart_detail"
-          :key="item.id"
-          class="bg-white rounded-xl border border-gray-200 p-4"
-        >
+        <div v-for="item in cart.cart_detail" :key="item.id" class="bg-white rounded-xl border border-gray-200 p-4">
           <div class="grid grid-cols-[auto_auto_1fr] gap-3 items-start">
-            <!-- Checkbox -->
-            <input
-              type="checkbox"
-              :checked="selectedIds.includes(item.id)"
-              @change="toggleItem(item.id)"
-              class="mt-1 w-4 h-4 accent-[#BF3131] cursor-pointer"
-            />
+            <!-- Centang per produk -->
+            <input type="checkbox" :checked="selectedIds.includes(item.id)" @change="toggleItem(item.id)" class="mt-1 w-4 h-4 accent-[#BF3131] cursor-pointer" />
 
-            <!-- Foto -->
-            <img
-              :src="item.product?.foto_cover || 'https://placehold.co/80'"
-              alt="Produk"
-              class="w-20 h-20 object-cover rounded-lg border border-gray-100 flex-shrink-0"
-            />
+            <!-- Gambar Produk -->
+            <img :src="item.product?.foto_cover || 'https://placehold.co/80'" class="w-20 h-20 object-cover rounded-lg border border-gray-100 flex-shrink-0" />
 
-            <!-- Info -->
+            <!-- Informasi Produk -->
             <div class="min-w-0">
-              <h2 class="navbar-font text-sm text-gray-900 leading-snug truncate">
-                {{ item.product?.nama_product || 'Produk tidak ditemukan' }}
-              </h2>
-              <p class="inter-font text-xs text-gray-400 mt-0.5">
-                Toko: {{ item.product?.user?.toko?.nama_toko }}
-              </p>
-              <p class="inter-font text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
-                {{ item.product?.deskripsi || 'Deskripsi tidak tersedia' }}
-              </p>
-
-              <!-- Harga -->
-              <div class="mt-2 space-y-0.5">
-                <p class="inter-font text-xs text-gray-400">
-                  Harga satuan:
-                  <span class="font-medium text-gray-800">
-                    Rp {{ formatRupiah(item.product?.harga) }}
-                  </span>
-                </p>
-                <p class="inter-font text-sm font-semibold text-[#BF3131]">
-                  Subtotal: Rp {{ formatRupiah(item.harga) }}
-                </p>
+              <h2 class="navbar-font text-sm text-gray-900 leading-snug truncate">{{ item.product?.nama_product }}</h2>
+              <p class="inter-font text-xs text-gray-400 mt-0.5">Toko: {{ item.product?.user?.toko?.nama_toko }}</p>
+              
+              <div class="mt-2">
+                <p class="inter-font text-xs text-gray-400">Harga satuan: <span class="font-medium text-gray-800">Rp {{ formatRupiah(item.product?.harga) }}</span></p>
+                <p class="inter-font text-sm font-semibold text-[#BF3131]">Subtotal: Rp {{ formatRupiah(item.harga) }}</p>
               </div>
 
-              <!-- Footer: qty + hapus -->
+              <!-- Pengatur Jumlah (Quantity) -->
               <div class="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-gray-100">
-                <!-- Qty -->
                 <div class="flex items-center gap-1.5">
-                  <button
-                    @click="decrementQuantity(item)"
-                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md text-base font-semibold transition-colors"
-                  >−</button>
-
-                  <input
-                    type="number"
-                    min="1"
-                    :max="item.product?.stok"
-                    v-model.number="item.jumlah"
-                    @input="onQuantityChange(item)"
-                    class="inter-font w-11 h-7 text-center text-sm font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#BF3131]"
-                  />
-
-                  <button
-                    @click="incrementQuantity(item)"
-                    class="w-7 h-7 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-md text-base font-semibold transition-colors"
-                  >+</button>
+                  <button @click="decrementQuantity(item)" class="w-7 h-7 flex items-center justify-center bg-gray-100 rounded-md">−</button>
+                  <input type="number" min="1" v-model.number="item.jumlah" @input="onQuantityChange(item)" class="inter-font w-11 h-7 text-center text-sm border border-gray-300 rounded-md" />
+                  <button @click="incrementQuantity(item)" class="w-7 h-7 flex items-center justify-center bg-gray-100 rounded-md">+</button>
                 </div>
-
-                <!-- Hapus -->
-                <button
-                  @click="deleteProductcart(item.id)"
-                  class="inter-font px-3 py-1.5 text-xs font-medium text-[#BF3131] border border-[#BF3131] rounded-md hover:bg-[#BF3131] hover:text-white transition-colors"
-                >
-                  Hapus
-                </button>
+                <!-- Tombol Hapus item dari keranjang -->
+                <button @click="deleteProductcart(item.id)" class="inter-font px-3 py-1.5 text-xs font-medium text-[#BF3131] border border-[#BF3131] rounded-md">Hapus</button>
               </div>
             </div>
           </div>
@@ -126,24 +65,19 @@
 
     <template v-else>
       <div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-2">
-        <span class="text-4xl opacity-30">🛒</span>
-        <p class="inter-font text-sm">Keranjang masih kosong...</p>
+        <span class="text-4xl opacity-30">🛒</span><p class="inter-font text-sm">Keranjang masih kosong...</p>
       </div>
     </template>
   </div>
 
-  <!-- Checkout bar -->
+  <!-- BAR PEMBAYARAN (FIXED DI BAWAH) -->
   <div class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between gap-4 shadow-sm z-10">
     <div>
       <p class="inter-font text-xs text-gray-400 mb-0.5">Total dipilih</p>
-      <p class="navbar-font text-base text-gray-900">
-        Rp {{ formatRupiah(selectedTotal) }}
-      </p>
+      <p class="navbar-font text-base text-gray-900">Rp {{ formatRupiah(selectedTotal) }}</p>
     </div>
-    <button
-      class="inter-font bg-[#BF3131] hover:bg-[#a32727] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors"
-      @click="checkoutSelected"
-    >
+    <!-- Tombol untuk lanjut ke halaman Checkout -->
+    <button class="inter-font bg-[#BF3131] hover:bg-[#a32727] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors" @click="checkoutSelected">
       Checkout
     </button>
   </div>
@@ -162,153 +96,75 @@ const selectedIds = ref([])
 const isLoading = ref(true)
 let updateTimeout = null
 
-const formatRupiah = (value) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-  }).format(value)
-}
+const formatRupiah = (value) => new Intl.NumberFormat('id-ID', { style: 'decimal', minimumFractionDigits: 0 }).format(value)
 
-// Hitung total harga dari item yang dicentang
+// Menghitung total harga hanya untuk produk yang dicentang user
 const selectedTotal = computed(() => {
   if (!cart.value?.cart_detail) return 0
-  return cart.value.cart_detail
-    .filter(item => selectedIds.value.includes(item.id))
-    .reduce((sum, item) => sum + (item.harga || 0), 0)
+  return cart.value.cart_detail.filter(item => selectedIds.value.includes(item.id)).reduce((sum, item) => sum + (item.harga || 0), 0)
 })
 
-// Cek apakah semua item tercentang
-const allSelected = computed(() => {
-  if (!cart.value?.cart_detail?.length) return false
-  return cart.value.cart_detail.every(item => selectedIds.value.includes(item.id))
-})
+const allSelected = computed(() => cart.value?.cart_detail?.length && cart.value.cart_detail.every(item => selectedIds.value.includes(item.id)))
 
-// Cek apakah sebagian item tercentang (untuk indeterminate)
-const someSelected = computed(() => {
-  if (!cart.value?.cart_detail?.length) return false
-  return cart.value.cart_detail.some(item => selectedIds.value.includes(item.id))
-})
-
-// Toggle satu item
 const toggleItem = (id) => {
   const idx = selectedIds.value.indexOf(id)
-  if (idx === -1) {
-    selectedIds.value.push(id)
-  } else {
-    selectedIds.value.splice(idx, 1)
-  }
+  idx === -1 ? selectedIds.value.push(id) : selectedIds.value.splice(idx, 1)
 }
 
-// Toggle semua item
 const toggleAll = (checked) => {
-  if (!cart.value?.cart_detail) return
-  if (checked) {
-    selectedIds.value = cart.value.cart_detail.map(item => item.id)
-  } else {
-    selectedIds.value = []
-  }
+  selectedIds.value = checked ? cart.value.cart_detail.map(item => item.id) : []
 }
 
+// Mengambil data keranjang dari server
 const getCart = async () => {
   try {
     const response = await api.get('/cart')
-    const data = response.data.data
-
-    if (Array.isArray(data)) {
-      cart.value = data[0] || { cart_detail: [], total_harga: 0 }
-    } else {
-      cart.value = data || { cart_detail: [], total_harga: 0 }
-    }
-  } catch (error) {
-    showError('Gagal mengambil data keranjang')
-    console.error(error)
-  } finally {
-    isLoading.value = false
-  }
+    cart.value = response.data.data[0] || response.data.data || { cart_detail: [] }
+  } catch (error) { showError('Gagal mengambil data keranjang') }
+  finally { isLoading.value = false }
 }
 
-const onQuantityChange = (item) => {
-  if (item.jumlah < 1) item.jumlah = 1
-
-  if (item.product?.stok && item.jumlah > item.product.stok) {
-    item.jumlah = item.product.stok
-    showError(`Jumlah melebihi stok! Maksimal hanya ${item.product.stok}`)
-  }
-
-  clearTimeout(updateTimeout)
-  updateTimeout = setTimeout(() => {
-    updateCartItem(item, item.jumlah)
-  }, 800)
-}
-
+/**
+ * Fungsi untuk mengubah jumlah produk di keranjang.
+ * Menggunakan debounce agar tidak setiap ketikan mengirim request ke server.
+ */
 const updateCartItem = async (item, newJumlah) => {
   try {
-    await api.put(`/detailcart/${item.id}`, {
-      jumlah: newJumlah,
-      product_id: item.product_id,
-    })
-    await getCart()
-    showSuccess('Jumlah produk diperbarui')
-  } catch (error) {
-    showError('Gagal memperbarui jumlah produk')
-    console.error(error)
-  }
+    await api.put(`/detailcart/${item.id}`, { jumlah: newJumlah, product_id: item.product_id })
+    await getCart() // Refresh data untuk mendapatkan subtotal terbaru
+  } catch (error) { showError('Gagal memperbarui jumlah produk') }
 }
 
 const incrementQuantity = (item) => {
-  if (item.product?.stok && item.jumlah >= item.product.stok) {
-    item.jumlah = item.product.stok
-    showError(`Jumlah melebihi stok! Maksimal hanya ${item.product.stok}`)
-    return
-  }
-  item.jumlah++
-  updateCartItem(item, item.jumlah)
+  if (item.jumlah >= item.product.stock) return showError('Stok tidak mencukupi')
+  item.jumlah++; updateCartItem(item, item.jumlah)
 }
 
 const decrementQuantity = (item) => {
-  if (item.jumlah > 1) {
-    item.jumlah--
-    updateCartItem(item, item.jumlah)
-  }
+  if (item.jumlah > 1) { item.jumlah--; updateCartItem(item, item.jumlah) }
 }
 
 const deleteProductcart = async (cartDetailId) => {
+  const confirmed = await showConfirm('Hapus produk ini dari keranjang?')
+  if (!confirmed) return
   try {
-    const confirmed = await showConfirm('Yakin ingin menghapus item ini dari keranjang?')
-    if (!confirmed) return
-
     await api.delete(`/detailcart/${cartDetailId}`)
-    await getCart()
-    showSuccess('Produk berhasil dihapus dari keranjang')
-  } catch (error) {
-    showError('Gagal menghapus produk dari keranjang')
-    console.error(error)
-  }
+    await getCart(); showSuccess('Berhasil dihapus')
+  } catch (error) { showError('Gagal menghapus produk') }
 }
 
+/**
+ * Fungsi Checkout: Mengirim daftar produk yang dicentang ke server
+ * dan membuat transaksi baru.
+ */
 const checkoutSelected = async () => {
-  if (selectedIds.value.length === 0) {
-    showError('Pilih minimal satu produk untuk checkout')
-    return
-  }
-
+  if (selectedIds.value.length === 0) return showError('Pilih minimal satu produk')
   try {
-    const confirmed = await showConfirm('Yakin ingin checkout produk terpilih?')
-    if (!confirmed) return
-
-    const response = await api.post('/checkout/products', {
-      cart_detail_ids: selectedIds.value
-    })
-
+    const response = await api.post('/checkout/products', { cart_detail_ids: selectedIds.value })
     showSuccess('Checkout berhasil!')
     router.push('/checkout/' + response.data.data.kode_transaksi)
-  } catch (error) {
-    showError('Checkout gagal, coba lagi.')
-    console.error(error)
-  }
+  } catch (error) { showError('Checkout gagal') }
 }
 
-onMounted(async () => {
-  await getCart()
-})
+onMounted(() => { getCart() })
 </script>

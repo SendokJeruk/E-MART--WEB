@@ -1,9 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oswald:wght@200..700&family=Righteous&display=swap');
 
+/* Font untuk elemen dekoratif atau judul besar (Style unik) */
 .navbar-font {
-  font-family: 'Righteous', cursive; /*Font utama sebagai font judul*/
+  font-family: 'Righteous', cursive;
 }
 
+/* Font utama untuk teks panjang agar nyaman dibaca (Modern & Bersih) */
 .inter-font {
-  font-family: 'Inter', sans-serif; /*Font kedua untuk teks biasa seperti deskripsi*/
+  font-family: 'Inter', sans-serif;
+}
+
+/* Font tambahan untuk kesan tegas (Biasanya untuk angka atau label) */
+.oswald-font {
+  font-family: 'Oswald', sans-serif;
 }

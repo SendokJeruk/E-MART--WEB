@@ -1,6 +1,8 @@
 <template>
+  <!-- Layout Dashboard Admin dengan Sidebar -->
   <div class="flex h-screen overflow-hidden">
-    <!-- Overlay untuk Mobile -->
+    
+    <!-- Lapisan Hitam Transparan (Overlay) saat sidebar terbuka di HP -->
     <transition name="fade">
       <div
         v-if="isSidebarOpen"
@@ -9,19 +11,19 @@
       ></div>
     </transition>
 
-    <!-- Sidebar -->
+    <!-- Sidebar: Menu Navigasi Samping -->
     <aside
       :class="[
         'fixed lg:static z-40 h-full w-64 bg-gradient-to-b from-[#7D0A0A] to-[#5E0A0A] text-white shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
     >
-      <!-- Header Sidebar -->
+      <!-- Bagian Atas Sidebar (Judul) -->
       <div class="px-6 py-6 text-center border-b border-white/10">
         <h1 class="text-xl font-bold tracking-wide">Admin Panel</h1>
       </div>
 
-      <!-- Menu Navigasi di Tengah -->
+      <!-- Bagian Tengah Sidebar (Daftar Menu) -->
       <div class="flex-1 flex items-center justify-center overflow-y-auto">
         <ul class="space-y-3 w-full px-6">
           <li v-for="item in menuItems" :key="item.path">
@@ -37,9 +39,9 @@
         </ul>
       </div>
 
-      <!-- Kotak Profil di Bawah -->
+      <!-- Bagian Bawah Sidebar (Informasi Profil & Logout) -->
       <div class="p-4 border-t border-white/10">
-        <!-- Skeleton Loading -->
+        <!-- Tampilan Loading Profil (Skeleton) -->
         <div
           v-if="isLoading"
           class="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/10 animate-pulse"
@@ -49,7 +51,7 @@
           <div class="h-3 w-1/2 bg-white/20 rounded"></div>
         </div>
 
-        <!-- Profil Admin -->
+        <!-- Data Profil Admin Asli -->
         <div
           v-else
           class="flex flex-col items-center text-center p-4 rounded-xl bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
@@ -67,7 +69,7 @@
             {{ user?.email || 'admin@example.com' }}
           </p>
 
-          <!-- Tombol Logout -->
+          <!-- Tombol Keluar (Logout) -->
           <button
             @click="logout"
             class="mt-4 w-full px-4 py-2 text-sm font-medium rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-300"
@@ -78,9 +80,10 @@
       </div>
     </aside>
 
-    <!-- Konten Utama -->
+    <!-- Area Konten Utama di sebelah kanan sidebar -->
     <div class="flex-1 flex flex-col bg-gray-100 overflow-auto">
-      <!-- Header Mobile -->
+      
+      <!-- Header khusus tampilan HP (untuk tombol buka menu) -->
       <header class="lg:hidden p-4 bg-white shadow flex items-center">
         <button
           @click="toggleSidebar"
@@ -90,7 +93,7 @@
         </button>
       </header>
 
-      <!-- Konten Halaman -->
+      <!-- Tempat menampilkan isi halaman admin -->
       <main class="flex-1 p-4 lg:p-8">
         <router-view />
         <slot />
@@ -112,7 +115,9 @@ const user = ref(null)
 const isSidebarOpen = ref(false)
 const isLoading = ref(true)
 
-// Daftar Menu Admin
+/**
+ * Daftar item menu navigasi untuk admin.
+ */
 const menuItems = [
   { label: 'Home', path: '/admin' },
   { label: 'Manage User', path: '/manage-user' },
@@ -123,7 +128,9 @@ const menuItems = [
   { label: 'Manage Banner', path: '/manage-banner' }
 ]
 
-// Styling untuk menu aktif
+/**
+ * Menentukan gaya tampilan link menu (berubah warna jika aktif).
+ */
 function linkClass(path) {
   return [
     'text-white',
@@ -133,19 +140,25 @@ function linkClass(path) {
   ]
 }
 
-// Toggle Sidebar
+/**
+ * Membuka atau menutup sidebar (untuk tampilan mobile).
+ */
 function toggleSidebar() {
   isSidebarOpen.value = !isSidebarOpen.value
 }
 
-// Tutup sidebar saat menu dipilih di mobile
+/**
+ * Menutup sidebar secara otomatis saat menu diklik di HP.
+ */
 function closeSidebar() {
   if (window.innerWidth < 1024) {
     isSidebarOpen.value = false
   }
 }
 
-// Logout
+/**
+ * Fungsi Logout: Menghapus token dan mengarahkan kembali ke halaman Login.
+ */
 const logout = async () => {
   const confirmed = await showConfirm("Anda Yakin Mau Logout?")
   if (!confirmed) return
@@ -161,7 +174,10 @@ const logout = async () => {
   }
 }
 
-// Ambil data profil admin
+/**
+ * Mengambil data profil admin dari server saat halaman dimuat.
+ * Jika yang login bukan admin, maka akan ditendang ke dashboard utama.
+ */
 const getProfile = async () => {
   try {
     const response = await api.get('/profile')
@@ -177,6 +193,7 @@ const getProfile = async () => {
   }
 }
 
+// Jalankan pengambilan profil saat komponen mulai muncul
 onMounted(() => {
   getProfile()
 })

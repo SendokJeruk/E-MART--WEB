@@ -1,8 +1,9 @@
 <template>
+  <!-- Halaman Login: Tempat user masuk ke akun mereka -->
   <div class="min-h-screen flex items-center justify-center bg-[#EEEEEE] inter-font">
     <div class="flex flex-col md:flex-row bg-white shadow-lg rounded-xl overflow-hidden w-[95%] max-w-4xl">
       
-      <!-- Carousel Image (desktop only) -->
+      <!-- Bagian Kiri: Carousel Gambar (Hanya tampil di layar besar/Desktop) -->
       <div v-if="isDesktop" class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4">
         <div class="w-11/12 h-[500px] bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
           <img
@@ -14,10 +15,11 @@
         </div>  
       </div>
 
-      <!-- Login Form -->
+      <!-- Bagian Kanan: Formulir Login -->
       <div class="w-full md:w-1/2 bg-[#7D0A0A] text-white p-10 text-center">
         <h2 class="text-2xl navbar-font mb-6">Login ke eleven market</h2>
         <form @submit.prevent="loginUser" class="space-y-4">
+          <!-- Input Email -->
           <input
             v-model="form.email"
             type="email"
@@ -25,6 +27,7 @@
             class="w-full p-3 bg-white rounded border-2 border-[#BF3131] text-black placeholder-gray-500 focus:outline-none focus:border-[#EAD196] inter-font"
             required
           />
+          <!-- Input Password -->
           <input
             v-model="form.password"
             type="password"
@@ -32,6 +35,7 @@
             class="w-full p-3 rounded bg-white border-2 border-[#BF3131] text-black placeholder-gray-500 focus:outline-none focus:border-[#EAD196] inter-font"
             required
           />
+          <!-- Tombol Login -->
           <button
             type="submit"
             :disabled="loading"
@@ -46,6 +50,7 @@
             {{ loading ? 'Logging in...' : 'Login' }}
           </button>
 
+          <!-- Link navigasi ke halaman Daftar atau Lupa Password -->
           <router-link
             to="/register"
             class="block text-[#EAD196] underline mt-2 inter-font"
@@ -78,14 +83,21 @@ const isDesktop = ref(window.innerWidth >= 768);
 const loading = ref(false);
 let interval = null;
 
+// Fungsi untuk mengganti gambar carousel di sisi kiri
 const nextImage = () => {
   currentImage.value = (currentImage.value + 1) % images.value.length;
 };
 
+// Mengecek ukuran layar untuk menentukan tampilan desktop/mobile
 const checkScreen = () => {
   isDesktop.value = window.innerWidth >= 768;
 };
 
+/**
+ * Fungsi Login:
+ * Mengirim email dan password ke server. Jika berhasil, menyimpan token ke localStorage
+ * dan mengarahkan user ke halaman Dashboard.
+ */
 const loginUser = async () => {
   loading.value = true;
   try {
@@ -105,6 +117,9 @@ const loginUser = async () => {
   }
 };
 
+/**
+ * Mengambil gambar banner khusus untuk halaman login dari server.
+ */
 const getBannerLogin = async () => {
   try {
     const response = await api.get("/content?section=login")
@@ -116,8 +131,6 @@ const getBannerLogin = async () => {
     } else {
       images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']
     }
-
-    console.log("Images:", images.value)
   } catch (error) {
     console.error("Error fetching login banners:", error)
     images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']

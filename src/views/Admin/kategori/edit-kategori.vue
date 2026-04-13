@@ -1,5 +1,6 @@
 <template>
     <adminside>
+      <!-- Halaman Edit Kategori: Digunakan admin untuk mengubah nama kategori yang sudah ada -->
       <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
         <h2 class="text-xl navbar-font mb-4">Form Edit Kategori</h2>
         <form @submit.prevent="submitForm">
@@ -7,18 +8,15 @@
             <label for="nama_category" class="block mb-1 navbar-font">Nama Kategori</label>
             <input
               id="nama_category"
-              name="nama_category"
               v-model="form.nama_category"
               type="text"
               class="w-full border px-3 py-2 rounded inter-font"
+              required
             />
           </div>
   
-          <button
-            type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 navbar-font"
-          >
-            Submit
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 navbar-font">
+            Update Kategori
           </button>
         </form>
       </div>
@@ -34,35 +32,31 @@ import { showSuccess, showError } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
+const form = ref({ nama_category: '' })
 
-const form = ref({
-  nama_category: '',
-})
+/**
+ * Mengambil data nama kategori yang lama dari server saat halaman dibuka.
+ */
+const fetchCategory = async () => {
+  try {
+    const res = await api.get(`/category/${route.params.id}`)
+    form.value.nama_category = res.data.data.nama_category
+  } catch (e) {}
+}
 
+/**
+ * Mengirimkan perubahan nama kategori ke server.
+ */
 const submitForm = async () => {
   try {
     const formData = new FormData()
     formData.append('nama_category', form.value.nama_category)
-    formData.append('_method', 'PUT')  
+    formData.append('_method', 'PUT') // Metode PUT untuk pembaruan data
     
-    const response = await api.post(`/category/${route.params.id}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-
-    showSuccess('Kategori berhasil diperbarui!')
-    router.push('/kategori') 
-  } catch (error) {
-    const errors = error.response?.data?.errors;
-    let errorMessage = error.response?.data?.message || 'Gagal mengubah kategori.';
-
-    if (errors) {
-      const allErrors = Object.values(errors).flat().join('\n');
-      errorMessage = allErrors;
-    }
-
-    showError(errorMessage);
-  }
+    await api.post(`/category/${route.params.id}`, formData)
+    showSuccess('Kategori berhasil diperbarui!'); router.push('/kategori') 
+  } catch (error) { showError('Gagal mengubah kategori.') }
 }
+
+onMounted(() => { fetchCategory() })
 </script>

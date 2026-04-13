@@ -1,237 +1,58 @@
 <template>
   <Navbar />
-
+  <!-- Halaman Pendaftaran Seller: Tempat pembeli mengajukan diri menjadi penjual dengan melengkapi data KTP -->
   <div class="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-2xl mt-6">
-    <h2 class="text-2xl text-gray-800 mb-6 text-center navbar-font">
-      Form Pengajuan Jadi Seller
-    </h2>
+    <h2 class="text-2xl text-gray-800 mb-6 text-center navbar-font">Form Pengajuan Jadi Seller</h2>
 
-    <!-- ane nambahain ini le buat loading sama ganti beberapa isi halaman biar dinamis status -->
-    <!-- Loading State -->
-    <div v-if="isLoading" class="text-center py-10">
-      <p class="text-gray-500 inter-font">Mengecek status pengajuan...</p>
-    </div>
+    <!-- Loading: Saat sistem mengecek apakah user sudah pernah mengajukan sebelumnya -->
+    <div v-if="isLoading" class="text-center py-10"><p class="text-gray-500">Mengecek status...</p></div>
 
-    <!-- Status Pengajuan Sudah Ada -->
+    <!-- TAMPILAN STATUS (Jika sudah pernah mengajukan) -->
     <div v-else-if="existingRequest && !isReapplying" class="text-center py-10 space-y-4">
-      <div class="inline-block p-4 rounded-full" 
-           :class="{
-             'bg-yellow-100 text-yellow-600 inter-font': existingRequest.status === 'pending',
-             'bg-green-100 text-green-600 inter-font': existingRequest.status === 'accepted' || existingRequest.status === 'approved',
-             'bg-red-100 text-red-600 inter-font': existingRequest.status === 'rejected'
-           }">
-        <!-- Icon / Status -->
-        <svg v-if="existingRequest.status === 'pending'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <svg v-else-if="existingRequest.status === 'accepted' || existingRequest.status === 'approved'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <svg v-else-if="existingRequest.status === 'rejected'" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-
-      <h3 class="text-xl font-bold text-gray-800 inter-font">
-        Status Pengajuan: <span class="uppercase">{{ existingRequest.status }}</span>
-      </h3>
-      
-      <p v-if="existingRequest.status === 'pending'" class="text-gray-600 inter-font">
-        Pengajuan Anda sedang direview oleh tim Admin. Mohon tunggu informasi selanjutnya.
-      </p>
-      <p v-else-if="existingRequest.status === 'accepted' || existingRequest.status === 'approved'" class="text-gray-600 inter-font">
-        Selamat! Pengajuan Anda telah disetujui. Anda sekarang adalah Seller.
-      </p>
-      <p v-else-if="existingRequest.status === 'rejected'" class="text-gray-600 inter-font">
-        Mohon maaf, pengajuan Anda saat ini ditolak.
-        <br>
-        <span v-if="existingRequest.note" class="font-semibold block mt-2 text-red-500 inter-font">Alasan: {{ existingRequest.note }}</span>
-      </p>
-
-      <div class="pt-6 flex justify-center gap-4">
-        <router-link to="/profile" class=" navbar-font inline-block px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-          Kembali ke Profil
-        </router-link>
-
-        <!-- Tombol Ajukan Ulang  -->
-        <button v-if="existingRequest.status === 'rejected'" @click="reapply" class="navbar-font inline-block px-6 py-2 bg-[#7D0A0A] text-white rounded-lg hover:bg-[#BF3131] transition">
-          Perbaiki & Ajukan Ulang
-        </button>
-      </div>
+      <h3 class="text-xl font-bold">Status: <span class="uppercase text-red-600">{{ existingRequest.status }}</span></h3>
+      <p v-if="existingRequest.status === 'pending'">Mohon tunggu, admin sedang memeriksa data Anda.</p>
+      <p v-if="existingRequest.status === 'rejected'">Maaf, pengajuan ditolak. Alasan: {{ existingRequest.note }}</p>
+      <button v-if="existingRequest.status === 'rejected'" @click="isReapplying = true" class="bg-[#7D0A0A] text-white px-6 py-2 rounded-lg">Ajukan Ulang</button>
     </div>
 
-    <!-- Form Pengajuan -->
-    <form v-else class="space-y-5" @submit.prevent="submitForm">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1 inter-font">Alasan Menjadi Seller</label>
-        <textarea v-model="form.note" rows="3" placeholder="Ceritakan Alasan atau motivasi Anda menjadi seller"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none"></textarea>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1 inter-font">NIK</label>
-        <input v-model="form.nik" type="text" placeholder="Masukkan 16 digit NIK"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1 inter-font">Nama Lengkap</label>
-        <input v-model="form.nama_lengkap" type="text" placeholder="Nama lengkap sesuai KTP"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1 inter-font">Tempat Lahir</label>
-        <input v-model="form.tempat_lahir" type="text" placeholder="Contoh: Jakarta"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1 inter-font">Tanggal Lahir</label>
-        <input v-model="form.tanggal_lahir" type="date"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1 inter-font">Jenis Kelamin</label>
-        <select v-model="form.jenis_kelamin"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none inter-font">
-          <option value="" disabled selected>Pilih jenis kelamin</option>
-          <option value="L">Laki-laki</option>
-          <option value="P">Perempuan</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1 inter-font">Alamat KTP</label>
-        <textarea v-model="form.alamat_ktp" rows="3" placeholder="Tuliskan alamat sesuai KTP"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none"></textarea>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Foto KTP</label>
-        <input type="file" accept="image/*"
-          @change="e => form.foto_ktp = e.target.files[0]"
-          class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-[#7D0A0A] focus:outline-none" />
-        <p class="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG (max 2MB)</p>
-      </div>
-
-      <div class="pt-4 flex gap-4">
-        <button v-if="isReapplying" type="button" @click="isReapplying = false"
-          class="w-1/3 py-3 bg-gray-200 text-gray-700 navbar-font rounded-lg shadow hover:bg-gray-300 transition duration-300">
-          Batal
-        </button>
-        <button type="submit"
-          class="flex-1 py-3 bg-[#7D0A0A] text-white navbar-font rounded-lg shadow hover:bg-[#BF3131] transition duration-300">
-          Kirim Pengajuan
-        </button>
-      </div>
+    <!-- FORMULIR PENGAJUAN (Jika belum mengajukan atau ingin ajukan ulang) -->
+    <form v-else @submit.prevent="submitForm" class="space-y-5">
+      <div><label class="block text-sm font-medium mb-1">NIK (16 Digit)</label><input v-model="form.nik" type="text" class="w-full border rounded-lg p-2" required /></div>
+      <div><label class="block text-sm font-medium mb-1">Nama Lengkap Sesuai KTP</label><input v-model="form.nama_lengkap" type="text" class="w-full border rounded-lg p-2" required /></div>
+      <div><label class="block text-sm font-medium mb-1">Alamat KTP</label><textarea v-model="form.alamat_ktp" class="w-full border rounded-lg p-2" required></textarea></div>
+      <div><label class="block text-sm font-medium mb-1">Foto KTP</label><input type="file" @change="e => form.foto_ktp = e.target.files[0]" accept="image/*" class="w-full border p-2" required /></div>
+      <button type="submit" class="w-full py-3 bg-[#7D0A0A] text-white rounded-lg font-bold">Kirim Pengajuan</button>
     </form>
   </div>
 </template>
 
 <script setup>
-import Navbar from '@/components/navbar/navbar.vue';
 import { ref, onMounted } from 'vue';
 import api from '@/plugins/axios';
-import { showSuccess,showError } from '@/utils/alert';
-import router from '@/router';
+import Navbar from '@/components/navbar/navbar.vue';
+import { showSuccess, showError } from '@/utils/alert';
 
 const isLoading = ref(true);
 const existingRequest = ref(null);
 const isReapplying = ref(false);
+const form = ref({ note: '', nik: '', nama_lengkap: '', tempat_lahir: '', tanggal_lahir: '', jenis_kelamin: '', alamat_ktp: '', foto_ktp: null });
 
-const form = ref({
-  note: '',
-  nik: '',
-  nama_lengkap: '',
-  tempat_lahir: '',
-  tanggal_lahir: '',
-  jenis_kelamin: '',
-  alamat_ktp: '',
-  foto_ktp: null,
-});
-
-const checkExistingRequest = async () => {
+// Mengecek apakah user ini sudah punya riwayat pengajuan di database
+const checkStatus = async () => {
   try {
-    const response = await api.get('/requestseller');
-    const resData = response.data.data;
-
-    if (resData && !Array.isArray(resData) && resData.id) {
-      existingRequest.value = resData;
-    } else if (Array.isArray(resData) && resData.length > 0) {
-      existingRequest.value = resData[0];
-    }
-  } catch (error) {
-    console.error('Belum ada request atau gagal mengambil data:', error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const reapply = () => {
-  if (existingRequest.value) {
-    form.value.note = existingRequest.value.note || '';
-    form.value.nik = existingRequest.value.nik || '';
-    form.value.nama_lengkap = existingRequest.value.nama_lengkap || '';
-    form.value.tempat_lahir = existingRequest.value.tempat_lahir || '';
-    form.value.tanggal_lahir = existingRequest.value.tanggal_lahir || '';
-    form.value.jenis_kelamin = existingRequest.value.jenis_kelamin || '';
-    form.value.alamat_ktp = existingRequest.value.alamat_ktp || '';
-    form.value.foto_ktp = null; 
-  }
-  isReapplying.value = true;
+    const res = await api.get('/requestseller');
+    existingRequest.value = res.data.data;
+  } finally { isLoading.value = false; }
 };
 
 const submitForm = async () => {
+  const fd = new FormData();
+  Object.keys(form.value).forEach(key => fd.append(key, form.value[key]));
   try {
-    const formData = new FormData();
-    formData.append('note', form.value.note);
-    formData.append('nik', form.value.nik);
-    formData.append('nama_lengkap', form.value.nama_lengkap);
-    formData.append('tempat_lahir', form.value.tempat_lahir);
-    formData.append('tanggal_lahir', form.value.tanggal_lahir);
-    formData.append('jenis_kelamin', form.value.jenis_kelamin);
-    formData.append('alamat_ktp', form.value.alamat_ktp);
-    if (form.value.foto_ktp) {
-      formData.append('foto_ktp', form.value.foto_ktp);
-    }
+    await api.post('/requestseller', fd);
+    showSuccess('Berhasil dikirim!'); checkStatus();
+  } catch (e) { showError('Gagal mengirim data'); }
+};
 
-    await api.post('/requestseller', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-
-    showSuccess('Pengajuan berhasil dikirim!');
-
-    form.value = {
-      note: '',
-      nik: '',
-      nama_lengkap: '',
-      tempat_lahir: '',
-      tanggal_lahir: '',
-      jenis_kelamin: '',
-      alamat_ktp: '',
-      foto_ktp: null,
-    };
-
-    isReapplying.value = false;
-
-    await checkExistingRequest();
-  } catch (error) {
-    console.error('Gagal submit form:', error);
-    const errors = error.response?.data?.errors;
-    let errorMessage = error.response?.data?.message || 'Gagal mengirim pengajuan.';
-    if (errors) {
-      const allErrors = Object.values(errors).flat().join('\n');
-      errorMessage = allErrors;
-    }
-    showError(errorMessage);
-  }
-}
-
-onMounted(() => {
-  checkExistingRequest();
-});
+onMounted(() => { checkStatus(); });
 </script>

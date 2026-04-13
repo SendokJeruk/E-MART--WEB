@@ -1,63 +1,57 @@
 <template>
   <sellerside>
+    <!-- Halaman Tambah Produk: Tempat seller mengunggah barang jualan baru -->
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <h2 class="text-xl font-bold mb-4 navbar-font">Form Tambah Produk</h2>
+      <h2 class="text-xl font-bold mb-4 navbar-font">Tambah Produk Baru</h2>
+      
       <form @submit.prevent="submitForm">
+        <!-- Input Nama Barang -->
         <div class="mb-4">
-          <label for="nama_product" class="block mb-1 navbar-font">Nama Produk</label>
-          <input id="nama_product" v-model="form.nama_product" type="text" class="w-full border px-3 py-2 rounded inter-font" />
+          <label class="block mb-1 navbar-font">Nama Produk</label>
+          <input v-model="form.nama_product" type="text" class="w-full border px-3 py-2 rounded inter-font" required />
         </div>
 
+        <!-- Input Deskripsi Lengkap -->
         <div class="mb-4">
-          <label for="deskripsi" class="block mb-1 navbar-font">Deskripsi</label>
-          <textarea id="deskripsi" v-model="form.deskripsi" class="w-full border px-3 py-2 rounded inter-font"></textarea>
+          <label class="block mb-1 navbar-font">Deskripsi</label>
+          <textarea v-model="form.deskripsi" class="w-full border px-3 py-2 rounded inter-font" rows="4" required></textarea>
         </div>
 
-        <div class="mb-4">
-          <label for="harga" class="block mb-1 navbar-font">Harga</label>
-          <input id="harga" v-model="form.harga" type="text" class="w-full border px-3 py-2 rounded inter-font" />
+        <!-- Input Harga dan Stok -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block mb-1 navbar-font">Harga (Rp)</label>
+            <input v-model="form.harga" type="number" class="w-full border px-3 py-2 rounded" required />
+          </div>
+          <div>
+            <label class="block mb-1 navbar-font">Stok Barang</label>
+            <input v-model="form.stock" type="number" class="w-full border px-3 py-2 rounded" required />
+          </div>
         </div>
 
+        <!-- Input Berat (Penting untuk perhitungan ongkir otomatis) -->
         <div class="mb-4">
-          <label for="stock" class="block mb-1 navbar-font">Stok</label>
-          <input id="stock" v-model="form.stock" type="number" class="w-full border px-3 py-2 rounded inter-font" />
+          <label class="block mb-1 navbar-font">Berat (Gram)</label>
+          <input v-model="form.berat" type="number" class="w-full border px-3 py-2 rounded" placeholder="Contoh: 1000 untuk 1kg" required />
         </div>
 
+        <!-- Pilihan Status: Draft (Belum tayang) atau Publish (Langsung jual) -->
         <div class="mb-4">
-          <label for="berat" class="block mb-1 navbar-font">Berat</label>
-          <input id="berat" v-model="form.berat" type="number" class="w-full border px-3 py-2 rounded inter-font" required />
-        </div>
-
-        <div class="mb-4">
-          <label for="status" class="block mb-1 navbar-font">Status Produk</label>
-          <select id="status" v-model="form.status" class="w-full border px-3 py-2 rounded inter-font">
-            <option value="">Pilih status</option>
-            <option value="draft">Draft</option>
-            <option value="publish">Publish</option>
+          <label class="block mb-1 navbar-font">Status Tayang</label>
+          <select v-model="form.status" class="w-full border px-3 py-2 rounded">
+            <option value="draft">Draft (Simpan saja)</option>
+            <option value="publish">Publish (Tampilkan di Toko)</option>
           </select>
         </div>
 
-        <div class="mb-4">
-          <label for="foto_cover"
-            class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer">
-            <div class="flex items-center justify-center gap-4">
-              <span class="inter-font">Upload Foto Produk</span>
-              <div v-if="selectedFileName" class="text-sm text-gray-500">
-                {{ selectedFileName }}
-              </div>
-
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m0-3-3-3m0 0-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75" />
-              </svg>
-            </div>
-            <input id="foto_cover" @change="handleFileUpload" type="file" accept="image/*" class="sr-only" />
-          </label>
+        <!-- Upload Foto Sampul (Cover) Produk -->
+        <div class="mb-6">
+          <label class="block mb-2 font-bold">Foto Utama Produk</label>
+          <input type="file" @change="e => form.foto_cover = e.target.files[0]" accept="image/*" class="w-full border p-2" required />
         </div>
 
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Submit
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">
+          Upload Produk
         </button>
       </form>
     </div>
@@ -65,99 +59,24 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import api from '@/plugins/axios'
 import sellerside from '@/components/navbar/seller-side.vue'
 import router from '@/router'
 import { showError, showSuccess } from '@/utils/alert'
 
+const form = ref({ nama_product: '', deskripsi: '', harga: '', stock: '', berat: '', status: 'publish', foto_cover: null });
 
-const selectedFileName = ref('')
-
-const user = ref({})
-const form = ref({
-  nama_product: '',
-  deskripsi: '',
-  harga: '',
-  stock: '',
-  foto_cover: null,
-  status: '',
-  berat: '',
-  user_id: '',
-})
-
-const handleFileUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    form.value.foto_cover = file
-    selectedFileName.value = file.name
-  } else {
-    form.value.foto_cover = null
-    selectedFileName.value = ''
-  }
-}
-
-const getProfile = async () => {
-  try {
-    const response = await api.get('/profile')
-    user.value = response.data.data
-    form.value.user_id = user.value.id
-  } catch (error) {
-    console.error('Gagal mengambil profil:', error)
-  }
-}
-
+/**
+ * Mengirim data produk baru ke server menggunakan FormData.
+ */
 const submitForm = async () => {
-  if (!form.value.user_id) {
-    showError('User belum dikenali, silakan tunggu beberapa saat...');
-    return;
-  }
+  const fd = new FormData();
+  Object.keys(form.value).forEach(key => { if(form.value[key]) fd.append(key, form.value[key]); });
 
   try {
-    const formData = new FormData()
-    formData.append('nama_product', form.value.nama_product)
-    formData.append('deskripsi', form.value.deskripsi)
-    formData.append('harga', form.value.harga)
-    formData.append('stock', form.value.stock)
-    formData.append('foto_cover', form.value.foto_cover)
-    if (form.value.foto_cover == null) {formData.delete('foto_cover')} 
-    formData.append('status_produk', form.value.status)
-    formData.append('berat', form.value.berat)
-    formData.append('user_id', form.value.user_id)
-
-    const response = await api.post('/product', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-
-    showSuccess('Produk berhasil ditambahkan!')
-    form.value = {
-      nama_product: '',
-      deskripsi: '',
-      harga: '',
-      stock: '',
-      foto_cover: null,
-      status: '',
-      berat: '',
-      user_id: '',
-    }
-
-    router.push('/manage-produk')
-  } catch (error) {
-    const errors = error.response?.data?.errors;
-    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
-
-    if (errors) {
-      const allErrors = Object.values(errors).flat().join('\n');
-      errorMessage = allErrors;
-    }
-
-    showError(errorMessage);
-  }
+    await api.post('/product', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    showSuccess('Produk berhasil ditambahkan!'); router.push('/manage-produk');
+  } catch (e) { showError('Gagal menambah produk. Cek kembali data Anda.'); }
 }
-
-onMounted(() => {
-  getProfile()
-})
 </script>

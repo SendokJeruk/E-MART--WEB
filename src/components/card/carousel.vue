@@ -1,13 +1,16 @@
 <template>
+  <!-- Komponen Carousel: Digunakan untuk menampilkan slider gambar banner di halaman utama -->
   <div class="relative w-full max-w-7xl mx-auto overflow-hidden rounded-xl shadow-lg bg-black">
 
     <!-- ================= SKELETON ================= -->
+    <!-- Menampilkan loading saat gambar belum siap -->
     <div v-if="isLoading" class="w-full h-[200px] sm:h-[300px]">
       <Skeleton width="100%" height="100%" />
     </div>
 
     <!-- ================= CAROUSEL ================= -->
     <div v-else>
+      <!-- Wadah gambar yang bisa bergeser -->
       <div
         class="flex transition-transform duration-700 ease-in-out"
         :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
@@ -25,7 +28,7 @@
         </div>
       </div>
 
-      <!-- BUTTON -->
+      <!-- Tombol Navigasi Kiri -->
       <button
         @click="prevSlide"
         class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 text-white px-3 py-2 rounded-full"
@@ -33,6 +36,7 @@
         ‹
       </button>
 
+      <!-- Tombol Navigasi Kanan -->
       <button
         @click="nextSlide"
         class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white px-3 py-2 rounded-full"
@@ -40,7 +44,7 @@
         ›
       </button>
 
-      <!-- DOT -->
+      <!-- Indikator Titik (Dots) di bawah carousel -->
       <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-2">
         <span
           v-for="(image, index) in images"
@@ -58,6 +62,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import Skeleton from '@/components/Skeleton.vue'
 
+// Menerima daftar URL gambar dari luar (props)
 const props = defineProps({
   images: {
     type: Array,
@@ -65,26 +70,32 @@ const props = defineProps({
   }
 })
 
+// Indeks gambar yang saat ini tampil
 const currentIndex = ref(0)
 let interval = null
 
+// Mengecek apakah data gambar masih kosong
 const isLoading = computed(() => props.images.length === 0)
 
+// Fungsi untuk geser ke gambar berikutnya
 const nextSlide = () => {
   if (!props.images.length) return
   currentIndex.value = (currentIndex.value + 1) % props.images.length
 }
 
+// Fungsi untuk geser ke gambar sebelumnya
 const prevSlide = () => {
   if (!props.images.length) return
   currentIndex.value =
     (currentIndex.value - 1 + props.images.length) % props.images.length
 }
 
+// Saat komponen dipasang, mulai jalankan slide otomatis setiap 3 detik
 onMounted(() => {
   interval = setInterval(nextSlide, 3000)
 })
 
+// Bersihkan interval saat komponen dihancurkan (agar tidak membebani memori)
 onBeforeUnmount(() => {
   clearInterval(interval)
 })
