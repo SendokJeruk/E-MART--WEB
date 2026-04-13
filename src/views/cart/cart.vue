@@ -8,15 +8,19 @@
 
     <!-- Skeleton -->
     <template v-if="isLoading">
-      <div v-for="n in 3" :key="n" class="bg-white rounded-xl border border-gray-200 p-4 mb-3 animate-pulse">
+      <div
+        v-for="n in 3"
+        :key="n"
+        class="bg-white rounded-xl border border-gray-200 p-4 mb-3"
+      >
         <div class="grid grid-cols-[auto_auto_1fr] gap-3">
-          <div class="w-4 h-4 bg-gray-200 rounded mt-1"></div>
-          <div class="w-20 h-20 bg-gray-200 rounded-lg"></div>
+          <Skeleton width="16px" height="16px" class="mt-1" />
+          <Skeleton width="80px" height="80px" class="rounded-lg" />
           <div class="space-y-2">
-            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-            <div class="h-3 bg-gray-200 rounded w-full"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+            <Skeleton width="75%" height="16px" />
+            <Skeleton width="50%" height="12px" />
+            <Skeleton width="100%" height="12px" />
+            <Skeleton width="33%" height="16px" />
           </div>
         </div>
       </div>
@@ -161,6 +165,7 @@ const cart = ref(null)
 const selectedIds = ref([])
 const isLoading = ref(true)
 let updateTimeout = null
+let notificationTimeout = null
 
 const formatRupiah = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -248,7 +253,12 @@ const updateCartItem = async (item, newJumlah) => {
       product_id: item.product_id,
     })
     await getCart()
-    showSuccess('Jumlah produk diperbarui')
+
+    clearTimeout(notificationTimeout)
+    notificationTimeout = setTimeout(() => {
+      showSuccess('Jumlah produk diperbarui')
+    }, 2000)
+
   } catch (error) {
     showError('Gagal memperbarui jumlah produk')
     console.error(error)
