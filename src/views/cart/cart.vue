@@ -257,7 +257,7 @@ const updateCartItem = async (item, newJumlah) => {
     clearTimeout(notificationTimeout)
     notificationTimeout = setTimeout(() => {
       showSuccess('Jumlah produk diperbarui')
-    }, 2000)
+    }, 1000)
 
   } catch (error) {
     showError('Gagal memperbarui jumlah produk')

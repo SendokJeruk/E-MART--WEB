@@ -85,6 +85,12 @@
         >
          Export Excel
         </button>
+        <button
+          @click="downloadSellerReportPDF"
+          class="w-full sm:w-auto px-5 py-2.5 bg-red-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-red-700 active:scale-95 transition"
+        >
+         Export PDF
+        </button>
 
       </div>
 
@@ -309,6 +315,58 @@ const exportExcel = async () => {
       })
     } else {
       showError('Gagal mengunduh excel')
+    }
+  }
+}
+
+const downloadSellerReportPDF = async () => {
+  try {
+    const queryParams = {}
+    if (startDate.value) queryParams.start_date = formatToDMY(startDate.value)
+    if (endDate.value) queryParams.end_date = formatToDMY(endDate.value)
+
+    // Endpoint diubah ke periodic-pdf
+    const response = await api.get('/report/seller/periodic-pdf', {
+      params: queryParams,
+      responseType: 'blob'
+    })
+
+    // Type diubah menjadi application/pdf
+    const pdfBlob = new Blob([response.data], { 
+      type: response.headers['content-type'] || 'application/pdf' 
+    })
+    
+    const downloadUrl = window.URL.createObjectURL(pdfBlob)
+    const downloadAnchor = document.createElement('a')
+    
+    const startLabel = formatToDMY(startDate.value) || 'awal'
+    const endLabel = formatToDMY(endDate.value) || 'akhir'
+    
+    downloadAnchor.href = downloadUrl
+    // Ekstensi file diubah menjadi .pdf
+    downloadAnchor.setAttribute('download', `Laporan_Penjualan_${startLabel}_sampai_${endLabel}.pdf`)
+    
+    document.body.appendChild(downloadAnchor)
+    downloadAnchor.click()
+    
+    // Cleanup
+    document.body.removeChild(downloadAnchor)
+    window.URL.revokeObjectURL(downloadUrl)
+
+    showSuccess("Laporan PDF berhasil diunduh")
+  } catch (err) {
+    console.error('Gagal mengunduh laporan PDF:', err)
+    
+    if (err.response && err.response.data instanceof Blob) {
+      const errorText = await err.response.data.text()
+      try {
+        const errorJson = JSON.parse(errorText)
+        showError(errorJson.message || 'Terjadi kesalahan pada server.')
+      } catch {
+        showError('Gagal mengunduh PDF. Server bermasalah.')
+      }
+    } else {
+      showError('Gagal mengunduh laporan PDF')
     }
   }
 }

@@ -43,6 +43,12 @@
         >
          Export Excel
         </button>
+        <button
+          @click="downloadAdminReportPDF"
+          class="w-full sm:w-auto px-5 py-2.5 bg-red-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-red-700 active:scale-95 transition"
+        >
+         Export PDF
+        </button>
 
       </div>
 
@@ -351,6 +357,56 @@ const fetchAdminStatistic = async () => {
 
 const applyFilter = () => {
   fetchAdminStatistic()
+}
+
+const downloadAdminReportPDF = async () => {
+  try {
+    const queryParams = {}
+    if (startDate.value) queryParams.start_date = formatToDMY(startDate.value)
+    if (endDate.value) queryParams.end_date = formatToDMY(endDate.value)
+
+    const response = await api.get('/report/admin/periodic-pdf', {
+      params: queryParams,
+      responseType: 'blob'
+    })
+
+    // Pastikan type menggunakan application/pdf
+    const contentType = response.headers['content-type'] || 'application/pdf'
+    const pdfBlob = new Blob([response.data], { type: contentType })
+    
+    const downloadUrl = window.URL.createObjectURL(pdfBlob)
+    const downloadAnchor = document.createElement('a')
+    
+    const startLabel = formatToDMY(startDate.value) || 'awal'
+    const endLabel = formatToDMY(endDate.value) || 'akhir'
+    const fileName = `Laporan_Admin_${startLabel}_sampai_${endLabel}.pdf`
+
+    downloadAnchor.href = downloadUrl
+    downloadAnchor.setAttribute('download', fileName)
+    
+    document.body.appendChild(downloadAnchor)
+    downloadAnchor.click()
+    
+    // Cleanup
+    document.body.removeChild(downloadAnchor)
+    window.URL.revokeObjectURL(downloadUrl)
+
+    showSuccess("Laporan PDF berhasil diunduh")
+  } catch (err) {
+    console.error('Gagal mengunduh laporan PDF:', err)
+    
+    if (err.response && err.response.data instanceof Blob) {
+      const errorText = await err.response.data.text()
+      try {
+        const errorJson = JSON.parse(errorText)
+        showError(errorJson.message || 'Terjadi kesalahan pada server.')
+      } catch {
+        showError('Gagal mengunduh PDF. Server bermasalah.')
+      }
+    } else {
+      showError('Gagal mengunduh PDF')
+    }
+  }
 }
 
 const exportExcel = async () => {
